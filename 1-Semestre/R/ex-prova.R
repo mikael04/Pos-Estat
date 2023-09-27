@@ -129,3 +129,13 @@ r_squared
 x = 0.6
 y_pred = a+b*x
 y_pred
+
+# i) Calcular o intervalo de confiança ----
+## Para o nível de confiança de 95%
+
+confint(m1)
+
+# intervalo de confiança de  (-1,94 , -1,00)
+# intervalo de confiança de b (2,20 , 3,67)
+
+
