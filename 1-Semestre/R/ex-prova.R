@@ -1,6 +1,6 @@
 ## Lendo os dados
 
-df <- readxl::read_excel("Dados/dados_exemplo.xlsx")
+df <- readxl::read_excel(here::here("1-Semestre/Dados/dados_exemplo.xlsx"))
 
 # a) ----
 ## Usando fórmulas aprendidas ----
@@ -48,7 +48,7 @@ r_xy <- Sxy/sqrt(Sxx*Syy)
 r_xy
 
 
-## Feito pelo Bard ----
+## Bard ----
 
 ## covariância de xy
 cov_xy <- cov(df$x, df$y)
@@ -68,24 +68,35 @@ r
 
 ## Usando fórmulas aprendidas ----
 
-## Feito pelo Bard ----
+## Bard ----
 t <- r * sqrt(1 - r^2 / nrow(df))
 t
 
 # c) Interpretação ----
 # Existe uma correlação forte positiva entre a razão de AIO3/NaOH empregada no processo produtivo e o teor de Na2O ocluído na Alumina
 
-# d) ----
+# d) Equação e linha de regressão ----
 # ŷ = a+bx
 # b = Sxy/Syy
 b = Sxy/Sxx
 b
 # a = y(med) - b*x(med)
+a = mean(df$y) - b*mean(df$x)
+a
 
-# Gráfico
-plot(df$x, df$y)
+## Regressão linear
+m1 <- lm(y~x, data=df)
 
-# Bard
+eq <- paste0("Equação da regressão: ŷ = ", a, " + ", b, "*x")
+eq
+
+## Valor qualquer
+x = 0.64
+
+y_pred = -1.6052+3.1428*x
+y_pred
+
+# Bard ----
 # Calcular o coeficiente angular e linear
 b <- (sum(df$x * df$y) - sum(df$y) * sum(df$y)) / (sum(df$y^2) - (sum(df$y))^2)
 a <- df$y[1] - b * df$y[1]
@@ -94,11 +105,27 @@ a <- df$y[1] - b * df$y[1]
 eq <- paste0("y = ", b, "x + ", a)
 
 
-m1 <- lm(y~x, data=df)
+## e) Gráfico de dispersão e regressão ----
+# Gráfico
+plot(df$x, df$y)
+abline(m1, col="red")
+
+# f) Coeficiente de determinação (R²) ----
+
+## Observando pelo summary
 summary(m1)
-0.4*b+a
 
--1.6052+3.1428*0.4
+## Calculando
+r_squared = b^2*Sxx/Syy
+r_squared
 
+## R: Calculando o índice de determinação de equação de regressão temos um valor considerado bom, indicando boa aproximação da relação entre as variáveis.
 
-y <- 0.03 * 0.655 + 0.4
+# g) Interpretação do coef. angular (b) ----
+
+# Temos um coeficiente angular de 3,1428 (b) indicando que para cada 1 unidade de variação da razão AI2O3/NaOH temos uma variação no teor de Na2O de 3,1428.
+
+# h) y_pred para x = 0,6 ----
+x = 0.6
+y_pred = a+b*x
+y_pred

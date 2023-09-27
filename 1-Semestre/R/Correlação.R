@@ -57,7 +57,7 @@ pcor.test(X1,X3,X2)					## coef. de correlacao parcial entre os grupos (1,3) vc 
 #
 # Coeficiente de correlacao parcial envolvendo mais de 3 variaveis
 # setwd("C:/Users/analu/Desktop/AULAS - REDE/STC - 854 - 02_2020/Correlacao")
-dados <- read.table(here::here("Dados/Material-Aulas/Material aula software R-20230822/dadoscor.txt"), head=T)
+dados <- read.table(here::here("1-Semestre/Dados/dadoscor.txt"), head=T)
 attach(dados)
 pcor.test(Var1,Var2,list(Var3,Var4))
 pcor.test(Var1,Var3,list(Var2,Var4))
