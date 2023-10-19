@@ -67,10 +67,11 @@ r
 # b) ----
 
 ## Usando fórmulas aprendidas ----
-
+tc <- r_xy * sqrt(nrow(df)-2) / sqrt(1 - r_xy^2)
+tc
 ## Bard ----
-t <- r * sqrt(1 - r^2 / nrow(df))
-t
+# t <- r * sqrt(1 - r^2 / nrow(df))
+# t
 
 # c) Interpretação ----
 # Existe uma correlação forte positiva entre a razão de AIO3/NaOH empregada no processo produtivo e o teor de Na2O ocluído na Alumina
