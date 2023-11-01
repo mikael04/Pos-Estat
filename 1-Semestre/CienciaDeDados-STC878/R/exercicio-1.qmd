@@ -1,0 +1,152 @@
+---
+title: "Exercício 1"
+author: "Mikael"
+format: html
+editor: visual
+date: 01/11/2023
+date-format: long
+lang: pt
+---
+
+# Aula de introdução à ciência de dados
+
+## Exercício 1
+
+### Manipulação de dados
+
+```{r, read-manip}
+
+## Lendo dados ----
+# df_sinasc <- data.table::fread(here::here("../../../1-Semestre/Ciência de dados - STC878/Dados/sinasc_2022.csv"))
+df_sinasc <- data.table::fread(here::here("1-Semestre/Ciência de dados - STC878/Dados/sinasc_2022.csv"))
+
+df_sinasc <- df_sinasc |> 
+  dplyr::select(UF, IDADEMAE, SEXO, RACACOR, PESO) |> 
+  dplyr::mutate(SEXO = as.factor(SEXO), RACACOR = as.factor(RACACOR),
+                PESO = as.numeric(PESO)) |> 
+  dplyr::mutate(SEXO =  forcats::fct_recode(SEXO, I = "0", M = "1", F = "2"),
+                RACACOR = forcats::fct_recode(RACACOR, Branca = "1", Preta = "2",
+                                              Amarela = "3", Parda = "4",
+                                              Indigena = "5"))
+```
+
+### Calculando a média por UF
+
+```{r, media-uf}
+
+media_idademae_uf <- df_sinasc |> 
+  dplyr::group_by(UF) |> 
+  dplyr::mutate(media_idade = mean(IDADEMAE, na.rm = T)) |> 
+  dplyr::distinct(UF, .keep_all = T) |>
+  dplyr::select(UF, media_idade) |> 
+  dplyr::arrange(desc(media_idade)) |> 
+  dplyr::ungroup()
+```
+
+A média de idade por Unidade Federativa é:
+
+```{r, table}
+library(gt)
+
+media_idademae_uf |> 
+  gt::gt() |> 
+  tab_header(title = "Média de idade da mãe por UF") %>%
+  cols_label(media_idade = "Idade em média") %>%
+  tab_source_note(source_note = "Fonte: SINASC") %>%
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = UF)
+  ) |>
+  fmt_number(
+    columns = media_idade,
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
+
+### Calculando a média por RACACOR
+
+```{r, media-racacor}
+
+media_idademae_racacor <- df_sinasc |> 
+  dplyr::filter(!is.na(RACACOR)) |> 
+  dplyr::group_by(RACACOR) |> 
+  dplyr::mutate(media_idade = mean(IDADEMAE, na.rm = T)) |> 
+  dplyr::distinct(RACACOR, .keep_all = T) |>
+  dplyr::select(RACACOR, media_idade) |> 
+  dplyr::arrange(desc(media_idade)) |> 
+  dplyr::ungroup()
+```
+
+A média de idade por Raça/Cor é:
+
+```{r, table-racacor}
+library(gt)
+
+media_idademae_racacor |> 
+  gt::gt() |> 
+  tab_header(title = "Média de idade da mãe por Raça/Cor") %>%
+  cols_label(media_idade = "Idade em média", RACACOR = "Raça/Cor") %>%
+  tab_source_note(source_note = "Fonte: SINASC") %>%
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = RACACOR)
+  ) |>
+  fmt_number(
+    columns = media_idade,
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
+
+### Calculando o percentual de nascidos vivos com baixo peso ao nascer
+
+```{r, media-racacor}
+
+df_baixoPeso <- df_sinasc |> 
+  dplyr::filter(!is.na(PESO), SEXO != "I") |> 
+  dplyr::mutate(baixopeso = ifelse(PESO < 2500, T, F)) |> 
+  dplyr::group_by(SEXO, baixopeso) |> 
+  dplyr::mutate(count = dplyr::n()) |> 
+  dplyr::distinct(SEXO, baixopeso, .keep_all = T) |>
+  dplyr::select(SEXO, baixopeso, count) |> 
+  dplyr::ungroup()
+
+# df_nasc2500g$perc <- df_nasc2500g$count/sum(df_nasc2500g$count)
+
+df_baixoPeso_perc <- df_baixoPeso |>
+  # dplyr::filter(baixopeso) |> 
+  dplyr::group_by(SEXO) |> 
+  dplyr::mutate(perc = count / sum(count)) |> 
+  dplyr::filter(baixopeso) |> 
+  dplyr::ungroup()
+
+
+df_baixoPeso_perc <- df_baixoPeso |>
+  dplyr::filter(baixopeso) |>
+  # dplyr::group_by(SEXO) |> 
+  dplyr::mutate(perc = count / sum(count)) |> 
+  dplyr::ungroup()
+```
+
+O percentual de nascidos vivos com baixo peso ao nascer, por sexo é:
+
+```{r, table-baixoPeso-sexo}
+library(gt)
+
+df_baixoPeso_perc |> 
+  dplyr::select(SEXO, perc) |> 
+  gt::gt() |> 
+  tab_header(title = "Percentual de nascidos vivos com baixo peso ao nascer por Sexo") %>%
+  cols_label(perc= "Percentual (em %)", SEXO = "Sexo") %>%
+  tab_source_note(source_note = "Fonte: SINASC") %>%
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = SEXO)
+  ) |>
+  fmt_number(
+    columns = perc,
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
