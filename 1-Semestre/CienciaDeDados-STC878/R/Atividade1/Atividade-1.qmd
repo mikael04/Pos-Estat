@@ -1,0 +1,219 @@
+---
+title: "Exercício 1"
+author: "Mikael"
+format: html
+editor: visual
+date: 01/11/2023
+date-format: long
+lang: pt
+---
+
+# Aula de introdução à ciência de dados
+
+## Atividade 1
+
+### 1, 2 e 3) Lendo base de dados e selecionando variáveis
+
+```{r, lendo-base}
+library(dplyr)
+
+## Lendo dados ----
+df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"))
+
+df_saeb <- df_saeb |> 
+  dplyr::select(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP, PROFICIENCIA_MT, NU_TIPO_NIVEL_INSE,
+                SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04) |> 
+  dplyr::mutate(dplyr::across(everything(), as.character))
+
+dplyr::glimpse(df_saeb)
+
+df_saeb_raw <- df_saeb
+
+```
+
+### 4) Alterando categorias das variáveis região e indicador de escola pública
+
+```{r, alterando-categorias}
+
+df_saeb <- df_saeb |> 
+  dplyr::mutate(
+    ID_REGIAO = case_when(
+      ID_REGIAO == "1" ~ "Norte",
+      ID_REGIAO == "2" ~ "Nordeste",
+      ID_REGIAO == "3" ~ "Sudeste",
+      ID_REGIAO == "4" ~ "Sul",
+      ID_REGIAO == "5" ~ "Centro-Oeste",
+      .default = "Sem Região"
+    ),
+    ID_UF = case_when(
+      ID_UF == "11" ~ "RO",
+      ID_UF == "12" ~ "AC",
+      ID_UF == "13" ~ "AM",
+      ID_UF == "14" ~ "RR",
+      ID_UF == "15" ~ "PA",
+      ID_UF == "16" ~ "AP",
+      ID_UF == "17" ~ "TO",
+      ID_UF == "21" ~ "MA",
+      ID_UF == "22" ~ "PI",
+      ID_UF == "23" ~ "CE",
+      ID_UF == "24" ~ "RN",
+      ID_UF == "25" ~ "PB",
+      ID_UF == "26" ~ "PE",
+      ID_UF == "27" ~ "AL",
+      ID_UF == "28" ~ "SE",
+      ID_UF == "29" ~ "BA",
+      ID_UF == "31" ~ "G",
+      ID_UF == "32" ~ "ES",
+      ID_UF == "33" ~ "RJ",
+      ID_UF == "35" ~ "SP",
+      ID_UF == "41" ~ "PR",
+      ID_UF == "42" ~ "SC",
+      ID_UF == "43" ~ "RS",
+      ID_UF == "50" ~ "MS",
+      ID_UF == "51" ~ "MT",
+      ID_UF == "52" ~ "GO",
+      ID_UF == "53" ~ "DF",
+      .default = "Sem Estado"
+    )
+  )
+  
+```
+
+### 5) Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa, por região:
+
+```{r, resultado-regiao}
+library(gt)
+
+resultado_regiao <- df_saeb |> 
+  dplyr::group_by(ID_UF) |> 
+  dplyr::mutate(
+    media_lp_por_UF = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    media_mt_por_UF = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
+    dp_lp_por_UF = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    dp_mt_por_UF = sd(as.numeric(PROFICIENCIA_MT), na.rm = T)
+  ) |> 
+  dplyr::distinct(ID_UF, .keep_all = T) |> 
+  dplyr::select(ID_UF, media_lp_por_UF, dp_lp_por_UF, media_mt_por_UF, dp_mt_por_UF) |> 
+  dplyr::ungroup()
+
+library(gt)
+
+resultado_regiao |> 
+  gt::gt() |> 
+  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa") |> 
+  cols_label(
+    ID_UF = "UF",
+    media_lp_por_UF = "Média de LP",
+    dp_lp_por_UF = "DP de LP",
+    media_mt_por_UF = "Média de MT",
+    dp_mt_por_UF = "DP de MT") |> 
+  tab_source_note(source_note = "Fonte: SAEB") |> 
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = ID_UF)
+  ) |>
+  fmt_number(
+    columns = c(media_lp_por_UF, media_mt_por_UF, dp_lp_por_UF, dp_mt_por_UF),
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
+
+Existem evidências de disparidade entre os estados, com o resultado mais baixo sendo -0.32 de nota média em português para o estado de Maranhão, e 0.27 de nota média de português no estado de Santa Catarina, para matemática temos um resultado parecido mantendo os mesmos estados com notas baixas e altas, apenas variando um pouco em valores. Porém, vemos que os desvios padrões são bem altos, ou seja, temos uma variação bem grande nestes dados.
+
+### 6) Calculando as médias e desvios padrões por sexo e tipo de escola (pública ou particular)
+
+```{r, resultado-racacor-sexo}
+# library(gt)
+
+resultado_sexo_tipoEscola <- df_saeb |> 
+  dplyr::group_by(SEXO, IN_PUBLICA) |> 
+  dplyr::mutate(
+    media_lp_por_sex_esc = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    media_mt_por_sex_esc = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
+    dp_lp_por_sex_esc = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    dp_mt_por_sex_esc = sd(as.numeric(PROFICIENCIA_MT), na.rm = T)
+  ) |> 
+  dplyr::distinct(SEXO, IN_PUBLICA, .keep_all = T) |> 
+  dplyr::select(SEXO, IN_PUBLICA, media_lp_por_sex_esc, dp_lp_por_sex_esc, media_mt_por_sex_esc, dp_mt_por_sex_esc) |> 
+  dplyr::ungroup()
+
+library(gt)
+
+resultado_sexo_tipoEscola |> 
+  gt::gt() |> 
+  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa por Sexo e Raça/Cor") |> 
+  cols_label(
+    SEXO = "Sexo",
+    IN_PUBLICA = "Escola pública ou particular",
+    media_lp_por_sex_esc = "Média de LP",
+    dp_lp_por_sex_esc = "DP de LP",
+    media_mt_por_sex_esc = "Média de MT",
+    dp_mt_por_sex_esc = "DP de MT") |> 
+  tab_source_note(source_note = "Fonte: SAEB") |> 
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = c(SEXO, IN_PUBLICA))
+  ) |>
+  fmt_number(
+    columns = c(media_lp_por_sex_esc, media_mt_por_sex_esc, dp_lp_por_sex_esc, dp_mt_por_sex_esc),
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
+
+### 7) Calculando as mediana, média e desvios padrões na proeficiência dos alunos em mat e port por categoria de nível social
+
+```{r, resultado-racacor-sexo}
+# library(gt)
+
+resultado_nivel <- df_saeb |> 
+  dplyr::filter(!is.na(NU_TIPO_NIVEL_INSE)) |> 
+  dplyr::group_by(NU_TIPO_NIVEL_INSE) |> 
+  dplyr::mutate(
+    media_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    media_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
+    dp_lp_por_nivel = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    dp_mt_por_nivel = sd(as.numeric(PROFICIENCIA_MT), na.rm = T),
+    mediana_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
+    mediana_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT), na.rm = T)
+  ) |> 
+  dplyr::distinct(NU_TIPO_NIVEL_INSE, .keep_all = T) |> 
+  dplyr::select(NU_TIPO_NIVEL_INSE, media_lp_por_nivel, dp_lp_por_nivel, mediana_lp_por_nivel, 
+                media_mt_por_nivel, dp_mt_por_nivel, mediana_mt_por_nivel) |> 
+  dplyr::ungroup()
+
+library(gt)
+
+resultado_nivel |> 
+  gt::gt() |> 
+  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa por Sexo e Raça/Cor") |> 
+  cols_label(
+    NU_TIPO_NIVEL_INSE = "Nível Socioeconômico",
+    media_lp_por_nivel = "Média de LP",
+    dp_lp_por_nivel = "DP de LP",
+    media_mt_por_nivel = "Média de MT",
+    dp_mt_por_nivel = "DP de MT") |> 
+  tab_source_note(source_note = "Fonte: SAEB") |> 
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = c(NU_TIPO_NIVEL_INSE))
+  ) |>
+  fmt_number(
+    columns = c(media_lp_por_nivel, media_mt_por_nivel, dp_lp_por_nivel, dp_mt_por_nivel),
+    decimals = 2,
+    use_seps = FALSE
+  )
+```
+
+### 8) Salvando resultado
+
+```{r, salvando-resultados}
+
+data.table::fwrite(resultado_regiao, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_regiao.csv"))
+data.table::fwrite(resultado_sexo_tipoEscola, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_sexo_tipoEscola.csv"))
+data.table::fwrite(resultado_nivel, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_nivel.csv"))
+
+
+
+```

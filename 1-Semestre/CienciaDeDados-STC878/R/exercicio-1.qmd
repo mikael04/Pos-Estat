@@ -78,7 +78,7 @@ media_idademae_racacor <- df_sinasc |>
   dplyr::ungroup()
 ```
 
-A média de idade por Raça/Cor é: 
+A média de idade por Raça/Cor é:
 
 ```{r, table-racacor}
 library(gt)
@@ -129,7 +129,7 @@ df_baixoPeso_perc <- df_baixoPeso |>
   dplyr::ungroup()
 ```
 
-O percentual de nascidos vivos com baixo peso ao nascer, por sexo é: 
+O percentual de nascidos vivos com baixo peso ao nascer, por sexo é:
 
 ```{r, table-baixoPeso-sexo}
 library(gt)
