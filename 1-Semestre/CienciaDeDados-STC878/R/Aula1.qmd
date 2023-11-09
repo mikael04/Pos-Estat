@@ -1,5 +1,5 @@
 ---
-title: "Exercício 1"
+title: "Aula 1"
 author: "Mikael"
 format: html
 editor: visual
@@ -18,10 +18,10 @@ lang: pt
 
 ## Lendo dados ----
 # df_sinasc <- data.table::fread(here::here("../../../1-Semestre/Ciência de dados - STC878/Dados/sinasc_2022.csv"))
-df_sinasc <- data.table::fread(here::here("1-Semestre/Ciência de dados - STC878/Dados/sinasc_2022.csv"))
+df_sinasc <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/sinasc_2022.csv"))
 
 df_sinasc <- df_sinasc |> 
-  dplyr::select(UF, IDADEMAE, SEXO, RACACOR, PESO) |> 
+  dplyr::select(UF, IDADEMAE, SEXO, RACACOR, PESO, DTNASC, PARTO) |> 
   dplyr::mutate(SEXO = as.factor(SEXO), RACACOR = as.factor(RACACOR),
                 PESO = as.numeric(PESO)) |> 
   dplyr::mutate(SEXO =  forcats::fct_recode(SEXO, I = "0", M = "1", F = "2"),
@@ -149,4 +149,60 @@ df_baixoPeso_perc |>
     decimals = 2,
     use_seps = FALSE
   )
+```
+
+
+### Calculando nascimentos por mês
+
+```{r, table-baixoPeso-sexo}
+df_sinasc_data <- df_sinasc |> 
+  dplyr::mutate(data = lubridate::dmy(DTNASC),
+                mes = lubridate::month(data),
+                dia = lubridate::wday(data))
+
+df_sinasc_data |> 
+  dplyr::group_by(mes) |> 
+  dplyr::summarise(quant = mean())
+
+df_sinasc_data |> 
+  dplyr::filter(!is.na(PARTO) & PARTO != "9") |> 
+  dplyr::group_by(PARTO, dia) |> 
+  dplyr::summarise(quant = dplyr::n()) |> 
+  View()
+```
+
+
+### Distribuição por UF de nascimentos
+
+```{r, ggplot-nascimentos-uf}
+
+library(dplyr)
+
+df_sinasc_nasc_uf <- df_sinasc |> 
+  dplyr::group_by(UF) |> 
+  dplyr::summarise(Quantidade = n())
+
+library(gt)
+df_sinasc_nasc_uf |>
+  gt::gt() |>
+  tab_header(title = "Distribuição por UF de nascimentos") |>
+  cols_label(
+    UF = "UF",
+    Quantidade = "Quantidade de nascimentos") |>
+  tab_source_note(source_note = "Fonte: SINASC") |>
+  tab_style(
+    style = list(cell_fill(color = "#F4F4F4")),
+    locations = cells_body(columns = UF)
+  )
+
+df_sinasc_nasc_uf |> 
+  ggplot(aes(y = forcats::fct_reorder(UF, Quantidade), x = Quantidade)) +
+  geom_col(fill = "cyan") +
+  theme_classic()+
+  labs(
+    x = "Contagem",
+    y = "UF",
+    title = "Quantidade de nascimentos por estado"
+  )
+  
 ```

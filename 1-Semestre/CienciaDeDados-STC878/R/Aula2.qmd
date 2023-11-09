@@ -1,0 +1,180 @@
+---
+title: "Aula 2"
+author: "Mikael"
+format: html
+editor: visual
+date: 09/11/2023
+date-format: long
+lang: pt
+---
+
+# Aula de de viualização de dados (ggplot2)
+
+## GGplot com dispersão do tamanho das pétalas da base iris
+
+```{r, ggplot-iris-point}
+library(ggplot2)
+
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point() +
+  theme_minimal() +
+  labs(
+    x = "Comprimento da pétala",
+    y = "Largura da pétala",
+    title = "Dispersão das flores por tamanho da pétala"
+  )
+
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(color = "#660000", size = 2) +
+  theme_classic() +
+  labs(
+    x = "Comprimento da pétala",
+    y = "Largura da pétala",
+    title = "Dispersão das flores por tamanho da pétala"
+  )
+
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Sepal.Width > 3.5), size = 2) +
+  theme_classic() +
+  labs(
+    x = "Comprimento da pétala",
+    y = "Largura da pétala",
+    title = "Dispersão das flores por tamanho da pétala"
+  )
+
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(size = Sepal.Width > 3.5)) +
+  theme_classic() +
+  labs(
+    x = "Comprimento da pétala",
+    y = "Largura da pétala",
+    title = "Dispersão das flores por tamanho da pétala"
+  )
+
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species)) +
+  theme_classic() +
+  labs(
+    x = "Comprimento da pétala",
+    y = "Largura da pétala",
+    title = "Dispersão das flores por tamanho da pétala",
+    color = "Espécies",
+    caption = "Fonte: autor"
+  )
+
+
+```
+
+
+
+## GGplot com dispersão do tamanho das pétalas da base iris
+
+```{r, ggplot-iris-hist}
+library(ggplot2)
+
+ggplot(data = iris, aes(x = Sepal.Length)) +
+  geom_histogram(color = "white", fill = "cyan") +
+  theme_minimal()+
+  labs(
+    title = "Histograma do comprimento das pétalas",
+    y = "Contagem",
+    x = "Agrupamento da pétala"
+  )
+```
+
+## GGplot com dispersão do tamanho das pétalas da base iris
+
+```{r, ggplot-iris-dens}
+library(ggplot2)
+
+ggplot(data = iris, aes(x = Sepal.Length)) +
+  geom_density(color = "cyan", fill = "green") +
+  theme_minimal()+
+  labs(
+    title = "Gráfico de densidade do comprimento das pétalas",
+    y = "Contagem",
+    x = "Agrupamento da pétala"
+  )
+
+iris <- iris
+ggplot(data = iris, aes(x = Sepal.Length, color = Species)) +
+  geom_density() +
+  theme_minimal()+
+  labs(
+    title = "Gráfico de densidade do comprimento das pétalas",
+    y = "Contagem",
+    x = "Agrupamento da pétala"
+  )
+
+## Posso usar o aes dentro do ggplot (para todos os próximos geometras) ou direto numa geometria
+ggplot(data = iris) +
+  geom_density( aes(x = Sepal.Length, color = Species)) +
+  theme_minimal()+
+  labs(
+    title = "Gráfico de densidade do comprimento das pétalas",
+    y = "Contagem",
+    x = "Agrupamento da pétala"
+  )
+
+
+## Posso usar o aes dentro do ggplot (para todos os próximos geometras) ou direto numa geometria
+ggplot(data = iris, aes(x = Sepal.Length, color = Species)) +
+  # geom_histogram(fill = "white") +
+  geom_density() +
+  theme_classic()+
+  labs(
+    title = "Gráfico de densidade do comprimento da sépalas",
+    y = "Densidade",
+    x = "Agrupamento da sépala",
+    color = "Espécie"
+  )
+```
+
+
+## GGplot com dispersão do tamanho das pétalas da base iris
+
+```{r, ggplot-diamons-barra}
+
+library(ggplot2)
+library(dplyr)
+
+diamonds |> 
+  dplyr::group_by(color) |> 
+  dplyr::mutate(quantidade = n()) |> 
+  dplyr::distinct(color, .keep_all = T) |>
+  dplyr::select(color, quantidade) |> 
+  dplyr::ungroup() |> 
+  ggplot(aes(x = color, y = quantidade)) +
+  geom_col(fill = "cyan", color = "white") +
+  theme_classic() +
+  labs(
+    x = "Cor",
+    y = "Quantidade",
+    title = "Contagem de diamantes por cor"
+  )
+  
+diamonds |> 
+  dplyr::group_by(color) |> 
+  dplyr:::summarise(quantidade = n()) |> 
+  ggplot(aes(x = forcats::fct_reorder(color, desc(quantidade)), y = quantidade)) +
+  geom_bar(fill = "cyan", color = "white", stat="identity") +
+  theme_classic() +
+  labs(
+    x = "Cor",
+    y = "Quantidade",
+    title = "Contagem de diamantes por cor"
+  )
+
+
+diamonds |> 
+  dplyr::group_by(color) |> 
+  dplyr:::summarise(quantidade = n()) |> 
+  ggplot(aes(x = forcats::fct_reorder(color, desc(quantidade)), y = quantidade)) +
+  geom_col(fill = "cyan", color = "white") +
+  theme_classic() +
+  labs(
+    x = "Cor",
+    y = "Quantidade",
+    title = "Contagem de diamantes por cor"
+  )
+```

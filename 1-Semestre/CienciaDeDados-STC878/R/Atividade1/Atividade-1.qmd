@@ -38,14 +38,30 @@ params:
 library(dplyr)
 
 ## Lendo dados ----
-df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"))
+df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"),
+                             select = c("ID_REGIAO", "ID_UF", "IN_PUBLICA", "PROFICIENCIA_LP", "PROFICIENCIA_MT", "NU_TIPO_NIVEL_INSE",
+                                    "TX_RESP_Q01", "TX_RESP_Q04")) |> 
+  dplyr::rename(SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04)
+
+# df_saeb <- df_saeb |> 
+#   dplyr::mutate(dplyr::across(.cols("ID_REGIAO"), ~ .x as.character))
+
+# df_saeb <- readr::read_delim(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"),
+#                              delim=",",
+#                              col_types = readr::cols_only(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP, PROFICIENCIA_MT, NU_TIPO_NIVEL_INSE, SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04))
+
+
+a <- integer(100)
+b <- double(100)
+object.size(a)
+object.size()
 
 df_saeb <- df_saeb |> 
   dplyr::select(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP, PROFICIENCIA_MT, NU_TIPO_NIVEL_INSE,
                 SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04) |> 
   dplyr::mutate(dplyr::across(everything(), as.character))
 
-df_saeb_raw <- df_saeb
+# df_saeb_raw <- df_saeb
 
 ```
 
