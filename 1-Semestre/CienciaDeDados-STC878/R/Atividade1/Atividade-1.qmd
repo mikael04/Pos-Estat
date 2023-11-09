@@ -1,13 +1,33 @@
 ---
-title: "Exercício 1"
+title: "Atividade 1"
 author: "Mikael"
-format: html
-editor: visual
+toc: true
 date: 01/11/2023
 date-format: long
 lang: pt
+execute:
+  warning: false
+cache: TRUE
+theme: cerulean
+reference-location: margin
+code-fold: true
+format:
+  html:
+    output-file: Atividade_1.html
+  docx: 
+    output-file: Atividade_1.docx
+    toc: true
+    number-sections: true
+    highlight-style: github
+params:
+  run_all_code: "T"
+  overwrite_tables: "T"
+  use_db: "T"
+  debug: "F"
 ---
 
+```{r, header}
+```
 # Aula de introdução à ciência de dados
 
 ## Atividade 1
@@ -25,8 +45,6 @@ df_saeb <- df_saeb |>
                 SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04) |> 
   dplyr::mutate(dplyr::across(everything(), as.character))
 
-dplyr::glimpse(df_saeb)
-
 df_saeb_raw <- df_saeb
 
 ```
@@ -34,7 +52,6 @@ df_saeb_raw <- df_saeb
 ### 4) Alterando categorias das variáveis região e indicador de escola pública
 
 ```{r, alterando-categorias}
-
 df_saeb <- df_saeb |> 
   dplyr::mutate(
     ID_REGIAO = case_when(
@@ -79,7 +96,7 @@ df_saeb <- df_saeb |>
   
 ```
 
-### 5) Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa, por região:
+### 5) Média e desvio padrão das proeficiências em Língua Portuguesa e Matemática, por UF:
 
 ```{r, resultado-regiao}
 library(gt)
@@ -96,18 +113,16 @@ resultado_regiao <- df_saeb |>
   dplyr::select(ID_UF, media_lp_por_UF, dp_lp_por_UF, media_mt_por_UF, dp_mt_por_UF) |> 
   dplyr::ungroup()
 
-library(gt)
-
-resultado_regiao |> 
-  gt::gt() |> 
-  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa") |> 
+resultado_regiao |>
+  gt::gt() |>
+  tab_header(title = "Média e desvio padrão das proeficiências em Língua Portuguesa e Matemática") |>
   cols_label(
     ID_UF = "UF",
     media_lp_por_UF = "Média de LP",
     dp_lp_por_UF = "DP de LP",
     media_mt_por_UF = "Média de MT",
-    dp_mt_por_UF = "DP de MT") |> 
-  tab_source_note(source_note = "Fonte: SAEB") |> 
+    dp_mt_por_UF = "DP de MT") |>
+  tab_source_note(source_note = "Fonte: SAEB") |>
   tab_style(
     style = list(cell_fill(color = "#F4F4F4")),
     locations = cells_body(columns = ID_UF)
@@ -117,16 +132,41 @@ resultado_regiao |>
     decimals = 2,
     use_seps = FALSE
   )
+
+# data.table::fwrite(resultado_regiao, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_regiao.csv"))
+
+# resultado_regiao_gt  |> gtsave(filename = here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_regiao.html"))
+
+library(DT)
+
+## Preparando tabela para impressão
+
+resultado_regiao_dt <- resultado_regiao |> 
+  dplyr::mutate(media_lp_por_UF = round(media_lp_por_UF, 2), dp_lp_por_UF = round(dp_lp_por_UF, 2),
+                media_mt_por_UF = round(media_mt_por_UF, 2), dp_mt_por_UF = round(dp_mt_por_UF, 2)) |> 
+  dplyr::rename(UF = ID_UF, "Média de LP" = media_lp_por_UF, "DP de LP" = dp_lp_por_UF, 
+                "Média de MT" = media_mt_por_UF, "DP de MT" = dp_mt_por_UF) |> 
+  datatable(options = list(
+  order = list(list(2, 'asc'), list(4, 'asc'))
+))
+
+resultado_regiao_dt |> htmlwidgets::saveWidget(here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_regiao.html"))
+
+resultado_regiao_dt
+
 ```
+
+#### *Resultado*
 
 Existem evidências de disparidade entre os estados, com o resultado mais baixo sendo -0.32 de nota média em português para o estado de Maranhão, e 0.27 de nota média de português no estado de Santa Catarina, para matemática temos um resultado parecido mantendo os mesmos estados com notas baixas e altas, apenas variando um pouco em valores. Porém, vemos que os desvios padrões são bem altos, ou seja, temos uma variação bem grande nestes dados.
 
-### 6) Calculando as médias e desvios padrões por sexo e tipo de escola (pública ou particular)
+### 6) Calculando as médias e desvios padrões das proeficiências em Língua Portuguêsa e Matemática por sexo e tipo de escola (pública ou particular)
 
-```{r, resultado-racacor-sexo}
+```{r, resultado-sexo-escola}
 # library(gt)
 
 resultado_sexo_tipoEscola <- df_saeb |> 
+  dplyr::filter(SEXO != "." & SEXO != "*") |> 
   dplyr::group_by(SEXO, IN_PUBLICA) |> 
   dplyr::mutate(
     media_lp_por_sex_esc = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
@@ -134,15 +174,18 @@ resultado_sexo_tipoEscola <- df_saeb |>
     dp_lp_por_sex_esc = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
     dp_mt_por_sex_esc = sd(as.numeric(PROFICIENCIA_MT), na.rm = T)
   ) |> 
+  dplyr::mutate(SEXO = if_else(SEXO == "A", "Masculino", if_else(SEXO == "B", "Feminino", "Branco ou nulo")),
+                IN_PUBLICA = if_else(IN_PUBLICA == "0", "Privada", if_else(IN_PUBLICA == "1", "Pública", "Inválido"))) |> 
   dplyr::distinct(SEXO, IN_PUBLICA, .keep_all = T) |> 
   dplyr::select(SEXO, IN_PUBLICA, media_lp_por_sex_esc, dp_lp_por_sex_esc, media_mt_por_sex_esc, dp_mt_por_sex_esc) |> 
+  dplyr::arrange(SEXO, desc(IN_PUBLICA)) |> 
   dplyr::ungroup()
 
 library(gt)
 
 resultado_sexo_tipoEscola |> 
   gt::gt() |> 
-  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa por Sexo e Raça/Cor") |> 
+  tab_header(title = "Média e desvio padrão das proeficiências em Língua Portuguesa e Matemática por Sexo e Raça/Cor") |> 
   cols_label(
     SEXO = "Sexo",
     IN_PUBLICA = "Escola pública ou particular",
@@ -160,11 +203,32 @@ resultado_sexo_tipoEscola |>
     decimals = 2,
     use_seps = FALSE
   )
+
+
+## Preparando tabela para impressão
+
+resultado_sexo_tipoEscola_dt <- resultado_sexo_tipoEscola |> 
+  dplyr::mutate(media_lp_por_sex_esc = round(media_lp_por_sex_esc, 2), dp_lp_por_sex_esc = round(dp_lp_por_sex_esc, 2),
+                media_mt_por_sex_esc = round(media_mt_por_sex_esc, 2), dp_mt_por_sex_esc = round(dp_mt_por_sex_esc, 2)) |> 
+  dplyr::rename(Sexo = SEXO, Escola = IN_PUBLICA, 
+                "Média de LP" = media_lp_por_sex_esc, "DP de LP" = dp_lp_por_sex_esc, 
+                "Média de MT" = media_mt_por_sex_esc, "DP de MT" = dp_mt_por_sex_esc) |> 
+  datatable(options = list(
+  order = list(list(1, 'asc'), list(2, 'desc'))
+)) 
+
+resultado_sexo_tipoEscola_dt |> htmlwidgets::saveWidget(here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_sexo_tipoEscola.html"))
+
+resultado_sexo_tipoEscola_dt
 ```
 
-### 7) Calculando as mediana, média e desvios padrões na proeficiência dos alunos em mat e port por categoria de nível social
+#### *Resultado*
 
-```{r, resultado-racacor-sexo}
+Podemos observar uma pequena variáção entre os sexos Masculino e Feminino, porém a diferença é bem mais expressiva se compararmos os tipos de escola, entre públicas e privadas, em ambos os sexos.
+
+### 7) Calculando as mediana, média e desvios padrões na proeficiência dos alunos em Língua Portuguêsa e Matemática por categoria de nível social
+
+```{r, resultado-nivel}
 # library(gt)
 
 resultado_nivel <- df_saeb |> 
@@ -181,30 +245,69 @@ resultado_nivel <- df_saeb |>
   dplyr::distinct(NU_TIPO_NIVEL_INSE, .keep_all = T) |> 
   dplyr::select(NU_TIPO_NIVEL_INSE, media_lp_por_nivel, dp_lp_por_nivel, mediana_lp_por_nivel, 
                 media_mt_por_nivel, dp_mt_por_nivel, mediana_mt_por_nivel) |> 
+  dplyr::arrange(NU_TIPO_NIVEL_INSE) |> 
   dplyr::ungroup()
 
 library(gt)
 
 resultado_nivel |> 
   gt::gt() |> 
-  tab_header(title = "Média e desvio padrão das proeficiências em Matemática e Língua Portuguesa por Sexo e Raça/Cor") |> 
+  tab_header(title = "Média e desvio padrão das proeficiências em Língua Portuguesa e Matemática por Sexo e Raça/Cor") |> 
   cols_label(
     NU_TIPO_NIVEL_INSE = "Nível Socioeconômico",
     media_lp_por_nivel = "Média de LP",
     dp_lp_por_nivel = "DP de LP",
+    mediana_lp_por_nivel  = "Mediana de LP",
     media_mt_por_nivel = "Média de MT",
-    dp_mt_por_nivel = "DP de MT") |> 
+    dp_mt_por_nivel = "DP de MT",
+    mediana_mt_por_nivel = "Mediana de MT") |> 
   tab_source_note(source_note = "Fonte: SAEB") |> 
   tab_style(
     style = list(cell_fill(color = "#F4F4F4")),
     locations = cells_body(columns = c(NU_TIPO_NIVEL_INSE))
   ) |>
   fmt_number(
-    columns = c(media_lp_por_nivel, media_mt_por_nivel, dp_lp_por_nivel, dp_mt_por_nivel),
+    columns = c(media_lp_por_nivel, media_mt_por_nivel, dp_lp_por_nivel, dp_mt_por_nivel,
+                mediana_lp_por_nivel, mediana_mt_por_nivel),
     decimals = 2,
     use_seps = FALSE
   )
+
+
+## Preparando tabela para impressão
+
+resultado_nivel_dt <- resultado_nivel |> 
+  dplyr::mutate(
+    NU_TIPO_NIVEL_INSE = case_when(
+      NU_TIPO_NIVEL_INSE == "1" ~ "Nível 1",
+      NU_TIPO_NIVEL_INSE == "2" ~ "Nível 2",
+      NU_TIPO_NIVEL_INSE == "3" ~ "Nível 3",
+      NU_TIPO_NIVEL_INSE == "4" ~ "Nível 4",
+      NU_TIPO_NIVEL_INSE == "5" ~ "Nível 5",
+      NU_TIPO_NIVEL_INSE == "6" ~ "Nível 6",
+      NU_TIPO_NIVEL_INSE == "7" ~ "Nível 7",
+      NU_TIPO_NIVEL_INSE == "8" ~ "Nível 8",
+      .default = "Sem nível"
+    )) |> 
+  dplyr::mutate(media_lp_por_nivel = round(media_lp_por_nivel, 2), dp_lp_por_nivel = round(dp_lp_por_nivel, 2),
+                media_mt_por_nivel = round(media_mt_por_nivel, 2), dp_mt_por_nivel = round(dp_mt_por_nivel, 2),
+                mediana_lp_por_nivel = round(mediana_lp_por_nivel, 2), mediana_mt_por_nivel = round(mediana_mt_por_nivel, 2)) |> 
+  dplyr::rename("Nível Socioeconômico" = NU_TIPO_NIVEL_INSE,
+                "Média de LP" = media_lp_por_nivel, "DP de LP" = dp_lp_por_nivel, 
+                "Média de MT" = media_mt_por_nivel, "DP de MT" = dp_mt_por_nivel, 
+                "Mediana de LP" = mediana_lp_por_nivel, "Mediana de MT" = mediana_mt_por_nivel) |> 
+  datatable(options = list(
+  order = list(list(1, 'asc'))
+))
+
+resultado_nivel_dt |> htmlwidgets::saveWidget(here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_nivel.html"))
+
+resultado_nivel_dt
+
 ```
+
+#### *Resultado*
+A evolução conforme o nível econômico também é bem clara, mostrando como os níveis mais baixos possuem os menores valores e como a média só cresce conforme o nível socioeconômico aumenta.
 
 ### 8) Salvando resultado
 
@@ -213,7 +316,5 @@ resultado_nivel |>
 data.table::fwrite(resultado_regiao, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_regiao.csv"))
 data.table::fwrite(resultado_sexo_tipoEscola, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_sexo_tipoEscola.csv"))
 data.table::fwrite(resultado_nivel, here::here("1-Semestre/CienciaDeDados-STC878/R/Atividade1/resultado_nivel.csv"))
-
-
 
 ```
