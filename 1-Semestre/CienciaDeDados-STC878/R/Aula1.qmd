@@ -151,7 +151,6 @@ df_baixoPeso_perc |>
   )
 ```
 
-
 ### Calculando nascimentos por mês
 
 ```{r, table-baixoPeso-sexo}
@@ -170,7 +169,6 @@ df_sinasc_data |>
   dplyr::summarise(quant = dplyr::n()) |> 
   View()
 ```
-
 
 ### Distribuição por UF de nascimentos
 

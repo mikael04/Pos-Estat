@@ -1,0 +1,20 @@
+Os jogos de tabuleiro são uma forma de entretenimento popular há séculos. Eles podem ser jogados por pessoas de todas as idades e origens, e oferecem uma variedade de desafios e experiências.
+
+Ao longo dos anos, muitos jogos de tabuleiro foram lançados, e cada um deles recebeu uma nota por parte dos críticos e jogadores. Essas notas podem ser úteis para os consumidores que estão procurando um novo jogo de tabuleiro, mas podem ser subjetivas e variar de pessoa para pessoa.
+
+Este artigo apresenta uma abordagem para prever a nota dada a um jogo de tabuleiro com base em dados objetivos. Os dados utilizados incluem informações sobre o jogo, como o número de jogadores, o tempo de jogo, o tema e o mecanismo.
+
+A previsão da nota de um jogo de tabuleiro pode ser útil para os seguintes propósitos:
+
+Ajudar os consumidores a tomar uma decisão informada sobre qual jogo comprar;
+Auxiliar os designers de jogos a criar jogos que sejam mais bem recebidos pelos críticos e jogadores;
+Fornecer informações sobre as tendências do mercado de jogos de tabuleiro.
+O objetivo deste artigo é apresentar uma abordagem que seja eficaz na previsão da nota de um jogo de tabuleiro. A abordagem é baseada em um modelo de aprendizado de máquina, que é treinado em um conjunto de dados de jogos de tabuleiro já avaliados.
+
+O artigo está organizado da seguinte forma:
+
+A seção Revisões de jogos de tabuleiro fornece uma breve revisão da literatura sobre a avaliação de jogos de tabuleiro.
+A seção Dados descreve os dados que serão utilizados neste estudo.
+A seção Modelo apresenta o modelo de aprendizado de máquina que será utilizado para prever a nota de um jogo de tabuleiro.
+A seção Resultados apresenta os resultados da avaliação do modelo.
+A seção Conclusão conclui o artigo e discute as implicações dos resultados.

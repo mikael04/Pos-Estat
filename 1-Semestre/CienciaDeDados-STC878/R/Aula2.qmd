@@ -65,8 +65,6 @@ ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
 
 ```
 
-
-
 ## GGplot com dispersão do tamanho das pétalas da base iris
 
 ```{r, ggplot-iris-hist}
@@ -130,7 +128,6 @@ ggplot(data = iris, aes(x = Sepal.Length, color = Species)) +
   )
 ```
 
-
 ## GGplot com dispersão do tamanho das pétalas da base iris
 
 ```{r, ggplot-diamons-barra}
@@ -177,4 +174,128 @@ diamonds |>
     y = "Quantidade",
     title = "Contagem de diamantes por cor"
   )
+```
+
+
+## Exercício 
+
+```{r, lendo-dados-sinasc}
+df_sinasc <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/sinasc_2022.csv"))
+
+df_sinasc <- df_sinasc |> 
+  dplyr::select(UF, IDADEMAE, SEXO, RACACOR, PESO, DTNASC, PARTO) |> 
+  dplyr::mutate(SEXO = as.factor(SEXO), RACACOR = as.factor(RACACOR),
+                PESO = as.numeric(PESO)) |> 
+  dplyr::mutate(SEXO =  forcats::fct_recode(SEXO, I = "0", M = "1", F = "2"),
+                RACACOR = forcats::fct_recode(RACACOR, Branca = "1", Preta = "2",
+                                              Amarela = "3", Parda = "4",
+                                              Indigena = "5"))
+```
+
+### Nascidos por UF
+
+```{r, grafico-sinasc-freq}
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_sinasc |> 
+  dplyr::group_by(UF) |> 
+  dplyr:::summarise(quantidade = n()) |> 
+  ggplot(aes(y = quantidade, x = UF)) +
+  # geom_bar(stat = "identity") +
+  geom_col(fill = "cyan", color = "white") +
+  theme_classic() +
+  labs(
+    x = "UF",
+    y = "",
+    title = "Quantidade de nascimentos por UF",
+  ) +
+  scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))
+
+```
+### Quantidade de nascidos ao longo dos meses (2022)
+
+```{r, grafico-sinasc-freq}
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_sinasc_line <- df_sinasc |> 
+  dplyr::mutate(data_nasc = lubridate::dmy(DTNASC),
+                month = lubridate::month(data_nasc)) |> 
+  dplyr::group_by(month) |> 
+  dplyr:::summarise(quantidade = n())
+
+# df_sinasc$mes <- forcats::fct_relevel(df_sinasc$month, 
+#              "1" = "Jan", "2" = "Fev", "3" = "Mar", "4" = "Abr", "5" =  "Mai",
+#              "6" = "Jun", "7" = "Jul", "8" = "Ago", "9" = "Set", "10" = "Out",
+#              "11" = "Nov", "12" = "Dez")
+# 
+# df_sinasc$mes <- factor(df_sinasc$month, levels = c(
+#              "Jan", "Fev", "Mar", "Abr", "Mai",
+#              "Jun", "Jul", "Ago", "Set", "Out",
+#              "Nov", "Dez"))
+  
+ggplot(data = df_sinasc_line, aes(y = quantidade, x = month)) +
+  geom_line(color = "cyan") +
+  theme_classic() +
+  labs(
+    x = "Meses",
+    y = "",
+    title = "Quantidade de nascimentos por mês (em 2022)",
+  ) +
+  scale_y_continuous(labels = unit_format(unit = "mil", scale = 1e-3)) +
+  scale_x_continuous(breaks = 1:12)
+
+```
+### Analisar a distribuição do peso dos nascidos entre os sexos (boxplot)
+
+```{r, grafico-sinasc-freq}
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_sinasc_boxplot <- df_sinasc |> 
+  dplyr::filter(SEXO != "I") |> 
+  dplyr::filter(!is.na(PESO))
+  
+ggplot(data = df_sinasc_boxplot, aes(y = PESO, x = SEXO)) +
+  geom_boxplot() +
+  theme_classic() +
+  labs(
+    x = "Sexos",
+    y = "",
+    title = "Distribuição dos pesos por sexo",
+  ) +
+  scale_y_continuous(labels = unit_format(unit = "kg", scale = 1e-3))
+
+```
+### Analisar a distribuição do peso dos nascidos entre os sexos (Densidade)
+
+```{r, grafico-sinasc-freq}
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_sinasc_boxplot <- df_sinasc |> 
+  dplyr::filter(SEXO != "I") |> 
+  dplyr::filter(!is.na(PESO))
+  
+ggplot(data = df_sinasc_boxplot, aes(y = PESO, color = SEXO)) +
+  geom_density() +
+  theme_classic() +
+  labs(
+    x = "Sexos",
+    y = "",
+    title = "Distribuição dos pesos por sexo",
+  ) +
+  scale_y_continuous(labels = unit_format(unit = "kg", scale = 1e-3),
+                     breaks = c(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000)) +
+  coord_flip()
+
 ```
