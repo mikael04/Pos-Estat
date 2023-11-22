@@ -1,0 +1,82 @@
+---
+title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
+author: "Mikael"
+format: html
+editor: visual
+date: 09/11/2023
+date-format: long
+lang: pt
+---
+
+# Introdução
+
+
+
+```{r, leitura-limpeza-dados}
+dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx")))
+
+df_bg <- dataset_bg |>
+  dplyr::select(id = ID, name = Name, year = `Year Published`, min_p = `Min Players`, max_p = `Max Players`,
+                playtime = `Play Time`, min_age = `Min Age`, users_rat = `Users Rated`,
+                compl = `Complexity Average`, own_users = `Owned Users`,
+                score = `Rating Average`) |> 
+  dplyr::mutate(year = as.numeric(year))
+
+```
+
+## Limpando dados
+
+Agora serão investigados os dados faltantes na base de dados.
+
+```{r, filter-data}
+df_bg |> 
+  dplyr::filter(is.na(year))
+
+## Apenas uma observação sem ano, será removida
+
+
+df_bg |> 
+  dplyr::filter(is.na(own_users))
+
+## 23 jogos pouco avaliados e menos conhecidos, também serão removidos
+
+
+df_bg <- df_bg |> 
+  dplyr::filter(!is.na(own_users) & !is.na(year)) |> 
+  dplyr::select(-id, -name)
+
+```
+Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
+
+## Correlação
+
+```{r, corr-matrix}
+library(gt)
+rxx <- cor(df_bg[,1:8])
+
+# heatmap(rxx)
+# rxx
+
+corrplot::corrplot(rxx)
+```
+
+
+```{r, modelo-inicial-step}
+model1 <- lm(data = df_bg, score ~ .)
+summary(model1)
+modelsummary::modelsummary(model1)
+```
+
+```{r, modelo-step}
+step(model1)
+anova(model1)
+
+model_step <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + users_rat + 
+    compl + own_users, data = df_bg)
+
+summary(lm(formula = score ~ year + compl + own_users, data = df_bg))
+
+summary(model_step)
+modelsummary::modelsummary(model_step)
+```
+
