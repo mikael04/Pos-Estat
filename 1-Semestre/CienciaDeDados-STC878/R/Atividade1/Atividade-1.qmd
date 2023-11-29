@@ -39,7 +39,7 @@ library(dplyr)
 
 ## Lendo dados ----
 df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"),
-                             select = c("ID_REGIAO", "ID_UF", "IN_PUBLICA", "PROFICIENCIA_LP", "PROFICIENCIA_MT", "NU_TIPO_NIVEL_INSE",
+                             select = c("ID_REGIAO", "ID_UF", "IN_PUBLICA", "PROFICIENCIA_LP_SAEB", "PROFICIENCIA_MT_SAEB", "NU_TIPO_NIVEL_INSE",
                                     "TX_RESP_Q01", "TX_RESP_Q04")) |> 
   dplyr::rename(SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04)
 
@@ -48,7 +48,7 @@ df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/
 
 # df_saeb <- readr::read_delim(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"),
 #                              delim=",",
-#                              col_types = readr::cols_only(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP, PROFICIENCIA_MT, NU_TIPO_NIVEL_INSE, SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04))
+#                              col_types = readr::cols_only(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP_SAEB, PROFICIENCIA_MT_SAEB, NU_TIPO_NIVEL_INSE, SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04))
 
 
 a <- integer(100)
@@ -57,7 +57,7 @@ object.size(a)
 object.size()
 
 df_saeb <- df_saeb |> 
-  dplyr::select(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP, PROFICIENCIA_MT, NU_TIPO_NIVEL_INSE,
+  dplyr::select(ID_REGIAO, ID_UF, IN_PUBLICA, PROFICIENCIA_LP_SAEB, PROFICIENCIA_MT_SAEB, NU_TIPO_NIVEL_INSE,
                 SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04) |> 
   dplyr::mutate(dplyr::across(everything(), as.character))
 
@@ -120,10 +120,10 @@ library(gt)
 resultado_regiao <- df_saeb |> 
   dplyr::group_by(ID_UF) |> 
   dplyr::mutate(
-    media_lp_por_UF = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    media_mt_por_UF = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
-    dp_lp_por_UF = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    dp_mt_por_UF = sd(as.numeric(PROFICIENCIA_MT), na.rm = T)
+    media_lp_por_UF = mean(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    media_mt_por_UF = mean(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T),
+    dp_lp_por_UF = sd(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    dp_mt_por_UF = sd(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T)
   ) |> 
   dplyr::distinct(ID_UF, .keep_all = T) |> 
   dplyr::select(ID_UF, media_lp_por_UF, dp_lp_por_UF, media_mt_por_UF, dp_mt_por_UF) |> 
@@ -185,10 +185,10 @@ resultado_sexo_tipoEscola <- df_saeb |>
   dplyr::filter(SEXO != "." & SEXO != "*") |> 
   dplyr::group_by(SEXO, IN_PUBLICA) |> 
   dplyr::mutate(
-    media_lp_por_sex_esc = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    media_mt_por_sex_esc = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
-    dp_lp_por_sex_esc = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    dp_mt_por_sex_esc = sd(as.numeric(PROFICIENCIA_MT), na.rm = T)
+    media_lp_por_sex_esc = mean(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    media_mt_por_sex_esc = mean(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T),
+    dp_lp_por_sex_esc = sd(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    dp_mt_por_sex_esc = sd(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T)
   ) |> 
   dplyr::mutate(SEXO = if_else(SEXO == "A", "Masculino", if_else(SEXO == "B", "Feminino", "Branco ou nulo")),
                 IN_PUBLICA = if_else(IN_PUBLICA == "0", "Privada", if_else(IN_PUBLICA == "1", "Pública", "Inválido"))) |> 
@@ -251,12 +251,12 @@ resultado_nivel <- df_saeb |>
   dplyr::filter(!is.na(NU_TIPO_NIVEL_INSE)) |> 
   dplyr::group_by(NU_TIPO_NIVEL_INSE) |> 
   dplyr::mutate(
-    media_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    media_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT), na.rm = T),
-    dp_lp_por_nivel = sd(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    dp_mt_por_nivel = sd(as.numeric(PROFICIENCIA_MT), na.rm = T),
-    mediana_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP), na.rm = T),
-    mediana_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT), na.rm = T)
+    media_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    media_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T),
+    dp_lp_por_nivel = sd(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    dp_mt_por_nivel = sd(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T),
+    mediana_lp_por_nivel = mean(as.numeric(PROFICIENCIA_LP_SAEB), na.rm = T),
+    mediana_mt_por_nivel = mean(as.numeric(PROFICIENCIA_MT_SAEB), na.rm = T)
   ) |> 
   dplyr::distinct(NU_TIPO_NIVEL_INSE, .keep_all = T) |> 
   dplyr::select(NU_TIPO_NIVEL_INSE, media_lp_por_nivel, dp_lp_por_nivel, mediana_lp_por_nivel, 
