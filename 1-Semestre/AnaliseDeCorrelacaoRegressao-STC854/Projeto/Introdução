@@ -1,6 +1,6 @@
 Os jogos de tabuleiro são uma forma de entretenimento popular há séculos. Eles podem ser jogados por pessoas de todas as idades e origens, e oferecem uma variedade de desafios e experiências.
 
-Ao longo dos anos, muitos jogos de tabuleiro foram lançados, e cada um deles recebeu uma nota por parte dos críticos e jogadores. Essas notas podem ser úteis para os consumidores que estão procurando um novo jogo de tabuleiro, mas podem ser subjetivas e variar de pessoa para pessoa.
+Ao longo dos anos, um número crescente de jogos de tabuleiro foram lançados, e para auxiliar o crescimento e a organização desses dados um website foi criado, o BoardGameGeek. E cada um deles recebeu uma nota por parte dos críticos e jogadores. Essas notas podem ser úteis para os consumidores que estão procurando um novo jogo de tabuleiro, mas podem ser subjetivas e variar de pessoa para pessoa.
 
 Este artigo apresenta uma abordagem para prever a nota dada a um jogo de tabuleiro com base em dados objetivos. Os dados utilizados incluem informações sobre o jogo, como o número de jogadores, o tempo de jogo, o tema e o mecanismo.
 
