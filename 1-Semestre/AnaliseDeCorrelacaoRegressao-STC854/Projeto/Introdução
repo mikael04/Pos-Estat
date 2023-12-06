@@ -18,3 +18,9 @@ A seção Dados descreve os dados que serão utilizados neste estudo.
 A seção Modelo apresenta o modelo de aprendizado de máquina que será utilizado para prever a nota de um jogo de tabuleiro.
 A seção Resultados apresenta os resultados da avaliação do modelo.
 A seção Conclusão conclui o artigo e discute as implicações dos resultados.
+
+
+Ideias
+- Descritiva da população dos jogos
+- Tabelas de frequência (por categoria de interesse, talvez domínio ou mecânicas)
+- Gráfico de resíduos mostrando homocedasticidade (resíduos vs index), variância constante

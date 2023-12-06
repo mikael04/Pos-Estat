@@ -32,10 +32,15 @@ df_bg <- df_bg |>
 
 ## Correlação ----
 
-corrplot::corrplot(rxx)
+# corrplot::corrplot(rxx)
 
 rxx <- cor(df_bg[,1:8])
-corrplot::corrplot(rxx)
+
+rxx_ <- cor.test(x = df_bg[, 1] |> dplyr::pull(), y = df_bg[, 2] |> dplyr::pull())
+
+
+library(corrplot)
+corrplot::corrplot(cor.test(df_bg[,1:8]))
 
 ## VIF ----
 
@@ -55,10 +60,10 @@ for(i in 1:n_covariaveis){
 
 ## Primeiro modelo
 
-modelo_completo <- lm(data = df_bg, score ~ .)
+modelo_completo <- lm(data = df_bg, compl ~ .)
 summary(modelo_completo)
 
-model_nulo <- lm(data = df_bg, score ~ 1)
+model_nulo <- lm(data = df_bg, compl ~ 1)
 summary(model_nulo)
 
 ## Modelo step
@@ -71,13 +76,13 @@ step(modelo_completo, direction = "both")
 ## Testando modelos "na mão"
 
 
-summary(lm(formula = score ~ year + min_p + min_age + users_rat +
-             compl + own_users, data = df_bg))
+summary(lm(formula = compl ~ year + min_p + max_p + playtime + min_age +
+             users_rat + score + own_users, data = df_bg))
 
-summary(lm(formula = score ~ compl, data = df_bg))
+summary(lm(formula = compl ~ compl, data = df_bg))
 
 
-summary(lm(formula = score ~ year + compl + own_users, data = df_bg))
+summary(lm(formula = compl ~ year + score + own_users, data = df_bg))
 
 
 # Analise dos resíduos
@@ -104,14 +109,15 @@ dataset_bg_filtered <- df_bg |>
   dplyr::filter(own_users > 2000)
 
 
-modelo_completo_filtrado <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + users_rat +
-                   compl + own_users, data = dataset_bg_filtered)
+modelo_completo_filtrado <- lm(formula = compl ~ year + min_p + max_p + playtime + min_age + users_rat +
+                   score + own_users, data = dataset_bg_filtered)
 
 summary(modelo_completo_filtrado)
 
 step(modelo_completo_filtrado, direction = "both")
 
-modelo_filtrado_step <- lm(formula = score ~ year + min_p + min_age + users_rat + compl,
+modelo_filtrado_step <- lm(formula = compl ~ year + min_p + max_p + playtime + min_age +
+                             users_rat + score + own_users,
    data = dataset_bg_filtered)
 
 summary(modelo_filtrado_step)
@@ -134,7 +140,7 @@ summary(influ)
 df_sem_influ <- df_bg[influ$is.inf[,10] != TRUE,]
 df_sem_influ_ <- df_bg[influ$is.inf[,10] != TRUE,]
 
-modelo_completo_sem_influ <- lm(formula = score ~ ., data = df_sem_influ)
+modelo_completo_sem_influ <- lm(formula = compl ~ ., data = df_sem_influ)
 summary(modelo_completo_sem_influ)
 
 ## Shapiro para apenas 5 mil observações
@@ -164,9 +170,9 @@ influ$is.inf
 summary(influ)
 
 ## Removendo pontos de influência baseados no dffit
-df_sem_influ <- dataset_bg_filtered[influ$is.inf[,7] != TRUE,]
+df_sem_influ <- dataset_bg_filtered[influ$is.inf[,10] != TRUE,]
 
-modelo_filtrado_sem_influ <- lm(formula = score ~ ., data = df_sem_influ)
+modelo_filtrado_sem_influ <- lm(formula = compl ~ ., data = df_sem_influ)
 summary(modelo_filtrado_sem_influ)
 
 ## Shapiro para apenas 5 mil observações
