@@ -10,8 +10,35 @@ lang: pt
 
 # Introdução
 
-```{r, leitura-limpeza-dados}
-dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx")))
+```{r, leitura-dados}
+dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"))) |> 
+  dplyr::mutate(`Year Published` = as.numeric(`Year Published`))
+```
+
+
+## Análise exploratória
+
+```{r, descritiva-variaveis}
+## Usando o skimr
+
+skimr::skim(dataset_bg)
+
+dataset_bg_melt <- dataset_bg |> 
+  dplyr::select(-`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
+
+dataset_bg_melt <- reshape2::melt(dataset_bg_melt, id.vars = "ID",
+                                  measure.vars=colnames(dataset_bg_melt)[2:10])
+colnames(dataset_bg_melt)[2:10]
+
+# creating a plot 
+p <- ggplot(dataset_bg_melt) + 
+  geom_boxplot(aes(x=ID, y=value, color=variable)) 
+  
+# printing the plot 
+print(p) 
+```
+
+```{r, selecao-variaveis} 
 
 df_bg <- dataset_bg |>
   dplyr::select(id = ID, name = Name, year = `Year Published`, min_p = `Min Players`, max_p = `Max Players`,
@@ -22,22 +49,26 @@ df_bg <- dataset_bg |>
 
 ```
 
+
 ## Limpando dados
 
-Agora serão investigados os dados faltantes na base de dados.
+Agora serão investigados os dados faltantes na base de dados, além disso serão será investigado o que pode ser considerado um dado inválido ou inconsistente.
+
+### Dados NA
 
 ```{r, filter-data}
 df_bg |> 
-  dplyr::filter(is.na(year))
+  dplyr::filter(is.na(year)) |> 
+  nrow()
 
 ## Apenas uma observação sem ano, será removida
 
 
 df_bg |> 
-  dplyr::filter(is.na(own_users))
+  dplyr::filter(is.na(own_users)) |> 
+  nrow()
 
 ## 23 jogos pouco avaliados e menos conhecidos, também serão removidos
-
 
 df_bg <- df_bg |> 
   dplyr::filter(!is.na(own_users) & !is.na(year)) |> 
@@ -46,6 +77,17 @@ df_bg <- df_bg |>
 ```
 
 Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
+
+### Removendo dados considerados inválidos
+
+```{r, demais-remocoes}
+games_year <- df_bg |> 
+  dplyr::filter(year >= 1995) |> 
+  # dplyr::pull(year) |> 
+  nrow()
+```
+
+Além disso, optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do "Colonizadores de Catan", criado por "Klaus Teuber", conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. Por isso, removemos aproximadamente `r round(games_year*100/nrow(df_bg),1)`
 
 ## Correlação
 

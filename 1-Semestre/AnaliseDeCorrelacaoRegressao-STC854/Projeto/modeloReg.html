@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,9 +69,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="modeloReg_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="modeloReg_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
-<script src="modeloReg_files/libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="modeloReg_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
-
 
 </head>
 
@@ -113,32 +110,315 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="introdução" class="level1">
 <h1>Introdução</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dataset_bg <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">as_tibble</span>(readxl<span class="sc">::</span><span class="fu">read_excel</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"</span>)))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> dataset_bg <span class="sc">|&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">id =</span> ID, <span class="at">name =</span> Name, <span class="at">year =</span> <span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>, <span class="at">min_p =</span> <span class="st">`</span><span class="at">Min Players</span><span class="st">`</span>, <span class="at">max_p =</span> <span class="st">`</span><span class="at">Max Players</span><span class="st">`</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">playtime =</span> <span class="st">`</span><span class="at">Play Time</span><span class="st">`</span>, <span class="at">min_age =</span> <span class="st">`</span><span class="at">Min Age</span><span class="st">`</span>, <span class="at">users_rat =</span> <span class="st">`</span><span class="at">Users Rated</span><span class="st">`</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">compl =</span> <span class="st">`</span><span class="at">Complexity Average</span><span class="st">`</span>, <span class="at">own_users =</span> <span class="st">`</span><span class="at">Owned Users</span><span class="st">`</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">score =</span> <span class="st">`</span><span class="at">Rating Average</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dataset_bg <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">as_tibble</span>(readxl<span class="sc">::</span><span class="fu">read_excel</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">Year Published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(dataset_bg)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">dataset_bg</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">20343</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19976</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mechanics</td>
+<td style="text-align: right;">1598</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">406</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7381</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Domains</td>
+<td style="text-align: right;">10159</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ID</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">108216.25</td>
+<td style="text-align: right;">98682.10</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">11029.00</td>
+<td style="text-align: right;">88931.00</td>
+<td style="text-align: right;">192939.50</td>
+<td style="text-align: right;">331787.00</td>
+<td style="text-align: left;">▇▂▃▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Year Published</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1984.25</td>
+<td style="text-align: right;">214.00</td>
+<td style="text-align: right;">-3500.00</td>
+<td style="text-align: right;">2001.00</td>
+<td style="text-align: right;">2011.00</td>
+<td style="text-align: right;">2016.00</td>
+<td style="text-align: right;">2022.00</td>
+<td style="text-align: left;">▁▁▁▁▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Min Players</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2.02</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">10.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Max Players</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5.67</td>
+<td style="text-align: right;">15.23</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: right;">999.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Play Time</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">91.29</td>
+<td style="text-align: right;">545.45</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">30.00</td>
+<td style="text-align: right;">45.00</td>
+<td style="text-align: right;">90.00</td>
+<td style="text-align: right;">60000.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Min Age</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9.60</td>
+<td style="text-align: right;">3.65</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">8.00</td>
+<td style="text-align: right;">10.00</td>
+<td style="text-align: right;">12.00</td>
+<td style="text-align: right;">25.00</td>
+<td style="text-align: left;">▂▇▆▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Users Rated</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">840.97</td>
+<td style="text-align: right;">3511.56</td>
+<td style="text-align: right;">30.00</td>
+<td style="text-align: right;">55.00</td>
+<td style="text-align: right;">120.00</td>
+<td style="text-align: right;">385.00</td>
+<td style="text-align: right;">102214.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rating Average</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6.40</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">1.05</td>
+<td style="text-align: right;">5.82</td>
+<td style="text-align: right;">6.43</td>
+<td style="text-align: right;">7.03</td>
+<td style="text-align: right;">9.58</td>
+<td style="text-align: left;">▁▁▅▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BGG Rank</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10172.89</td>
+<td style="text-align: right;">5872.83</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">5087.50</td>
+<td style="text-align: right;">10173.00</td>
+<td style="text-align: right;">15258.50</td>
+<td style="text-align: right;">20344.00</td>
+<td style="text-align: left;">▇▇▇▇▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Complexity Average</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.99</td>
+<td style="text-align: right;">0.85</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">1.97</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">5.00</td>
+<td style="text-align: left;">▂▇▆▂▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Owned Users</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1408.46</td>
+<td style="text-align: right;">5040.18</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">146.00</td>
+<td style="text-align: right;">309.00</td>
+<td style="text-align: right;">864.00</td>
+<td style="text-align: right;">155312.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(dataset_bg)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 14</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> dataset_bg <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">id =</span> ID, <span class="at">name =</span> Name, <span class="at">year =</span> <span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>, <span class="at">min_p =</span> <span class="st">`</span><span class="at">Min Players</span><span class="st">`</span>, <span class="at">max_p =</span> <span class="st">`</span><span class="at">Max Players</span><span class="st">`</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">playtime =</span> <span class="st">`</span><span class="at">Play Time</span><span class="st">`</span>, <span class="at">min_age =</span> <span class="st">`</span><span class="at">Min Age</span><span class="st">`</span>, <span class="at">users_rat =</span> <span class="st">`</span><span class="at">Users Rated</span><span class="st">`</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">compl =</span> <span class="st">`</span><span class="at">Complexity Average</span><span class="st">`</span>, <span class="at">own_users =</span> <span class="st">`</span><span class="at">Owned Users</span><span class="st">`</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">score =</span> <span class="st">`</span><span class="at">Rating Average</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="limpando-dados" class="level2">
 <h2 class="anchored" data-anchor-id="limpando-dados">Limpando dados</h2>
 <p>Agora serão investigados os dados faltantes na base de dados.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 11
-     id name   year min_p max_p playtime min_age users_rat compl own_users score
-  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-1    NA Hus      NA     2     2       40       0        38   1.5        NA  6.28</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Apenas uma observação sem ano, será removida</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(own_users))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>games_year <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># dplyr::pull(year) |&gt; </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Apenas uma observação sem ano, será removida</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(own_users))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 23 × 11
        id name       year min_p max_p playtime min_age users_rat compl own_users
@@ -156,32 +436,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 # ℹ 13 more rows
 # ℹ 1 more variable: score &lt;dbl&gt;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 23 jogos pouco avaliados e menos conhecidos, também serão removidos</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(own_users) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(year)) <span class="sc">|&gt;</span> </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>id, <span class="sc">-</span>name)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 23 jogos pouco avaliados e menos conhecidos, também serão removidos</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(own_users) <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>id, <span class="sc">-</span>name)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.</p>
+<p>Além disso, optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do “Colonizadores de Catan”, criado por “Klaus Teuber”, conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. Por isso, removemos aproximadamente 100.1</p>
 </section>
 <section id="correlação" class="level2">
 <h2 class="anchored" data-anchor-id="correlação">Correlação</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rxx <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_bg[,<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># heatmap(rxx)</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rxx</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(rxx)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rxx <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_bg[,<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># heatmap(rxx)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rxx</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(rxx)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="modeloReg_files/figure-html/corr-matrix-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">data =</span> df_bg, score <span class="sc">~</span> .)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">data =</span> df_bg, score <span class="sc">~</span> .)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -189,306 +470,167 @@ lm(formula = score ~ ., data = df_bg)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--5.2961 -0.4577  0.0376  0.5001  4.6191 
+-5.5331 -0.3826  0.0331  0.4267  3.2634 
 
 Coefficients:
               Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)  5.016e+00  5.742e-02  87.349  &lt; 2e-16 ***
-year         2.422e-04  2.646e-05   9.153  &lt; 2e-16 ***
-min_p       -1.107e-01  8.391e-03 -13.190  &lt; 2e-16 ***
-max_p        3.699e-04  3.726e-04   0.993 0.320926    
-playtime     1.711e-05  1.053e-05   1.625 0.104180    
-min_age      1.365e-02  1.634e-03   8.356  &lt; 2e-16 ***
-users_rat   -3.280e-05  9.671e-06  -3.392 0.000696 ***
-compl        4.806e-01  7.238e-03  66.402  &lt; 2e-16 ***
-own_users    4.721e-05  6.746e-06   6.999 2.66e-12 ***
+(Intercept) -1.036e+02  1.695e+00 -61.131  &lt; 2e-16 ***
+year         5.428e-02  8.420e-04  64.464  &lt; 2e-16 ***
+min_p       -5.693e-02  8.055e-03  -7.067 1.64e-12 ***
+max_p        1.515e-04  3.365e-04   0.450  0.65267    
+playtime     1.121e-04  1.684e-05   6.656 2.90e-11 ***
+min_age      8.814e-04  1.564e-03   0.564  0.57296    
+users_rat    2.743e-05  8.840e-06   3.103  0.00192 ** 
+compl        5.146e-01  7.050e-03  72.990  &lt; 2e-16 ***
+own_users    3.921e-06  6.181e-06   0.634  0.52586    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.8039 on 20311 degrees of freedom
-Multiple R-squared:  0.2622,    Adjusted R-squared:  0.262 
-F-statistic: 902.5 on 8 and 20311 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 0.6992 on 16714 degrees of freedom
+Multiple R-squared:  0.4264,    Adjusted R-squared:  0.4261 
+F-statistic:  1553 on 8 and 16714 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>modelsummary<span class="sc">::</span><span class="fu">modelsummary</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small" data-quarto-postprocess="true">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">&nbsp;(1)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: center;">5.016</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.057)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">year</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">min_p</td>
-<td style="text-align: center;">-0.111</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.008)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">max_p</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">playtime</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">min_age</td>
-<td style="text-align: center;">0.014</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.002)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">users_rat</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">compl</td>
-<td style="text-align: center;">0.481</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.007)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">own_users</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; box-shadow: 0px 1.5px;"></td>
-<td style="text-align: center; box-shadow: 0px 1.5px;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Num.Obs.</td>
-<td style="text-align: center;">20320</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">R2</td>
-<td style="text-align: center;">0.262</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">R2 Adj.</td>
-<td style="text-align: center;">0.262</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AIC</td>
-<td style="text-align: center;">48807.8</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">BIC</td>
-<td style="text-align: center;">48887.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Log.Lik.</td>
-<td style="text-align: center;">-24393.888</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">F</td>
-<td style="text-align: center;">902.466</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RMSE</td>
-<td style="text-align: center;">0.80</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modelsummary::modelsummary(model1)</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">step</span>(model1, <span class="at">direction =</span> <span class="fu">c</span>(<span class="st">"both"</span>))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">step</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Start:  AIC=-8859.89
+<pre><code>Start:  AIC=-11958.48
 score ~ year + min_p + max_p + playtime + min_age + users_rat + 
     compl + own_users
 
-            Df Sum of Sq   RSS     AIC
-- max_p      1      0.64 13128 -8860.9
-&lt;none&gt;                   13127 -8859.9
-- playtime   1      1.71 13129 -8859.2
-- users_rat  1      7.44 13135 -8850.4
-- own_users  1     31.66 13159 -8812.9
-- min_age    1     45.13 13172 -8792.1
-- year       1     54.15 13182 -8778.2
-- min_p      1    112.44 13240 -8688.6
-- compl      1   2849.74 15977 -4869.9
+            Df Sum of Sq     RSS      AIC
+- max_p      1      0.10  8171.3 -11960.3
+- min_age    1      0.16  8171.4 -11960.2
+- own_users  1      0.20  8171.4 -11960.1
+&lt;none&gt;                    8171.2 -11958.5
+- users_rat  1      4.71  8175.9 -11950.9
+- playtime   1     21.66  8192.9 -11916.2
+- min_p      1     24.42  8195.6 -11910.6
+- year       1   2031.58 10202.8  -8247.2
+- compl      1   2604.56 10775.8  -7333.5
 
-Step:  AIC=-8860.9
+Step:  AIC=-11960.28
 score ~ year + min_p + playtime + min_age + users_rat + compl + 
     own_users
 
-            Df Sum of Sq   RSS     AIC
-&lt;none&gt;                   13128 -8860.9
-- playtime   1      1.72 13130 -8860.2
-+ max_p      1      0.64 13127 -8859.9
-- users_rat  1      7.47 13136 -8851.3
-- own_users  1     31.74 13160 -8813.8
-- min_age    1     45.47 13174 -8792.6
-- year       1     54.13 13182 -8779.3
-- min_p      1    111.82 13240 -8690.6
-- compl      1   2862.04 15990 -4855.4</code></pre>
+            Df Sum of Sq     RSS      AIC
+- min_age    1      0.16  8171.5 -11961.9
+- own_users  1      0.20  8171.5 -11961.9
+&lt;none&gt;                    8171.3 -11960.3
+- users_rat  1      4.70  8176.0 -11952.7
+- playtime   1     21.69  8193.0 -11918.0
+- min_p      1     24.32  8195.6 -11912.6
+- year       1   2031.91 10203.2  -8248.5
+- compl      1   2619.49 10790.8  -7312.2
+
+Step:  AIC=-11961.95
+score ~ year + min_p + playtime + users_rat + compl + own_users
+
+            Df Sum of Sq     RSS      AIC
+- own_users  1      0.22  8171.7 -11963.5
+&lt;none&gt;                    8171.5 -11961.9
+- users_rat  1      4.63  8176.1 -11954.5
+- playtime   1     21.58  8193.1 -11919.8
+- min_p      1     24.20  8195.7 -11914.5
+- year       1   2069.46 10240.9  -8188.8
+- compl      1   2853.87 11025.3  -6954.6
+
+Step:  AIC=-11963.5
+score ~ year + min_p + playtime + users_rat + compl
+
+            Df Sum of Sq     RSS      AIC
+&lt;none&gt;                    8171.7 -11963.5
+- playtime   1     21.63  8193.3 -11921.3
+- min_p      1     24.42  8196.1 -11915.6
+- users_rat  1    256.36  8428.0 -11448.9
+- year       1   2106.77 10278.5  -8129.7
+- compl      1   2854.06 11025.7  -6956.0</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = score ~ year + min_p + playtime + min_age + users_rat + 
-    compl + own_users, data = df_bg)
+lm(formula = score ~ year + min_p + playtime + users_rat + compl, 
+    data = df_bg)
 
 Coefficients:
-(Intercept)         year        min_p     playtime      min_age    users_rat  
-  5.018e+00    2.422e-04   -1.101e-01    1.717e-05    1.370e-02   -3.288e-05  
-      compl    own_users  
-  4.800e-01    4.727e-05  </code></pre>
+(Intercept)         year        min_p     playtime    users_rat        compl  
+ -1.039e+02    5.441e-02   -5.635e-02    1.119e-04    3.301e-05    5.155e-01  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>model_step <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> min_p <span class="sc">+</span> playtime <span class="sc">+</span> min_age <span class="sc">+</span> users_rat <span class="sc">+</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>modelsummary<span class="sc">::</span><span class="fu">modelsummary</span>(model_step)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small" data-quarto-postprocess="true">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">&nbsp;(1)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: center;">5.018</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.057)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">year</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">min_p</td>
-<td style="text-align: center;">-0.110</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.008)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">playtime</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">min_age</td>
-<td style="text-align: center;">0.014</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.002)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">users_rat</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">compl</td>
-<td style="text-align: center;">0.480</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"></td>
-<td style="text-align: center;">(0.007)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">own_users</td>
-<td style="text-align: center;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; box-shadow: 0px 1.5px;"></td>
-<td style="text-align: center; box-shadow: 0px 1.5px;">(0.000)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Num.Obs.</td>
-<td style="text-align: center;">20320</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">R2</td>
-<td style="text-align: center;">0.262</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">R2 Adj.</td>
-<td style="text-align: center;">0.262</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AIC</td>
-<td style="text-align: center;">48806.8</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">BIC</td>
-<td style="text-align: center;">48878.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Log.Lik.</td>
-<td style="text-align: center;">-24394.380</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">F</td>
-<td style="text-align: center;">1031.250</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RMSE</td>
-<td style="text-align: center;">0.80</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
 
-
+Response: score
+             Df Sum Sq Mean Sq   F value    Pr(&gt;F)    
+year          1 2163.9 2163.92 4426.2494 &lt; 2.2e-16 ***
+min_p         1  276.7  276.67  565.9312 &lt; 2.2e-16 ***
+max_p         1   16.0   16.05   32.8237 1.026e-08 ***
+playtime      1  306.2  306.19  626.3134 &lt; 2.2e-16 ***
+min_age       1  292.9  292.88  599.0808 &lt; 2.2e-16 ***
+users_rat     1  413.8  413.78  846.3762 &lt; 2.2e-16 ***
+compl         1 2604.4 2604.37 5327.1640 &lt; 2.2e-16 ***
+own_users     1    0.2    0.20    0.4024    0.5259    
+Residuals 16714 8171.2    0.49                        
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>model_step <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> min_p <span class="sc">+</span> max_p <span class="sc">+</span> playtime <span class="sc">+</span> min_age <span class="sc">+</span> users_rat <span class="sc">+</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ year + compl + own_users, data = df_bg)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.5664 -0.3834  0.0307  0.4275  3.3680 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -1.050e+02  1.653e+00  -63.50   &lt;2e-16 ***
+year         5.487e-02  8.218e-04   66.78   &lt;2e-16 ***
+compl        5.351e-01  6.452e-03   82.93   &lt;2e-16 ***
+own_users    2.272e-05  1.010e-06   22.49   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7012 on 16719 degrees of freedom
+Multiple R-squared:  0.4229,    Adjusted R-squared:  0.4228 
+F-statistic:  4084 on 3 and 16719 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_step)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ year + min_p + max_p + playtime + min_age + 
+    users_rat + compl + own_users, data = df_bg)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.5331 -0.3826  0.0331  0.4267  3.2634 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -1.036e+02  1.695e+00 -61.131  &lt; 2e-16 ***
+year         5.428e-02  8.420e-04  64.464  &lt; 2e-16 ***
+min_p       -5.693e-02  8.055e-03  -7.067 1.64e-12 ***
+max_p        1.515e-04  3.365e-04   0.450  0.65267    
+playtime     1.121e-04  1.684e-05   6.656 2.90e-11 ***
+min_age      8.814e-04  1.564e-03   0.564  0.57296    
+users_rat    2.743e-05  8.840e-06   3.103  0.00192 ** 
+compl        5.146e-01  7.050e-03  72.990  &lt; 2e-16 ***
+own_users    3.921e-06  6.181e-06   0.634  0.52586    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.6992 on 16714 degrees of freedom
+Multiple R-squared:  0.4264,    Adjusted R-squared:  0.4261 
+F-statistic:  1553 on 8 and 16714 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modelsummary::modelsummary(model_step)</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

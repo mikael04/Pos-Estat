@@ -2,6 +2,8 @@
 
 dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx")))
 
+skimr::skim(dataset_bg)
+
 df_bg <- dataset_bg |>
   dplyr::select(id = ID, name = Name, year = `Year Published`, min_p = `Min Players`, max_p = `Max Players`,
                 playtime = `Play Time`, min_age = `Min Age`, users_rat = `Users Rated`,
