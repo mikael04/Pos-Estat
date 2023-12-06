@@ -22,20 +22,34 @@ dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/Analis
 ## Usando o skimr
 
 skimr::skim(dataset_bg)
+ 
+# dataset_bg_melt <- dataset_bg |> 
+#   dplyr::select(-`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
+#
+# dataset_bg_melt <- reshape2::melt(dataset_bg_melt, id.vars = "ID",
+#                                   measure.vars=colnames(dataset_bg_melt)[2:10])
+# colnames(dataset_bg_melt)[2:10]
+# 
+# # creating a plot 
+# p <- ggplot(dataset_bg_melt) + 
+#   geom_boxplot(aes(x=ID, y=value, color=variable)) 
+#   
+# # printing the plot 
+# print(p) 
 
-dataset_bg_melt <- dataset_bg |> 
-  dplyr::select(-`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
+dataset_bg_boxplot <- dataset_bg |> 
+  dplyr::select(-ID, -`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
 
-dataset_bg_melt <- reshape2::melt(dataset_bg_melt, id.vars = "ID",
-                                  measure.vars=colnames(dataset_bg_melt)[2:10])
-colnames(dataset_bg_melt)[2:10]
+dataset_bg_boxplot |> 
+  ggplot(aes(x = `Year Published`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x.axis.label = element_blank()
+  )
 
-# creating a plot 
-p <- ggplot(dataset_bg_melt) + 
-  geom_boxplot(aes(x=ID, y=value, color=variable)) 
-  
-# printing the plot 
-print(p) 
+mpg
 ```
 
 ```{r, selecao-variaveis} 
