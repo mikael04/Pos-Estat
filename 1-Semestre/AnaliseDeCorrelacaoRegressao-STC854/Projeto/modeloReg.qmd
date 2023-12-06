@@ -10,8 +10,6 @@ lang: pt
 
 # Introdução
 
-
-
 ```{r, leitura-limpeza-dados}
 dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx")))
 
@@ -46,6 +44,7 @@ df_bg <- df_bg |>
   dplyr::select(-id, -name)
 
 ```
+
 Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
 
 ## Correlação
@@ -60,11 +59,10 @@ rxx <- cor(df_bg[,1:8])
 corrplot::corrplot(rxx)
 ```
 
-
 ```{r, modelo-inicial-step}
 model1 <- lm(data = df_bg, score ~ .)
 summary(model1)
-modelsummary::modelsummary(model1)
+# modelsummary::modelsummary(model1)
 ```
 
 ```{r, modelo-step}
@@ -77,6 +75,5 @@ model_step <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + u
 summary(lm(formula = score ~ year + compl + own_users, data = df_bg))
 
 summary(model_step)
-modelsummary::modelsummary(model_step)
+# modelsummary::modelsummary(model_step)
 ```
-

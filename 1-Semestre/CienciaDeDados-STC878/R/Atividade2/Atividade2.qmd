@@ -1,0 +1,106 @@
+---
+title: "Atividade 2"
+author: "Mikael"
+toc: true
+date: 29/11/2023
+date-format: long
+lang: pt
+execute:
+  warning: false
+cache: TRUE
+theme: cerulean
+reference-location: margin
+code-fold: true
+format:
+  html:
+    output-file: Atividade_1.html
+  docx: 
+    output-file: Atividade_1.docx
+    toc: true
+    number-sections: true
+    highlight-style: github
+params:
+  run_all_code: "T"
+  overwrite_tables: "T"
+  use_db: "T"
+  debug: "F"
+---
+
+```{r, header}
+```
+
+# Atividade 2
+
+## Lendo a base
+
+```{r, lendo-dados}
+library(dplyr)
+
+## Lendo dados ----
+df_saeb <- data.table::fread(here::here("1-Semestre/CienciaDeDados-STC878/Dados/saeb_2021_ts_aluno_9ef.csv"),
+                             select = c("ID_REGIAO", "ID_UF", "IN_PUBLICA", "PROFICIENCIA_LP", "PROFICIENCIA_MT",
+                                        "PROFICIENCIA_LP_SAEB", "PROFICIENCIA_MT_SAEB",
+                                        "NU_TIPO_NIVEL_INSE", "TX_RESP_Q01", "TX_RESP_Q04")) |> 
+  dplyr::rename(SEXO = TX_RESP_Q01, RACACOR = TX_RESP_Q04)
+```
+
+## Nível de proeficência em língua portuguesa por região e tipo de escola
+
+```{r, grafico-nivel-proef-lp}
+df_saeb_regiao <- df_saeb |> 
+  dplyr::filter(ID_REGIAO <= 5 & ID_REGIAO >= 1,
+                IN_PUBLICA >= 0 & IN_PUBLICA <= 1) |> 
+  dplyr::group_by(ID_REGIAO, IN_PUBLICA) |> 
+  dplyr::summarise(media_proef_lp = mean(PROFICIENCIA_LP_SAEB, na.rm = T),
+                   media_proef_mt = mean(PROFICIENCIA_MT_SAEB, na.rm = T)) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(
+    ID_REGIAO = case_when(
+      ID_REGIAO == "1" ~ "Norte",
+      ID_REGIAO == "2" ~ "Nordeste",
+      ID_REGIAO == "3" ~ "Sudeste",
+      ID_REGIAO == "4" ~ "Sul",
+      ID_REGIAO == "5" ~ "Centro-Oeste",
+      .default = "Sem Região"
+    ),
+    IN_PUBLICA = if_else(IN_PUBLICA == "0", "Privadas", if_else(IN_PUBLICA == "1", "Públicas", "Inválido"))
+  )
+  
+library(ggplot2)
+ggplot(df_saeb_regiao, aes(x = ID_REGIAO, y = media_proef_lp, fill = IN_PUBLICA)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  labs(
+    title = "Média de proeficiência em português por região e tipo de escola",
+    fill = "Escolas",
+    x = "",
+    y = ""
+  )
+
+```
+
+
+## Nível de proeficência em língua portuguesa por região e tipo de escola
+
+```{r, boxplot-proef-lp}
+
+df_saeb_escola <- df_saeb |> 
+  dplyr::filter(IN_PUBLICA >= 0 & IN_PUBLICA <= 1) |> 
+  dplyr::mutate(
+    IN_PUBLICA = if_else(IN_PUBLICA == "0", "Privadas", if_else(IN_PUBLICA == "1", "Públicas", "Inválido"))
+  ) |> 
+  dplyr::filter(!is.na(PROFICIENCIA_LP_SAEB))
+  
+
+library(ggplot2)
+ggplot(df_saeb_escola, aes(x = IN_PUBLICA, y = PROFICIENCIA_LP_SAEB, fill = IN_PUBLICA)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    title = "Distribuição da proficiência por tipo de escola",
+    fill = "Escolas",
+    x = "",
+    y = ""
+  ) +
+  scale_fill_manual(values = c("green", "blue"))
+```
