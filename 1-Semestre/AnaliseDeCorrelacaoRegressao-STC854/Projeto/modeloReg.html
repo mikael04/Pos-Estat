@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -72,10 +72,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a>
+  <ul class="collapse">
+  <li><a href="#análise-exploratória" id="toc-análise-exploratória" class="nav-link" data-scroll-target="#análise-exploratória">Análise exploratória</a></li>
+  <li><a href="#selecionando-variáveis" id="toc-selecionando-variáveis" class="nav-link" data-scroll-target="#selecionando-variáveis">Selecionando variáveis</a></li>
+  <li><a href="#limpando-dados" id="toc-limpando-dados" class="nav-link" data-scroll-target="#limpando-dados">Limpando dados</a>
+  <ul class="collapse">
+  <li><a href="#dados-na" id="toc-dados-na" class="nav-link" data-scroll-target="#dados-na">Dados NA</a></li>
+  <li><a href="#removendo-dados-considerados-inválidos" id="toc-removendo-dados-considerados-inválidos" class="nav-link" data-scroll-target="#removendo-dados-considerados-inválidos">Removendo dados considerados inválidos</a></li>
+  </ul></li>
+  <li><a href="#avaliando-a-correlação" id="toc-avaliando-a-correlação" class="nav-link" data-scroll-target="#avaliando-a-correlação">Avaliando a correlação</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -109,11 +127,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introdução" class="level1">
 <h1>Introdução</h1>
+<p>Introdução</p>
+<p>A história dos jogos de tabuleiro é longa e complexa, surgindo com o início da civilização humana. Os primeiros jogos de tabuleiro eram simples, geralmente representando uma batalha entre dois exércitos, usando ferramentas e componentes simples. Com o tempo, os jogos de tabuleiro tornaram-se mais robustos e variados, incorporando elementos de estratégia, sorte, negociação e até mesmo atuação.</p>
+<p>No início, os jogos de tabuleiro eram usados principalmente para fins educacionais. Eles eram usados para ensinar habilidades estratégicas, matemáticas e até mesmo valores morais. Com o tempo, os jogos de tabuleiro tornaram-se cada vez mais populares como forma de entretenimento, tornando-se uma forma lúdica de ensinar e exercitar capacidades.</p>
+<p>No século XX, com a industrialização e evolução das tarefas, os jogos de tabuleiro passaram por um novo período de crescimento, com o desenvolvimento de jogos clássicos como Monopoly, Risk e Clue, conhecidos no Brasil em suas versões próximas como, respectivamente Banco imobiliário, War e Detetive. Esses jogos tornaram-se populares em todo o mundo e continuam a ser jogados até hoje.</p>
+<p>Nos últimos anos, já no final do século XX e início do século XXI, os jogos de tabuleiro estão experimentando um novo ressurgimento, com a criação de jogos modernos mais complexos e sofisticados. Esses produtos atraem jogadores de todas as idades e níveis de experiência, além de atingirem diferentes públicos e gostos.</p>
+<p>A história dos jogos de tabuleiro é uma história de criatividade, inovação e entretenimento. Os jogos de tabuleiro são uma parte essencial da cultura humana e continuam a ser uma forma popular de recreação e aprendizado.</p>
+<p>Ao longo dos anos, para auxiliar os jogadores a entenderem melhor esse número crescente de jogos e facilitar a comunicação entre diversas pessoas do hobbie, um website foi criado, o BoardGameGeek. Ele centraliza boa parte das discussões, informações e arquivos relacionados a jogos de tabuleiro a nível mundial. Trazendo portanto a maior base de dados relativos aos jogos de tabuleiro disponível atualmente.</p>
+<p>Logo em seu princípio, para ajudar os jogadores a entenderem sobre os jogos lançados, o site lançou uma forma colaborativa de atribuir uma nota aos jogos, onde os jogadores cadastrados no portal podem atribuir uma nota à um jogo, que vai de 0 à 10, além de deixar uma opinião para contribuir com a pesquisa dos demais jogadores sobre o determinado jogo. Essa nota se tornou um fator muito importante aos novos jogadores, que a tomam como base para decidir suas futuras aquisições, além de comparar com jogos próprios.</p>
+<p>O sucesso de um jogo de tabuleiro pode ser medida de diferentes formas, número de vendas, posições em ranking, recomendações de formadores de opinião e também por sua nota, como muitas dessas informações são de difícil acesso, e para casar com a disciplina de Análise de Regressão cursada, foi escolhida como objetivo de estudo a nota dos jogos.</p>
+<p>O objetivo deste projeto é fazer uma análise sobre a base de dados de jogos de tabuleiro, e tentar criar uma regressão multivariada que preveja a nota de um jogo de tabuleiro, baseada em alguns aspectos como, número de jogadores, tempo estimado de jogo, idade mínima recomendada, ano de publicação, número de avaliações, complexidade e número de pessoas que possuem o jogo. Para isso será utilizada uma base de dados disponibilizada no site: https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games</p>
+<p>A nossa exploração inicial se dará na base de dados, observando seu tamanho, sua completude, e fazendo uma estatística descritiva de cada uma das variáveis.</p>
+<section id="análise-exploratória" class="level2">
+<h2 class="anchored" data-anchor-id="análise-exploratória">Análise exploratória</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dataset_bg <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">as_tibble</span>(readxl<span class="sc">::</span><span class="fu">read_excel</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="st">`</span><span class="at">Year Published</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>))</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(dataset_bg)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Usando o skimr</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(dataset_bg)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <caption>Data summary</caption>
@@ -390,247 +423,455 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dataset_bg_boxplot <span class="ot">&lt;-</span> dataset_bg <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>ID, <span class="sc">-</span><span class="st">`</span><span class="at">BGG Rank</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Name</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Mechanics</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Domains</span><span class="st">`</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>graf_boxplot_year <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Ano de lançamento"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>graf_boxplot_min_p <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Min Players</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mínimo de jogadores"</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>graf_boxplot_max_p <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Max Players</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Máximo de jogadores"</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>graf_boxplot_time <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Play Time</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Duração do jogo"</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>graf_boxplot_min_age <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Min Age</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Idade mínima"</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>graf_boxplot_users_rated <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Users Rated</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Número de avaliações"</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>graf_boxplot_avg_rate <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Rating Average</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Nota média"</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>graf_boxplot_compl <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Complexity Average</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Complexidade"</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>graf_boxplot_own_users <span class="ot">&lt;-</span> dataset_bg_boxplot <span class="sc">|&gt;</span> </span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Owned Users</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Número de usuários que possuem"</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="co"># graf_boxplot_own_users</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>(graf_boxplot_year <span class="sc">|</span> graf_boxplot_min_p <span class="sc">|</span> graf_boxplot_max_p <span class="sc">|</span> graf_boxplot_time) <span class="sc">/</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>(graf_boxplot_users_rated <span class="sc">|</span> graf_boxplot_avg_rate <span class="sc">|</span> graf_boxplot_compl <span class="sc">|</span> graf_boxplot_own_users)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="modeloReg_files/figure-html/descritiva-variaveis-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+</section>
+<section id="selecionando-variáveis" class="level2">
+<h2 class="anchored" data-anchor-id="selecionando-variáveis">Selecionando variáveis</h2>
+<p>Por se tratar de um trabalho de regressão múltipla, optei por selecionar apenas as variáveis do tipo numérica para o modelo, portanto farei a seleção das variáveis:</p>
+<ul>
+<li><strong>ID</strong>: Que será o identificador do jogo;</li>
+<li><strong>name</strong>: Contendo o nome do jogo;</li>
+<li><strong>year</strong>: O ano de lançamento do jogo;</li>
+<li><strong>min_p</strong>: Número mínimo de jogadores para o jogo;</li>
+<li><strong>max_p</strong>: Número máximo de jogadores para o jogo;</li>
+<li><strong>playtime</strong>: O tempo médio de jogo;</li>
+<li><strong>min_age</strong>: A idade mínima recomendada;</li>
+<li><strong>users_rat</strong>: O número de usuários que avaliou o jogo;</li>
+<li><strong>compl</strong>: A complexidade do jogo, uma média dos valores atribuídos pelos jogadores;</li>
+<li><strong>own_users</strong>: Número de usuários que possuem o jogo;</li>
+<li><strong>score</strong>: A nota, calculada através da média das notas atribuídas pelos jogadores;</li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(dataset_bg)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 14</code></pre>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> dataset_bg <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">id =</span> ID, <span class="at">name =</span> Name, <span class="at">year =</span> <span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>, <span class="at">min_p =</span> <span class="st">`</span><span class="at">Min Players</span><span class="st">`</span>, <span class="at">max_p =</span> <span class="st">`</span><span class="at">Max Players</span><span class="st">`</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">playtime =</span> <span class="st">`</span><span class="at">Play Time</span><span class="st">`</span>, <span class="at">min_age =</span> <span class="st">`</span><span class="at">Min Age</span><span class="st">`</span>, <span class="at">users_rat =</span> <span class="st">`</span><span class="at">Users Rated</span><span class="st">`</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">compl =</span> <span class="st">`</span><span class="at">Complexity Average</span><span class="st">`</span>, <span class="at">own_users =</span> <span class="st">`</span><span class="at">Owned Users</span><span class="st">`</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">score =</span> <span class="st">`</span><span class="at">Rating Average</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> dataset_bg <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">id =</span> ID, <span class="at">name =</span> Name, <span class="at">year =</span> <span class="st">`</span><span class="at">Year Published</span><span class="st">`</span>, <span class="at">min_p =</span> <span class="st">`</span><span class="at">Min Players</span><span class="st">`</span>, <span class="at">max_p =</span> <span class="st">`</span><span class="at">Max Players</span><span class="st">`</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">playtime =</span> <span class="st">`</span><span class="at">Play Time</span><span class="st">`</span>, <span class="at">min_age =</span> <span class="st">`</span><span class="at">Min Age</span><span class="st">`</span>, <span class="at">users_rat =</span> <span class="st">`</span><span class="at">Users Rated</span><span class="st">`</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">compl =</span> <span class="st">`</span><span class="at">Complexity Average</span><span class="st">`</span>, <span class="at">own_users =</span> <span class="st">`</span><span class="at">Owned Users</span><span class="st">`</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">score =</span> <span class="st">`</span><span class="at">Rating Average</span><span class="st">`</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">as.numeric</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+</section>
 <section id="limpando-dados" class="level2">
 <h2 class="anchored" data-anchor-id="limpando-dados">Limpando dados</h2>
-<p>Agora serão investigados os dados faltantes na base de dados.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>games_year <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># dplyr::pull(year) |&gt; </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Apenas uma observação sem ano, será removida</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(own_users))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 23 × 11
-       id name       year min_p max_p playtime min_age users_rat compl own_users
-    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
- 1 202755 Guildhal…  2016     2     4       45      10       565  2           NA
- 2 196305 Guildhal…  2016     2     4       45      10       360  2.14        NA
- 3 196306 Guildhal…  2016     2     4       45      10       336  2.13        NA
- 4    289 Chariot …  1999     3     4      360      12       221  2.81        NA
- 5   6813 Operatio…  1985     2     2      120      12        94  3.04        NA
- 6    139 Hoax       1981     3    12       45      10       216  1.38        NA
- 7 266756 Devil Bo…  2021     1     1       60      14        49  2.83        NA
- 8     NA Ace of A…  1990     2     2       20      10       110  1.88        NA
- 9     NA Die Erbe…  1999     3     8       45      12       137  2.15        NA
-10     NA Rommel i…  1986     2     2        0      12        53  3.63        NA
-# ℹ 13 more rows
-# ℹ 1 more variable: score &lt;dbl&gt;</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 23 jogos pouco avaliados e menos conhecidos, também serão removidos</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(own_users) <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>id, <span class="sc">-</span>name)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Agora serão investigados os dados faltantes na base de dados, além disso serão será investigado o que pode ser considerado um dado inválido ou inconsistente.</p>
+<section id="dados-na" class="level3">
+<h3 class="anchored" data-anchor-id="dados-na">Dados NA</h3>
 <p>Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.</p>
-<p>Além disso, optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do “Colonizadores de Catan”, criado por “Klaus Teuber”, conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. Por isso, removemos aproximadamente 100.1</p>
-</section>
-<section id="correlação" class="level2">
-<h2 class="anchored" data-anchor-id="correlação">Correlação</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rxx <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_bg[,<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># heatmap(rxx)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rxx</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(rxx)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nrow_year_na <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(year)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Apenas uma observação sem ano, será removida</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>nrow_year_own_users <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">is.na</span>(own_users)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 23 jogos pouco avaliados e menos conhecidos, também serão removidos</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>df_bg <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(own_users) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(year))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="removendo-dados-considerados-inválidos" class="level3">
+<h3 class="anchored" data-anchor-id="removendo-dados-considerados-inválidos">Removendo dados considerados inválidos</h3>
+<p>Para tornar mais homogêneo o meu banco de dados, optei também por remover alguns dados que divergem da realidade mercadológica atual, em algumas variáveis serão utilizados alguns filtros.</p>
+<section id="ano-de-lançamento" class="level4">
+<h4 class="anchored" data-anchor-id="ano-de-lançamento">Ano de lançamento</h4>
+<p>Optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do “Colonizadores de Catan”, criado por “Klaus Teuber”, conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual.</p>
+</section>
+<section id="mínimo-e-máximo-de-jogadores" class="level4">
+<h4 class="anchored" data-anchor-id="mínimo-e-máximo-de-jogadores">Mínimo e máximo de jogadores</h4>
+<p>É comum vermos jogos que são feitos para um único jogador (chamados jogos <em>solo</em>), jogos que precisam de pelo menos dois ou três jogadores, e alguns poucos jogos que precisam de mais do que este número, portanto, como número mínimo de jogadores, aceitaremos jogos com valores de 1 à 5.</p>
+<p>Já para um número máximo, é um tanto mais complicado, porque existem jogos feitos para muitos jogadores, 10, 20 ou mais jogadores, assim como os jogos <em>solo</em> que são para apenas um jogador. Portanto vamos manter nesta variável jogos feitos para 1 até 20 jogadores, que deve abrangir boa parte do mercado atual.</p>
+</section>
+<section id="duração-do-jogo" class="level4">
+<h4 class="anchored" data-anchor-id="duração-do-jogo">Duração do jogo</h4>
+<p>No quesito duração dos jogos, também temos uma variação bem grande, com jogos sendo na casa de poucos minutos, à jogos que levam algumas horas, mas, para colocar um limite máximo, definiremos o valor de 300 minutos ou 5 horas, que já é bastante abrangente.</p>
+</section>
+<section id="usuários-que-possuem-o-jogo-e-número-de-avaliações" class="level4">
+<h4 class="anchored" data-anchor-id="usuários-que-possuem-o-jogo-e-número-de-avaliações">Usuários que possuem o jogo e número de avaliações</h4>
+<p>O número de usuários que possuem os jogos também varia bastante, mas é algo esperado porque temos jogos lançados a muitos anos, que fizeram muito sucesso, e jogos que recém foram lançados ou que não fizeram muito sucesso, portanto vamos remover apenas os jogos que possuem menos jogadores, definindo um limite mínimo de 100 jogadores e 100 avaliações.</p>
+</section>
+<section id="nota-média-e-complexidade" class="level4">
+<h4 class="anchored" data-anchor-id="nota-média-e-complexidade">Nota média e complexidade</h4>
+<p>Ainda que existam jogos com notas muito baixas e níveis de complexidade muito baixos, a distribuição parece ser mais uniforme e condizente com a realidade, portanto nenhum jogo será filtrado com base nessas variáveis.</p>
+</section>
+<section id="fim-da-limpeza" class="level4">
+<h4 class="anchored" data-anchor-id="fim-da-limpeza">Fim da limpeza</h4>
+<div class="cell">
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_bg_filt <span class="ot">&lt;-</span> df_bg <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> <span class="dv">1995</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                min_p <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">&amp;</span> min_p <span class="sc">&lt;=</span> <span class="dv">5</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                min_p <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">&amp;</span> max_p <span class="sc">&lt;=</span> <span class="dv">20</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                playtime <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> playtime <span class="sc">&lt;=</span> <span class="dv">300</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                users_rat <span class="sc">&gt;</span> <span class="dv">100</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                own_users <span class="sc">&gt;</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>id, <span class="sc">-</span>name)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Após concluir as filtragens dos dados, agora nossa base possui um total de 7507 jogos, uma boa diminuição se considerarmos que o número inicial era de 20343 jogos, porém, agora temos uma base mais homogênea e mais condizente com o nosso objetivo de avaliar as notas dos jogos de tabuleiro modernos. Além disso, também removeremos as colunas ID e name, que se tratam apenas de identificadores, não podendo ser levados para as próximas análises.</p>
+</section>
+</section>
+</section>
+<section id="avaliando-a-correlação" class="level2">
+<h2 class="anchored" data-anchor-id="avaliando-a-correlação">Avaliando a correlação</h2>
+<div class="cell">
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(gt)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>rxx <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_bg_filt[,<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># heatmap(rxx)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rxx</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(rxx)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="modeloReg_files/figure-html/corr-matrix-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">data =</span> df_bg, score <span class="sc">~</span> .)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">data =</span> df_bg_filt, score <span class="sc">~</span> .)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = score ~ ., data = df_bg)
+lm(formula = score ~ ., data = df_bg_filt)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--5.5331 -0.3826  0.0331  0.4267  3.2634 
+-3.3943 -0.3224  0.0187  0.3626  2.5354 
 
 Coefficients:
               Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -1.036e+02  1.695e+00 -61.131  &lt; 2e-16 ***
-year         5.428e-02  8.420e-04  64.464  &lt; 2e-16 ***
-min_p       -5.693e-02  8.055e-03  -7.067 1.64e-12 ***
-max_p        1.515e-04  3.365e-04   0.450  0.65267    
-playtime     1.121e-04  1.684e-05   6.656 2.90e-11 ***
-min_age      8.814e-04  1.564e-03   0.564  0.57296    
-users_rat    2.743e-05  8.840e-06   3.103  0.00192 ** 
-compl        5.146e-01  7.050e-03  72.990  &lt; 2e-16 ***
-own_users    3.921e-06  6.181e-06   0.634  0.52586    
+(Intercept) -8.786e+01  2.115e+00 -41.547  &lt; 2e-16 ***
+year         4.645e-02  1.052e-03  44.149  &lt; 2e-16 ***
+min_p        4.414e-02  1.458e-02   3.027  0.00248 ** 
+max_p       -1.581e-02  3.360e-03  -4.706 2.57e-06 ***
+playtime     9.611e-04  1.942e-04   4.949 7.62e-07 ***
+min_age     -6.150e-03  2.350e-03  -2.617  0.00889 ** 
+users_rat    4.702e-05  8.208e-06   5.729 1.05e-08 ***
+compl        4.566e-01  1.390e-02  32.851  &lt; 2e-16 ***
+own_users   -1.076e-05  5.772e-06  -1.864  0.06238 .  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.6992 on 16714 degrees of freedom
-Multiple R-squared:  0.4264,    Adjusted R-squared:  0.4261 
-F-statistic:  1553 on 8 and 16714 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 0.564 on 7498 degrees of freedom
+Multiple R-squared:  0.4477,    Adjusted R-squared:  0.4472 
+F-statistic: 759.9 on 8 and 7498 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modelsummary::modelsummary(model1)</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modelsummary::modelsummary(model1)</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">step</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">step</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Start:  AIC=-11958.48
+<pre><code>Start:  AIC=-8590.42
 score ~ year + min_p + max_p + playtime + min_age + users_rat + 
     compl + own_users
 
-            Df Sum of Sq     RSS      AIC
-- max_p      1      0.10  8171.3 -11960.3
-- min_age    1      0.16  8171.4 -11960.2
-- own_users  1      0.20  8171.4 -11960.1
-&lt;none&gt;                    8171.2 -11958.5
-- users_rat  1      4.71  8175.9 -11950.9
-- playtime   1     21.66  8192.9 -11916.2
-- min_p      1     24.42  8195.6 -11910.6
-- year       1   2031.58 10202.8  -8247.2
-- compl      1   2604.56 10775.8  -7333.5
-
-Step:  AIC=-11960.28
-score ~ year + min_p + playtime + min_age + users_rat + compl + 
-    own_users
-
-            Df Sum of Sq     RSS      AIC
-- min_age    1      0.16  8171.5 -11961.9
-- own_users  1      0.20  8171.5 -11961.9
-&lt;none&gt;                    8171.3 -11960.3
-- users_rat  1      4.70  8176.0 -11952.7
-- playtime   1     21.69  8193.0 -11918.0
-- min_p      1     24.32  8195.6 -11912.6
-- year       1   2031.91 10203.2  -8248.5
-- compl      1   2619.49 10790.8  -7312.2
-
-Step:  AIC=-11961.95
-score ~ year + min_p + playtime + users_rat + compl + own_users
-
-            Df Sum of Sq     RSS      AIC
-- own_users  1      0.22  8171.7 -11963.5
-&lt;none&gt;                    8171.5 -11961.9
-- users_rat  1      4.63  8176.1 -11954.5
-- playtime   1     21.58  8193.1 -11919.8
-- min_p      1     24.20  8195.7 -11914.5
-- year       1   2069.46 10240.9  -8188.8
-- compl      1   2853.87 11025.3  -6954.6
-
-Step:  AIC=-11963.5
-score ~ year + min_p + playtime + users_rat + compl
-
-            Df Sum of Sq     RSS      AIC
-&lt;none&gt;                    8171.7 -11963.5
-- playtime   1     21.63  8193.3 -11921.3
-- min_p      1     24.42  8196.1 -11915.6
-- users_rat  1    256.36  8428.0 -11448.9
-- year       1   2106.77 10278.5  -8129.7
-- compl      1   2854.06 11025.7  -6956.0</code></pre>
+            Df Sum of Sq    RSS     AIC
+&lt;none&gt;                   2384.8 -8590.4
+- own_users  1      1.10 2385.9 -8588.9
+- min_age    1      2.18 2387.0 -8585.6
+- min_p      1      2.91 2387.7 -8583.3
+- max_p      1      7.04 2391.8 -8570.3
+- playtime   1      7.79 2392.6 -8567.9
+- users_rat  1     10.44 2395.2 -8559.6
+- compl      1    343.25 2728.1 -7582.9
+- year       1    619.93 3004.7 -6857.8</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = score ~ year + min_p + playtime + users_rat + compl, 
-    data = df_bg)
-
-Coefficients:
-(Intercept)         year        min_p     playtime    users_rat        compl  
- -1.039e+02    5.441e-02   -5.635e-02    1.119e-04    3.301e-05    5.155e-01  </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(model1)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Analysis of Variance Table
-
-Response: score
-             Df Sum Sq Mean Sq   F value    Pr(&gt;F)    
-year          1 2163.9 2163.92 4426.2494 &lt; 2.2e-16 ***
-min_p         1  276.7  276.67  565.9312 &lt; 2.2e-16 ***
-max_p         1   16.0   16.05   32.8237 1.026e-08 ***
-playtime      1  306.2  306.19  626.3134 &lt; 2.2e-16 ***
-min_age       1  292.9  292.88  599.0808 &lt; 2.2e-16 ***
-users_rat     1  413.8  413.78  846.3762 &lt; 2.2e-16 ***
-compl         1 2604.4 2604.37 5327.1640 &lt; 2.2e-16 ***
-own_users     1    0.2    0.20    0.4024    0.5259    
-Residuals 16714 8171.2    0.49                        
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>model_step <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> min_p <span class="sc">+</span> max_p <span class="sc">+</span> playtime <span class="sc">+</span> min_age <span class="sc">+</span> users_rat <span class="sc">+</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = score ~ year + compl + own_users, data = df_bg)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--5.5664 -0.3834  0.0307  0.4275  3.3680 
-
-Coefficients:
-              Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -1.050e+02  1.653e+00  -63.50   &lt;2e-16 ***
-year         5.487e-02  8.218e-04   66.78   &lt;2e-16 ***
-compl        5.351e-01  6.452e-03   82.93   &lt;2e-16 ***
-own_users    2.272e-05  1.010e-06   22.49   &lt;2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 0.7012 on 16719 degrees of freedom
-Multiple R-squared:  0.4229,    Adjusted R-squared:  0.4228 
-F-statistic:  4084 on 3 and 16719 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_step)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 lm(formula = score ~ year + min_p + max_p + playtime + min_age + 
-    users_rat + compl + own_users, data = df_bg)
+    users_rat + compl + own_users, data = df_bg_filt)
+
+Coefficients:
+(Intercept)         year        min_p        max_p     playtime      min_age  
+ -8.786e+01    4.645e-02    4.414e-02   -1.581e-02    9.611e-04   -6.150e-03  
+  users_rat        compl    own_users  
+  4.702e-05    4.566e-01   -1.076e-05  </code></pre>
+</div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># anova(model1)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>model_step <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span> year <span class="sc">+</span> min_p <span class="sc">+</span> max_p <span class="sc">+</span> playtime <span class="sc">+</span> min_age <span class="sc">+</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    users_rat <span class="sc">+</span> compl <span class="sc">+</span> own_users, <span class="at">data =</span> df_bg_filt)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_step)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ year + min_p + max_p + playtime + min_age + 
+    users_rat + compl + own_users, data = df_bg_filt)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--5.5331 -0.3826  0.0331  0.4267  3.2634 
+-3.3943 -0.3224  0.0187  0.3626  2.5354 
 
 Coefficients:
               Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -1.036e+02  1.695e+00 -61.131  &lt; 2e-16 ***
-year         5.428e-02  8.420e-04  64.464  &lt; 2e-16 ***
-min_p       -5.693e-02  8.055e-03  -7.067 1.64e-12 ***
-max_p        1.515e-04  3.365e-04   0.450  0.65267    
-playtime     1.121e-04  1.684e-05   6.656 2.90e-11 ***
-min_age      8.814e-04  1.564e-03   0.564  0.57296    
-users_rat    2.743e-05  8.840e-06   3.103  0.00192 ** 
-compl        5.146e-01  7.050e-03  72.990  &lt; 2e-16 ***
-own_users    3.921e-06  6.181e-06   0.634  0.52586    
+(Intercept) -8.786e+01  2.115e+00 -41.547  &lt; 2e-16 ***
+year         4.645e-02  1.052e-03  44.149  &lt; 2e-16 ***
+min_p        4.414e-02  1.458e-02   3.027  0.00248 ** 
+max_p       -1.581e-02  3.360e-03  -4.706 2.57e-06 ***
+playtime     9.611e-04  1.942e-04   4.949 7.62e-07 ***
+min_age     -6.150e-03  2.350e-03  -2.617  0.00889 ** 
+users_rat    4.702e-05  8.208e-06   5.729 1.05e-08 ***
+compl        4.566e-01  1.390e-02  32.851  &lt; 2e-16 ***
+own_users   -1.076e-05  5.772e-06  -1.864  0.06238 .  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.6992 on 16714 degrees of freedom
-Multiple R-squared:  0.4264,    Adjusted R-squared:  0.4261 
-F-statistic:  1553 on 8 and 16714 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 0.564 on 7498 degrees of freedom
+Multiple R-squared:  0.4477,    Adjusted R-squared:  0.4472 
+F-statistic: 759.9 on 8 and 7498 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modelsummary::modelsummary(model_step)</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Mostrar o código</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>model_final <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> score <span class="sc">~</span>  year <span class="sc">+</span> min_p <span class="sc">+</span> max_p <span class="sc">+</span> playtime <span class="sc">+</span> min_age <span class="sc">+</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    users_rat <span class="sc">+</span> compl, <span class="at">data =</span> df_bg_filt)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(model_final)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>sjPlot<span class="sc">::</span><span class="fu">tab_model</span>(model_final)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: center; border-top: double; font-style: normal; font-weight: bold; padding: 0.2cm;">&nbsp;</td>
+<td colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-top: double; font-style: normal; font-weight: bold; padding: 0.2cm;">score</td>
+</tr>
+<tr class="even">
+<td style="text-align: center; border-bottom: 1px solid; font-style: italic; font-weight: normal;">Predictors</td>
+<td style="text-align: center; border-bottom: 1px solid; font-style: italic; font-weight: normal;">Estimates</td>
+<td style="text-align: center; border-bottom: 1px solid; font-style: italic; font-weight: normal;">CI</td>
+<td style="text-align: center; border-bottom: 1px solid; font-style: italic; font-weight: normal;">p</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">(Intercept)</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-87.23</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-91.33&nbsp;–&nbsp;-83.14</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">year</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.05</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.04&nbsp;–&nbsp;0.05</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">min p</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.04</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.02&nbsp;–&nbsp;0.07</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>0.002</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">max p</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-0.02</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-0.02&nbsp;–&nbsp;-0.01</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">playtime</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.00</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.00&nbsp;–&nbsp;0.00</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">min age</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-0.01</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">-0.01&nbsp;–&nbsp;-0.00</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>0.007</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">users rat</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.00</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.00&nbsp;–&nbsp;0.00</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">compl</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.46</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;">0.43&nbsp;–&nbsp;0.49</td>
+<td style="text-align: left; padding: 0.2cm; vertical-align: top;"><strong>&lt;0.001</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top; padding-top: 0.1cm; padding-bottom: 0.1cm; border-top: 1px solid;">Observations</td>
+<td colspan="3" style="text-align: left; padding: 0.2cm; vertical-align: top; padding-top: 0.1cm; padding-bottom: 0.1cm; border-top: 1px solid;">7507</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding: 0.2cm; vertical-align: top; padding-top: 0.1cm; padding-bottom: 0.1cm;">R<sup>2</sup> / R<sup>2</sup> adjusted</td>
+<td colspan="3" style="text-align: left; padding: 0.2cm; vertical-align: top; padding-top: 0.1cm; padding-bottom: 0.1cm;">0.447 / 0.447</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
 </div>
 </section>
 </section>

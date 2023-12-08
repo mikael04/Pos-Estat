@@ -1,20 +1,54 @@
 ---
 title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
 author: "Mikael"
-format: html
+cache: FALSE
+theme: cerulean
+reference-location: margin
+toc: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Mostrar o código"
 editor: visual
 date: 09/11/2023
 date-format: long
 lang: pt
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 # Introdução
 
-```{r, leitura-dados}
+Introdução
+
+A história dos jogos de tabuleiro é longa e complexa, surgindo com o início da civilização humana. Os primeiros jogos de tabuleiro eram simples, geralmente representando uma batalha entre dois exércitos, usando ferramentas e componentes simples. Com o tempo, os jogos de tabuleiro tornaram-se mais robustos e variados, incorporando elementos de estratégia, sorte, negociação e até mesmo atuação.
+
+No início, os jogos de tabuleiro eram usados principalmente para fins educacionais. Eles eram usados para ensinar habilidades estratégicas, matemáticas e até mesmo valores morais. Com o tempo, os jogos de tabuleiro tornaram-se cada vez mais populares como forma de entretenimento, tornando-se uma forma lúdica de ensinar e exercitar capacidades.
+
+No século XX, com a industrialização e evolução das tarefas, os jogos de tabuleiro passaram por um novo período de crescimento, com o desenvolvimento de jogos clássicos como Monopoly, Risk e Clue, conhecidos no Brasil em suas versões próximas como, respectivamente Banco imobiliário, War e Detetive. Esses jogos tornaram-se populares em todo o mundo e continuam a ser jogados até hoje.
+
+Nos últimos anos, já no final do século XX e início do século XXI, os jogos de tabuleiro estão experimentando um novo ressurgimento, com a criação de jogos modernos mais complexos e sofisticados. Esses produtos atraem jogadores de todas as idades e níveis de experiência, além de atingirem diferentes públicos e gostos.
+
+A história dos jogos de tabuleiro é uma história de criatividade, inovação e entretenimento. Os jogos de tabuleiro são uma parte essencial da cultura humana e continuam a ser uma forma popular de recreação e aprendizado.
+
+Ao longo dos anos, para auxiliar os jogadores a entenderem melhor esse número crescente de jogos e facilitar a comunicação entre diversas pessoas do hobbie, um website foi criado, o BoardGameGeek. Ele centraliza boa parte das discussões, informações e arquivos relacionados a jogos de tabuleiro a nível mundial. Trazendo portanto a maior base de dados relativos aos jogos de tabuleiro disponível atualmente.
+
+Logo em seu princípio, para ajudar os jogadores a entenderem sobre os jogos lançados, o site lançou uma forma colaborativa de atribuir uma nota aos jogos, onde os jogadores cadastrados no portal podem atribuir uma nota à um jogo, que vai de 0 à 10, além de deixar uma opinião para contribuir com a pesquisa dos demais jogadores sobre o determinado jogo. Essa nota se tornou um fator muito importante aos novos jogadores, que a tomam como base para decidir suas futuras aquisições, além de comparar com jogos próprios.
+
+O sucesso de um jogo de tabuleiro pode ser medida de diferentes formas, número de vendas, posições em ranking, recomendações de formadores de opinião e também por sua nota, como muitas dessas informações são de difícil acesso, e para casar com a disciplina de Análise de Regressão cursada, foi escolhida como objetivo de estudo a nota dos jogos.
+
+O objetivo deste projeto é fazer uma análise sobre a base de dados de jogos de tabuleiro, e tentar criar uma regressão multivariada que preveja a nota de um jogo de tabuleiro, baseada em alguns aspectos como, número de jogadores, tempo estimado de jogo, idade mínima recomendada, ano de publicação, número de avaliações, complexidade e número de pessoas que possuem o jogo. Para isso será utilizada uma base de dados disponibilizada no site: https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games
+
+A nossa exploração inicial se dará na base de dados, observando seu tamanho, sua completude, e fazendo uma estatística descritiva de cada uma das variáveis.
+
+```{r, leitura-dados, echo=FALSE}
+library(ggplot2)
+library(dplyr)
 dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"))) |> 
   dplyr::mutate(`Year Published` = as.numeric(`Year Published`))
 ```
-
 
 ## Análise exploratória
 
@@ -22,37 +56,165 @@ dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/Analis
 ## Usando o skimr
 
 skimr::skim(dataset_bg)
- 
-# dataset_bg_melt <- dataset_bg |> 
-#   dplyr::select(-`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
-#
-# dataset_bg_melt <- reshape2::melt(dataset_bg_melt, id.vars = "ID",
-#                                   measure.vars=colnames(dataset_bg_melt)[2:10])
-# colnames(dataset_bg_melt)[2:10]
-# 
-# # creating a plot 
-# p <- ggplot(dataset_bg_melt) + 
-#   geom_boxplot(aes(x=ID, y=value, color=variable)) 
-#   
-# # printing the plot 
-# print(p) 
 
 dataset_bg_boxplot <- dataset_bg |> 
   dplyr::select(-ID, -`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
 
-dataset_bg_boxplot |> 
+graf_boxplot_year <- dataset_bg_boxplot |> 
   ggplot(aes(x = `Year Published`)) +
   geom_boxplot() +
   theme_minimal() +
   coord_flip() +
   labs(
-    x.axis.label = element_blank()
+    x = "",
+    y = "Ano de lançamento"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
   )
 
-mpg
+
+graf_boxplot_min_p <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Min Players`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Mínimo de jogadores"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_max_p <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Max Players`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Máximo de jogadores"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_time <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Play Time`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Duração do jogo"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_min_age <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Min Age`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Idade mínima"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_users_rated <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Users Rated`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Número de avaliações"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_avg_rate <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Rating Average`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Nota média"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_compl <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Complexity Average`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Complexidade"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+graf_boxplot_own_users <- dataset_bg_boxplot |> 
+  ggplot(aes(x = `Owned Users`)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Número de usuários que possuem"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+
+# graf_boxplot_own_users
+
+library(patchwork)
+
+(graf_boxplot_year | graf_boxplot_min_p | graf_boxplot_max_p | graf_boxplot_time) /
+(graf_boxplot_users_rated | graf_boxplot_avg_rate | graf_boxplot_compl | graf_boxplot_own_users)
+
+
 ```
 
-```{r, selecao-variaveis} 
+## Selecionando variáveis
+
+Por se tratar de um trabalho de regressão múltipla, optei por selecionar apenas as variáveis do tipo numérica para o modelo, portanto farei a seleção das variáveis:
+
+-   **ID**: Que será o identificador do jogo;
+-   **name**: Contendo o nome do jogo;
+-   **year**: O ano de lançamento do jogo;
+-   **min_p**: Número mínimo de jogadores para o jogo;
+-   **max_p**: Número máximo de jogadores para o jogo;
+-   **playtime**: O tempo médio de jogo;
+-   **min_age**: A idade mínima recomendada;
+-   **users_rat**: O número de usuários que avaliou o jogo;
+-   **compl**: A complexidade do jogo, uma média dos valores atribuídos pelos jogadores;
+-   **own_users**: Número de usuários que possuem o jogo;
+-   **score**: A nota, calculada através da média das notas atribuídas pelos jogadores;
+
+```{r, selecao-variaveis}
 
 df_bg <- dataset_bg |>
   dplyr::select(id = ID, name = Name, year = `Year Published`, min_p = `Min Players`, max_p = `Max Players`,
@@ -63,51 +225,79 @@ df_bg <- dataset_bg |>
 
 ```
 
-
 ## Limpando dados
 
 Agora serão investigados os dados faltantes na base de dados, além disso serão será investigado o que pode ser considerado um dado inválido ou inconsistente.
 
 ### Dados NA
 
+Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
+
 ```{r, filter-data}
-df_bg |> 
+nrow_year_na <- df_bg |> 
   dplyr::filter(is.na(year)) |> 
   nrow()
 
 ## Apenas uma observação sem ano, será removida
 
-
-df_bg |> 
+nrow_year_own_users <- df_bg |> 
   dplyr::filter(is.na(own_users)) |> 
   nrow()
 
 ## 23 jogos pouco avaliados e menos conhecidos, também serão removidos
 
 df_bg <- df_bg |> 
-  dplyr::filter(!is.na(own_users) & !is.na(year)) |> 
-  dplyr::select(-id, -name)
+  dplyr::filter(!is.na(own_users) & !is.na(year))
 
 ```
-
-Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
 
 ### Removendo dados considerados inválidos
 
+Para tornar mais homogêneo o meu banco de dados, optei também por remover alguns dados que divergem da realidade mercadológica atual, em algumas variáveis serão utilizados alguns filtros.
+
+#### Ano de lançamento
+
+Optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do "Colonizadores de Catan", criado por "Klaus Teuber", conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. 
+
+#### Mínimo e máximo de jogadores
+
+É comum vermos jogos que são feitos para um único jogador (chamados jogos *solo*), jogos que precisam de pelo menos dois ou três jogadores, e alguns poucos jogos que precisam de mais do que este número, portanto, como número mínimo de jogadores, aceitaremos jogos com valores de 1 à 5.
+
+Já para um número máximo, é um tanto mais complicado, porque existem jogos feitos para muitos jogadores, 10, 20 ou mais jogadores, assim como os jogos *solo* que são para apenas um jogador. Portanto vamos manter nesta variável jogos feitos para 1 até 20 jogadores, que deve abrangir boa parte do mercado atual.
+
+#### Duração do jogo
+
+No quesito duração dos jogos, também temos uma variação bem grande, com jogos sendo na casa de poucos minutos, à jogos que levam algumas horas, mas, para colocar um limite máximo, definiremos o valor de 300 minutos ou 5 horas, que já é bastante abrangente.
+
+#### Usuários que possuem o jogo e número de avaliações
+
+O número de usuários que possuem os jogos também varia bastante, mas é algo esperado porque temos jogos lançados a muitos anos, que fizeram muito sucesso, e jogos que recém foram lançados ou que não fizeram muito sucesso, portanto vamos remover apenas os jogos que possuem menos jogadores, definindo um limite mínimo de 100 jogadores e 100 avaliações.
+
+#### Nota média e complexidade
+
+Ainda que existam jogos com notas muito baixas e níveis de complexidade muito baixos, a distribuição parece ser mais uniforme e condizente com a realidade, portanto nenhum jogo será filtrado com base nessas variáveis.
+
+#### Fim da limpeza
+
 ```{r, demais-remocoes}
-games_year <- df_bg |> 
-  dplyr::filter(year >= 1995) |> 
-  # dplyr::pull(year) |> 
-  nrow()
+df_bg_filt <- df_bg |> 
+  dplyr::filter(year >= 1995,
+                min_p > 1 & min_p <= 5,
+                min_p > 1 & max_p <= 20,
+                playtime > 0 & playtime <= 300,
+                users_rat > 100,
+                own_users > 100) |> 
+  dplyr::select(-id, -name)
 ```
 
-Além disso, optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do "Colonizadores de Catan", criado por "Klaus Teuber", conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. Por isso, removemos aproximadamente `r round(games_year*100/nrow(df_bg),1)`
+Após concluir as filtragens dos dados, agora nossa base possui um total de `r nrow(df_bg_filt)` jogos, uma boa diminuição se considerarmos que o número inicial era de 20343 jogos, porém, agora temos uma base mais homogênea e mais condizente com o nosso objetivo de avaliar as notas dos jogos de tabuleiro modernos.
+Além disso, também removeremos as colunas ID e name, que se tratam apenas de identificadores, não podendo ser levados para as próximas análises.
 
-## Correlação
+## Avaliando a correlação
 
 ```{r, corr-matrix}
-library(gt)
-rxx <- cor(df_bg[,1:8])
+# library(gt)
+rxx <- cor(df_bg_filt[,1:8])
 
 # heatmap(rxx)
 # rxx
@@ -116,20 +306,24 @@ corrplot::corrplot(rxx)
 ```
 
 ```{r, modelo-inicial-step}
-model1 <- lm(data = df_bg, score ~ .)
+model1 <- lm(data = df_bg_filt, score ~ .)
 summary(model1)
 # modelsummary::modelsummary(model1)
 ```
 
 ```{r, modelo-step}
 step(model1)
-anova(model1)
+# anova(model1)
 
-model_step <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + users_rat + 
-    compl + own_users, data = df_bg)
-
-summary(lm(formula = score ~ year + compl + own_users, data = df_bg))
+model_step <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + 
+    users_rat + compl + own_users, data = df_bg_filt)
 
 summary(model_step)
-# modelsummary::modelsummary(model_step)
+
+model_final <- lm(formula = score ~  year + min_p + max_p + playtime + min_age + 
+    users_rat + compl, data = df_bg_filt)
+
+summary(model_final)
+sjPlot::tab_model(model_final)
+
 ```
