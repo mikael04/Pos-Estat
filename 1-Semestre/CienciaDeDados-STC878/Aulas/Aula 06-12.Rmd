@@ -1,0 +1,107 @@
+---
+title: "Aula 06-12"
+author: "Mikael Marin Coletto"
+date: '2023-12-06'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{css}
+p{
+  color:#660000;
+}
+h3{
+  color:red;
+}
+.titulo2{
+  color:green;
+}
+```
+
+## Testando CSS
+
+### R Markdown
+
+<p style="color:#660000; font-size: 20px; font-weight: 900; font-style: italic; text-decoration: underline">This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. </p>
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+### Including Plots
+
+<h2 class="titulo2"> Including Plots</h2>
+
+## Web scrapping
+
+```{r, lendo-arquivos}
+library(rvest)
+url <- "http://premiacao.obmep.org.br/17obmep/verRelatorioPremiadosOuro.do.htm"
+
+tabelas <- url |> 
+  rvest::read_html() |> 
+  rvest::html_table()
+
+## Tabela 1
+
+tabela1 <- data.frame(tabelas[[1]])
+tabela1 <- tabela1[,2:7]
+# names(tabela1) <- NULL
+# View(tabela1)
+
+tabela1 <- tabela1 |> 
+  janitor::row_to_names(row_number = 1) |> 
+  dplyr::mutate(Nivel = 1)
+
+## Tabela 2
+
+tabela2 <- data.frame(tabelas[[2]])
+tabela2 <- tabela2[,2:7]
+# names(tabela1) <- NULL
+# View(tabela1)
+
+tabela2 <- tabela2 |> 
+  janitor::row_to_names(row_number = 1) |> 
+  dplyr::mutate(Nivel = 2)
+
+
+## Tabela 3
+
+tabela3 <- data.frame(tabelas[[3]])
+tabela3 <- tabela3[,2:7]
+# names(tabela1) <- NULL
+# View(tabela1)
+
+tabela3 <- tabela3 |> 
+  janitor::row_to_names(row_number = 1) |> 
+  dplyr::mutate(Nivel = 3)
+
+tabela_total <- dplyr::bind_rows(tabela1, tabela2, tabela3)
+
+tabela_final <- tabela_total |> 
+  dplyr::group_by(UF, Nivel) |> 
+  dplyr::summarise(Quantidade = dplyr::n()) |> 
+  dplyr::ungroup()
+
+library(ggplot2)
+tabela_final |> 
+  ggplot2::ggplot(aes(x = UF, y = Quantidade)) +
+  geom_col() +
+  facet_wrap(~Nivel, scales= "free")
+
+```
+
+```{r, lendo-pregao}
+url2 <- "https://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-ajustes-do-pregao-ptBR.asp"
+
+tabelas_pregao <- url2 |> 
+  rvest::read_html() |> 
+  rvest::html_table()
+
+```
+
