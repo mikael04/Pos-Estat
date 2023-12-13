@@ -23,7 +23,7 @@ library(dplyr)
 ```
 
 ```{r, rank}
-use_rank <- f
+use_rank <- F
 ```
 
 # Introdução
