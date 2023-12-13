@@ -1,7 +1,7 @@
 ---
-title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
+title: "Análise descritiva da base de dados sobre jogos de tabuleiro"
 author: "Mikael"
-cache: TRUE
+cache: FALSE
 theme: cerulean
 reference-location: margin
 toc: true
@@ -21,6 +21,7 @@ library(ggplot2)
 library(dplyr)
 library(gt)
 library(patchwork)
+
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 
 ## Função para calcular moda
@@ -73,8 +74,8 @@ A nossa base de dados possui `r df_bg_raw |> nrow()` linhas e `r df_bg_raw |> nc
 ```{r, descritiva-inicial}
 colnames(df_bg_raw)
 ```
-Primeiramente vou trabalhar no nome das colunas, usando o pacote **janitor** e a função **clean_names** para padronizar o nome das colunas.
 
+Primeiramente vou trabalhar no nome das colunas, usando o pacote **janitor** e a função **clean_names** para padronizar o nome das colunas.
 
 ```{r, clean-names}
 df_bg_raw <- df_bg_raw |> 
@@ -92,8 +93,8 @@ A coluna ID representa um identificador do jogo, tendo um código utilizado para
 n_unicos <- dplyr::n_distinct(df_bg_raw$id)
 n_unicos
 ```
-Inicialmente tentei verificar se a quantidade de IDs é realmente única, porém tive um resultado menor do que o número de linhas (`r n_unicos` IDs únicos ao invés das `r nrow(df_bg_raw)` linhas), o que provavelmente indica algum problema nesta coluna.
 
+Inicialmente tentei verificar se a quantidade de IDs é realmente única, porém tive um resultado menor do que o número de linhas (`r n_unicos` IDs únicos ao invés das `r nrow(df_bg_raw)` linhas), o que provavelmente indica algum problema nesta coluna.
 
 ```{r, id-na}
 na_count <- sum(is.na(df_bg_raw$id))
@@ -106,7 +107,6 @@ Consegui identificar `r na_count` linhas que possuíam valores como *NA*, que de
 df_bg_raw <- df_bg_raw |> 
   dplyr::filter(!is.na(id))
 ```
-
 
 ```{r, id-sum-na-rm}
 n_unicos <- dplyr::n_distinct(df_bg_raw$id)
@@ -164,8 +164,8 @@ df_tend_central |>
   )
 ```
 
-
 ```{r, year-dist-graph}
+#| out-width: 80%
 df_bg_raw |> 
   ggplot(aes(x = year_published)) +
   geom_boxplot() +
@@ -184,6 +184,9 @@ df_bg_raw |>
 O boxplot nos ajuda a observar melhor a distribuição dos dados, podemos ver que existem muitos dados nos anos próximos dos 2000, porém existem jogos que datam de mais de 2000 mil anos atrás.
 
 ```{r, old-games}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_bg_raw |> 
   dplyr::filter(year_published < 0) |> 
   dplyr::select(name, year_published, rating_average, bgg_rank, complexity_average, 
@@ -198,11 +201,13 @@ df_bg_raw |>
     locations = cells_column_labels()
   )
 ```
+
 <br>
 
 Observando alguns dos jogos que me são conhecidos, como o jogo da velha ("Tic-Tac-Toe") que é egípcio e Go que é um jogo muito antigo chinês, concluí que são mesmo jogos antigos e não dados preenchidos de forma inconsistente. Isso influência bastante a média, que é puxada para baixo pelos valores bastante altos "negativos". Então, como me propus a trabalhar com a análise descritiva de jogos de tabuleiros modernos, achei mais correto filtrar os jogos a partir de um determinado ano. E o ano escolhido foi o de lançamento do jogo "Catan", conhecido como o primeiro e provavelmente o mais famoso jogo de tabuleiro moderno, lançado em 1993.
 
 #### Filtro
+
 ```{r, year-filter}
 df_bg <- df_bg_raw |> 
   dplyr::filter(year_published >= 1993)
@@ -228,7 +233,7 @@ df_tend_central |>
   )
 ```
 
-```{r, year-filter-grafs}
+```{r, year-filter-grafs, warning=F}
 
 boxplot <- df_bg |> 
   ggplot(aes(x = as.numeric(year_published))) +
@@ -288,21 +293,23 @@ dplyr::inner_join(df_tend_central_min, df_tend_central_max, by="Medida")|>
 
 ```
 
-
 ```{r, min-max-hist}
+#| column: page
+#| out-width: 90%
+#| warning: false
 hist_min <- df_bg_raw |> 
   ggplot(aes(x = min_players)) +
-  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  geom_histogram(fill = "#B7DFF7", binwidth = 1) +
   theme_minimal() +
   labs(
     x = "Mínimo de jogadores",
     y = "Contagem"
-  ) + 
-  scale_x_discrete(limits=c(0,1,2,3,4,5,6,7,8,9,10))
-
+  ) +
+  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+# hist_min
 hist_max <- df_bg_raw |> 
   ggplot(aes(x = max_players)) +
-  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  geom_histogram(stat = "count", fill = "#B7DFF7") +
   theme_minimal() +
   labs(
     x = "Máximo de jogadores",
@@ -314,7 +321,6 @@ hist_max <- df_bg_raw |>
   patchwork::plot_annotation(
   title = 'Histograma do mínimo e máximo de jogadores')
 ```
-
 
 É comum vermos jogos que são feitos para um único jogador (chamados jogos *solo*), jogos que precisam de pelo menos dois ou três jogadores, e alguns poucos jogos que precisam de mais do que este número, portanto, o ideal seria filtrar os dados para que houvesse um valor máximo para a variável mínimo de jogadores, pelo histograma e pelos quantis, eu diria que o valor 5 é um valor bastante alto e abrange boa parte dos dados. Isto irá remover aproximadamente **`r nrow(df_bg_raw |> dplyr::filter(min_players > 5 | min_players < 1))` observações**.
 
@@ -328,11 +334,13 @@ df_bg <- df_bg |>
                 max_players <= 20 & max_players >= 1)
 ```
 
-
 #### Distribuição do mínimo e máximo de jogadores na base de dados
+
 Após a aplicação do filtro, os novos dados são:
 
 ```{r, min-max-filter-tendencia-central}
+#| column: screen
+#| out-width: 90%
 quantis <- round(quantile(df_bg_raw$min_players), 0)
 media <- round(mean(df_bg_raw$min_players), 2)
 moda <- round(func_getmode(df_bg_raw$min_players), 0)
@@ -356,9 +364,11 @@ dplyr::inner_join(df_tend_central_min, df_tend_central_max, by="Medida")|>
 
 ```
 
-```{r, min-max-filter-hist}
+```{r, min-max-filter-hist, warning = F}
+#| column: page
+#| out-width: 90%
 (df_bg |> ggplot(aes(x = min_players)) +
-  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  geom_histogram(stat = "count", fill = "#B7DFF7", binwidth = 1) +
   theme_minimal() +
   labs(
     x = "Mínimo de jogadores",
@@ -366,7 +376,7 @@ dplyr::inner_join(df_tend_central_min, df_tend_central_max, by="Medida")|>
   ) + 
   scale_x_discrete(limits=c(0,1,2,3,4,5))) /
 (df_bg |> ggplot(aes(x = max_players)) +
-  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  geom_histogram(stat = "count", fill = "#B7DFF7", binwidth = 1) +
   theme_minimal() +
   labs(
     x = "Mínimo de jogadores",
@@ -388,8 +398,7 @@ Já para a quantidade máxima de jogadores, já é bem mais diverso, mas podemos
 
 ### Tempo de jogo
 
-O tempo de jogo (*play_time*) é uma variável bastante interessante, porque dentro desta base de dados temos jogos muito  rápidos, jogos mais longos e ainda pudemos perceber alguns jogos com valores bastante fora dos padrões, que serão tratados como inconsistentes.
-
+O tempo de jogo (*play_time*) é uma variável bastante interessante, porque dentro desta base de dados temos jogos muito rápidos, jogos mais longos e ainda pudemos perceber alguns jogos com valores bastante fora dos padrões, que serão tratados como inconsistentes.
 
 ```{r, play_time-tendencia-central}
 quantis <- round(quantile(df_bg$play_time), 0)
@@ -408,6 +417,9 @@ df_tend_central |>
 ```
 
 ```{r, play_time-inconsistentes}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_bg_play_time <- df_bg_raw |> 
   dplyr::select(name, play_time, year_published, rating_average, bgg_rank, complexity_average, mechanics, domains) |> 
   dplyr::filter(play_time < 0 | play_time > 360)
@@ -422,15 +434,15 @@ df_bg_play_time |>
 
 ```
 
-Verificamos que, **acima de 360 minutos**, temos **apenas `r nrow(df_bg_play_time)` jogos**, portanto delimitaremos este valor como limite, mesmo que, ao verificar na tabela de resultado, verifiquemos jogos que realmente possuam mais de 360 minutos e se tratem de jogos reais.
+Verificamos que, **acima de 360 minutos**, temos **apenas `r nrow(df_bg_play_time)` jogos**, porém, existem alguns jogos no topo da lista de rankeamento que possuem mais de 360 minutos por partida, sendo eles "Twilight Imperium: Fourth Edition" com 480 minutos, "The 7th Continent" com 1000 minutos, portanto delimitaremos o valor limite como 360, mas para uma modelagem esse ponto deve ser melhor investigado
 
 #### Filtro
 
 ```{r, play_time-filter}
+playtime_max <- 360
 df_bg <- df_bg |> 
-  dplyr::filter(play_time > 0 & play_time <= 1000)
+  dplyr::filter(play_time > 0 & play_time <= playtime_max)
 ```
-
 
 #### Distribuição do tempo de jogo na base de dados
 
@@ -453,6 +465,9 @@ df_tend_central |>
 ```
 
 ```{r, play_time-filter-histograma-boxplot}
+#| column: page
+#| out-width: 90%
+#| warning: false
 
 boxplot_play_time <- df_bg |> 
   dplyr::select(name, play_time, year_published, rating_average, bgg_rank, 
@@ -460,7 +475,7 @@ boxplot_play_time <- df_bg |>
   ggplot(aes(x = play_time)) +
   geom_boxplot() +
   theme_minimal() +
-  scale_x_continuous(breaks=seq(0, 360, by=50)) +
+  scale_x_continuous(breaks=seq(0, playtime_max, by=50)) +
   labs(
     x = "",
     y = "Tempo de jogo"
@@ -475,14 +490,14 @@ hist_play_time <- df_bg |>
   dplyr::select(name, play_time, year_published, rating_average, bgg_rank, 
                 complexity_average, mechanics, domains) |> 
   ggplot(aes(x = play_time)) +
-  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 10) +
+  geom_histogram(fill = "#B7DFF7", binwidth = 10) +
   theme_minimal() +
-  scale_x_continuous(breaks=seq(0, 360, by=50)) +
+  scale_x_continuous(breaks=seq(0, playtime_max, by=20)) +
   labs(
     x = "Tempo de jogo",
     y = "Contagem"
   )
-
+hist_play_time
 (boxplot_play_time) /
 (hist_play_time) +
   patchwork::plot_annotation(
@@ -513,6 +528,9 @@ df_tend_central |>
 ```
 
 ```{r, min_age-inconsistentes}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_bg_min_age <- df_bg_raw |> 
   dplyr::select(name, min_age, year_published, rating_average, bgg_rank, complexity_average, mechanics, domains) |> 
   dplyr::filter(min_age > 17 | min_age < 4)
@@ -540,7 +558,6 @@ df_bg <- df_bg |>
   dplyr::filter(min_age > 3)
 ```
 
-
 #### Distribuição das idades mínimas na base de dados
 
 Após a aplicação do filtro temos:
@@ -562,6 +579,9 @@ df_tend_central |>
 ```
 
 ```{r, min_age-filter-histograma-boxplot}
+#| column: page
+#| out-width: 90%
+#| warning: false
 boxplot_min_age <- df_bg |> 
   ggplot(aes(x = min_age)) +
   geom_boxplot() +
@@ -600,7 +620,6 @@ Em geral as recomendações se dão através dos números pares (4, 6, 8, 10, 12
 
 As variáveis número de avaliações e número de usuários (respectivamente *users_rated* e *owned_users*) que possuem estes jogos, possivelmente existe uma relação entre elas, já que, para avaliar um jogo, um fator que exerce bastante peso é possuir o jogo (não necessário, porque um usuário pode por exemplo jogar o jogo de um amigo, e fazer uma avaliação, porém é menos comum).
 
-
 ```{r, users_rated-tendencia-central}
 quantis <- round(quantile(df_bg_raw$users_rated), 0)
 media <- round(mean(df_bg_raw$users_rated), 2)
@@ -620,6 +639,9 @@ sum(is.na(df_bg_raw$owned_users))
 Antes de criar as tabelas de tendência central, foi preciso remover as observações que possuíam valor *NA* na variável "owned_users".
 
 ```{r, owners_users-tendencia-central_without_na}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_owned_users <- df_bg_raw[!is.na(df_bg_raw$owned_users), 12]
 quantis <- round(quantile(df_owned_users$owned_users), 0)
 media <- round(mean(df_owned_users$owned_users), 2)
@@ -637,8 +659,10 @@ dplyr::inner_join(df_tend_central_users, df_tend_central_owners, by="Medida")|>
 
 ```
 
-
 ```{r, users_rated_owners-hist}
+#| column: page
+#| out-width: 90%
+#| warning: false
 hist_min <- df_bg_raw |> 
   ggplot(aes(x = users_rated)) +
   geom_histogram(fill = "#B7DFF7") +
@@ -646,8 +670,7 @@ hist_min <- df_bg_raw |>
   labs(
     x = "Número de avaliações do jogo",
     y = "Contagem"
-  ) #+ 
-  # scale_x_discrete(limits=c(0,1,2,3,4,5,6,7,8,9,10))
+  )
 
 hist_max <- df_owned_users |> 
   ggplot(aes(x = owned_users)) +
@@ -669,7 +692,6 @@ O histograma e o boxplot para estes dados que possuem valores muito discrepantes
 #### Número de avaliações
 
 Já as medidas de tendência central são mais úteis, neste caso mostram a discrepância dos dados, apresentando a **moda como `r round(mean(df_bg_raw$users_rated), 0)`**, o valor que mais se repete, a **mediana como `r round(median(df_bg_raw$users_rated), 0)`**, o valor central e a **média como `r round(func_getmode(df_bg_raw$users_rated), 0)`**.
-
 
 #### Número de pessoas que possuem o jogo
 
@@ -711,6 +733,9 @@ df_tend_central |>
 ```
 
 ```{r, rating_average-inconsistentes}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_bg_rat_avg <- df_bg_raw |> 
   dplyr::select(name, rating_average, users_rated, bgg_rank, complexity_average, mechanics, domains) |> 
   dplyr::filter(rating_average > 9 | rating_average < 4)
@@ -724,6 +749,7 @@ df_bg_rat_avg |>
   gt::opt_interactive()
 
 ```
+
 Como pudemos observar na tabela, jogos com avaliações muito altas (acima de 9) e muito baixas (abaixo de 4) são jogos com poucas avaliações e em posições ruins no ranking, com exceção de alguns casos de jogos já mais antigos como o War (que é um clássico, mas considerado um jogo de muita sorte e não muito bem visto por jogadores de jogos mais modernos) e o Jogo da Velha (por ser um jogo mais simples). Portanto, para termos uma base mais homogênea, faremos a remoção destes jogos também.
 
 #### Filtro
@@ -757,6 +783,9 @@ df_tend_central |>
 ```
 
 ```{r, rating_average-filter-histograma-boxplot}
+#| column: page
+#| out-width: 90%
+#| warning: false
 boxplot_rating_average <- df_bg |> 
   ggplot(aes(x = rating_average)) +
   geom_boxplot() +
@@ -775,7 +804,6 @@ hist_rating_average <- df_bg |>
   ggplot(aes(x = rating_average)) +
   geom_histogram(fill = "#B7DFF7", binwidth = 1) +
   theme_minimal() +
-  # scale_x_continuous(limits = seq(2, 25, 2)) +
   scale_x_continuous(breaks = seq(4, 9, 1)) +
   labs(
     x = "Nota média",
@@ -791,17 +819,15 @@ hist_rating_average <- df_bg |>
 
 Podemos observar, tanto pelas medidas de tendência central quanto pelo histograma e boxplot, que praticamente metade das nossas notas se estão entre 6 e 7 (1º quartil `r quantis[1]` e 3º quartil `r quantis[3]`).
 
-
 ### Complexidade
 
-A variável complexidade (*complexity_average*) tenta definir um número, de 0 à 5 para auxiliar no entendimento de o quão complexo pode ser jogar aquele jogo. Nem sempre um jogo complexo significa mais regras, mas muitas vezes é determinado pela quantidade de opções e quantidade de atributos, pontos, cartas, e outros componentes que o jogador precisa estar atento, tanto dele quanto dos demais jogadores para que se saia bem no jogo.
-Segundo o próprio site, a classificação dos jogos conforme a complexidade é a seguinte:
+A variável complexidade (*complexity_average*) tenta definir um número, de 0 à 5 para auxiliar no entendimento de o quão complexo pode ser jogar aquele jogo. Nem sempre um jogo complexo significa mais regras, mas muitas vezes é determinado pela quantidade de opções e quantidade de atributos, pontos, cartas, e outros componentes que o jogador precisa estar atento, tanto dele quanto dos demais jogadores para que se saia bem no jogo. Segundo o próprio site, a classificação dos jogos conforme a complexidade é a seguinte:
 
-- 1: Jogos leves.
-- 2: Jogos leves pra médios.
-- 3: Jogos médios.
-- 4: Jogos médios pra pesados.
-- 5: Jogos pesados.
+-   1: Jogos leves.
+-   2: Jogos leves pra médios.
+-   3: Jogos médios.
+-   4: Jogos médios pra pesados.
+-   5: Jogos pesados.
 
 Além disso, como esse número também é votado por usuários, o valor de complexidade de um jogo pode mudar ao longo do tempo.
 
@@ -840,7 +866,6 @@ Observando jogos com valores menores que 1, notei que muitos jogos que não poss
 
 #### Filtro
 
-
 ```{r, complexity_average-filter}
 lines_before <- nrow(df_bg)
 df_bg <- df_bg |> 
@@ -870,6 +895,9 @@ df_tend_central |>
 ```
 
 ```{r, complexity_average-filter-histograma-boxplot}
+#| column: page
+#| out-width: 90%
+#| warning: false
 boxplot_complexity_average <- df_bg |> 
   ggplot(aes(x = complexity_average)) +
   geom_boxplot() +
@@ -923,6 +951,7 @@ df_mechanics_count |>
   )
 
 ```
+
 Os dados estão em inglês, mas traduzindo livremente, as mecânicas que mais aparecem em ordem são: Rolagem de dados, gerenciamento de mão, coleção de conjuntos, poderes variáveis, seleção de cartas, colocação de peças, tabuleiro modular, influência ou maioria de área, jogos cooperativos e pontos de ação. Ainda que é importante ressaltar que estas categorias não são excludentes, um jogo pode pertencer a mais de uma delas.
 
 Outro dado interessante é que aparecem `r nrow(df_mechanics_count)` tipos de mecânicas diferentes.
@@ -947,13 +976,14 @@ Os dados estão em inglês, mas traduzindo livremente temos: jogos estratégicos
 
 Interessante que para esta variável temos apenas `r nrow(df_domains_count)` classes diferentes.
 
-
 ### Ranking
 
-Por fim, avaliaremos a variável ranking (*bgg_rank*), apesar de númerica, se trata de uma variável ordinal, portanto não deve ser avaliada como uma variável numérica quantitativa. Para este escopo, será suficiente verificar se existe inconsistências na base de dados.
-Vale lembrar que, a posição no ranking não se deve exclusivamente da nota do jogo, mas é um cálculo feito que utiliza também o número de avaliações e de jogadores que possuem o jogo para a classificação. Por isso, é comum ver jogos nas posições mais altas com notas 8 e jogos com notas 10 em posições muito abaixo. Um ponto que irei analisar é a nota média das primeiras posições no ranking para termos uma visão da relação entre essas variáveis.
+Por fim, avaliaremos a variável ranking (*bgg_rank*), apesar de númerica, se trata de uma variável ordinal, portanto não deve ser avaliada como uma variável numérica quantitativa. Para este escopo, será suficiente verificar se existe inconsistências na base de dados. Vale lembrar que, a posição no ranking não se deve exclusivamente da nota do jogo, mas é um cálculo feito que utiliza também o número de avaliações e de jogadores que possuem o jogo para a classificação. Por isso, é comum ver jogos nas posições mais altas com notas 8 e jogos com notas 10 em posições muito abaixo. Um ponto que irei analisar é a nota média das primeiras posições no ranking para termos uma visão da relação entre essas variáveis.
 
 ```{r, ranking-vs-nota}
+#| column: page
+#| out-width: 90%
+#| warning: false
 df_bg_rank <- df_bg |> 
   dplyr::select(id, name, bgg_rank, year_published, rating_average, complexity_average, play_time, users_rated, owned_users)
 
