@@ -1,0 +1,972 @@
+---
+title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
+author: "Mikael"
+cache: TRUE
+theme: cerulean
+reference-location: margin
+toc: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Mostrar o código"
+    page-layout: full
+editor: visual
+date: 09/11/2023
+date-format: long
+lang: pt
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(gt)
+library(patchwork)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
+## Função para calcular moda
+func_getmode <- function(vector) {
+   uniqv <- unique(vector)
+   uniqv[which.max(tabulate(match(vector, uniqv)))]
+}
+
+## Função que limpa, separa strings e devolve um dataframe com a contagem de vezes que cada string aparece
+func_df_count_exp <- function(col, colname, pattern){
+  teste_interno <- F
+  if(teste_interno){
+    col = df_bg$mechanics
+    colname = "mechanics"
+    pattern = ", "
+  }
+  col_not_na <- col[!is.na(col)]
+  all_strings <- col_not_na |> 
+    purrr::map(\(x) stringr::str_sort(stringr::str_split_1(x, pattern = pattern)))
+  
+  ## Colocando tudo numa única lista para contagem
+  all_string_listwise <- tolower(unlist(lapply(all_strings, unique)))
+  
+  ## Fazendo a contagem e transformando em um dataframe, podemos verifiicar diretamente na tabela
+  df_count <- as.data.frame(table(all_string_listwise), stringsAsFactors = F)
+  ## Renomeando colunas
+  names(df_count) <- c(colname, "count")
+  df_count
+}
+```
+
+# Introdução
+
+Para este trabalho de conclusão da disciplina de Ciência de dados, farei uma análise descritiva de uma base de dados extraída do site IEEE ([link](https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games "https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games")) sobre dados de um portal de jogos de tabuleiros modernos.
+
+O objetivo é ter uma ideia do mercado atual de jogos de tabuleiro presentes nesta base de dados, enquanto aproveito os conhecimentos aprendidos no curso de ciência de dados para elaborar gráficos, tabelas e usando outras ferramentas que facilitem a visualização e o entendimento dos dados.
+
+# Análise descritiva
+
+## Leitura da base de dados
+
+```{r, lendo-dados}
+df_bg_raw <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/CienciaDeDados-STC878/TrabalhoFinal/Dados/BGG_Data_Set.xlsx")))
+```
+
+## Visão inicial
+
+A nossa base de dados possui `r df_bg_raw |> nrow()` linhas e `r df_bg_raw |> ncol()` colunas. Sendo as colunas:
+
+```{r, descritiva-inicial}
+colnames(df_bg_raw)
+```
+Primeiramente vou trabalhar no nome das colunas, usando o pacote **janitor** e a função **clean_names** para padronizar o nome das colunas.
+
+
+```{r, clean-names}
+df_bg_raw <- df_bg_raw |> 
+  janitor::clean_names()
+
+## Novos nomes
+colnames(df_bg_raw)
+```
+
+### ID
+
+A coluna ID representa um identificador do jogo, tendo um código utilizado para cada jogo.
+
+```{r, id-sum}
+n_unicos <- dplyr::n_distinct(df_bg_raw$id)
+n_unicos
+```
+Inicialmente tentei verificar se a quantidade de IDs é realmente única, porém tive um resultado menor do que o número de linhas (`r n_unicos` IDs únicos ao invés das `r nrow(df_bg_raw)` linhas), o que provavelmente indica algum problema nesta coluna.
+
+
+```{r, id-na}
+na_count <- sum(is.na(df_bg_raw$id))
+na_count
+```
+
+Consegui identificar `r na_count` linhas que possuíam valores como *NA*, que deverão ser removidas da nossa base de dados.
+
+```{r, id-na-rm}
+df_bg_raw <- df_bg_raw |> 
+  dplyr::filter(!is.na(id))
+```
+
+
+```{r, id-sum-na-rm}
+n_unicos <- dplyr::n_distinct(df_bg_raw$id)
+n_unicos
+```
+
+Agora sim o nosso número de IDs únicos é o mesmo do número de linhas (`r n_unicos` IDs únicos e `r nrow(df_bg_raw)` linhas).
+
+### Nomes
+
+Esta variável (*name*) traz o nome do jogo, não há muito o que investigar, a não ser verificar possíveis duplicatas de nomes, que podem trazer algum tipo de problema futuro.
+
+```{r, names}
+nomes_dif <- dplyr::n_distinct(df_bg_raw$name)
+nomes_dif
+```
+
+Como resultado, temos `r nomes_dif`, ou seja, temos `r nrow(df_bg_raw) - nomes_dif` observações com nomes que aparecem pelo menos duas vezes.
+
+```{r, dupli-names}
+nomes_duplicados <- df_bg_raw |> 
+  dplyr::select(name) |> 
+  dplyr::group_by(name) |> 
+  dplyr::summarise(count = n()) |> 
+  dplyr::ungroup() |> 
+  dplyr::filter(count > 1)
+
+nomes_duplicados |> 
+  gt::gt() |>
+  gt::opt_interactive()
+```
+
+### Ano de publicação
+
+```{r, year_published-numeric}
+df_bg_raw <- df_bg_raw |> 
+  dplyr::mutate(year_published = as.numeric(year_published))
+```
+
+A variável ano de publicação (*year_published*) estava definida como caracter, portanto optei por transformar ela em numérica primeiro, para depois trabalhar com a variável.
+
+```{r, year-dist-table}
+quantis <- round(quantile(df_bg_raw$year_published), 0)
+media <- round(mean(df_bg_raw$year_published), 2)
+moda <- round(func_getmode(df_bg_raw$year_published), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Ano de lançamento` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+
+```{r, year-dist-graph}
+df_bg_raw |> 
+  ggplot(aes(x = year_published)) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Ano de lançamento"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+O boxplot nos ajuda a observar melhor a distribuição dos dados, podemos ver que existem muitos dados nos anos próximos dos 2000, porém existem jogos que datam de mais de 2000 mil anos atrás.
+
+```{r, old-games}
+df_bg_raw |> 
+  dplyr::filter(year_published < 0) |> 
+  dplyr::select(name, year_published, rating_average, bgg_rank, complexity_average, 
+                mechanics, domains) |> 
+  gt::gt() |>
+  gt::cols_width(
+    tidyselect::matches(c("mechanics", "domains")) ~ px(300),
+    tidyselect::everything() ~ px(150)
+  ) |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+<br>
+
+Observando alguns dos jogos que me são conhecidos, como o jogo da velha ("Tic-Tac-Toe") que é egípcio e Go que é um jogo muito antigo chinês, concluí que são mesmo jogos antigos e não dados preenchidos de forma inconsistente. Isso influência bastante a média, que é puxada para baixo pelos valores bastante altos "negativos". Então, como me propus a trabalhar com a análise descritiva de jogos de tabuleiros modernos, achei mais correto filtrar os jogos a partir de um determinado ano. E o ano escolhido foi o de lançamento do jogo "Catan", conhecido como o primeiro e provavelmente o mais famoso jogo de tabuleiro moderno, lançado em 1993.
+
+#### Filtro
+```{r, year-filter}
+df_bg <- df_bg_raw |> 
+  dplyr::filter(year_published >= 1993)
+```
+
+#### Distribuição do ano de publicação na base de dados
+
+Após a aplicação do filtro, os novos dados são:
+
+```{r, year-filter-table}
+quantis <- round(quantile(df_bg$year_published), 0)
+media <- round(mean(df_bg$year_published), 2)
+moda <- round(func_getmode(df_bg$year_published), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Ano de lançamento` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, year-filter-grafs}
+
+boxplot <- df_bg |> 
+  ggplot(aes(x = as.numeric(year_published))) +
+  geom_boxplot() +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Ano de lançamento"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+boxplot
+
+hist <- df_bg |> 
+  ggplot(aes(x = as.numeric(year_published))) +
+  geom_histogram(fill = "#B7DFF7") +
+  theme_minimal() +
+  labs(
+    x = "Ano de lançamento",
+    y = "Contagem"
+  )
+
+hist
+```
+
+Agora podemos ter uma boa noção da distribuição dos dados, vemos um crescimento bem grande até os anos de 2018 e 2019, e em 2020 tivemos a pandemia, além disso, como os dados foram coletados até 2022, podemos esperar que exista uma retomada do crescimento do lançamento de jogos de tabuleiros.
+
+### Mínimo e máximo de jogadores
+
+Por serem variáveis com significado próximo, analisaremos as variáveis mínimo e máximo de jogadores (respectivamente *min_players* e *max_players*) em conjunto e traremos uma conclusão ao final.
+
+```{r, min-max-tendencia-central}
+quantis <- round(quantile(df_bg_raw$min_players), 0)
+media <- round(mean(df_bg_raw$min_players), 2)
+moda <- round(func_getmode(df_bg_raw$min_players), 0)
+
+df_tend_central_min <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Mínimo de jogadores` = c(media, quantis[3], moda, quantis[1:5]))
+
+quantis <- round(quantile(df_bg_raw$max_players), 0)
+media <- round(mean(df_bg_raw$max_players), 2)
+moda <- round(func_getmode(df_bg_raw$max_players), 0)
+
+df_tend_central_max <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Máximo de jogadores` = c(media, quantis[3], moda, quantis[1:5]))
+
+dplyr::inner_join(df_tend_central_min, df_tend_central_max, by="Medida")|> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+
+```
+
+
+```{r, min-max-hist}
+hist_min <- df_bg_raw |> 
+  ggplot(aes(x = min_players)) +
+  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  labs(
+    x = "Mínimo de jogadores",
+    y = "Contagem"
+  ) + 
+  scale_x_discrete(limits=c(0,1,2,3,4,5,6,7,8,9,10))
+
+hist_max <- df_bg_raw |> 
+  ggplot(aes(x = max_players)) +
+  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  labs(
+    x = "Máximo de jogadores",
+    y = "Contagem"
+  )
+
+(hist_min) /
+  (hist_max) +
+  patchwork::plot_annotation(
+  title = 'Histograma do mínimo e máximo de jogadores')
+```
+
+
+É comum vermos jogos que são feitos para um único jogador (chamados jogos *solo*), jogos que precisam de pelo menos dois ou três jogadores, e alguns poucos jogos que precisam de mais do que este número, portanto, o ideal seria filtrar os dados para que houvesse um valor máximo para a variável mínimo de jogadores, pelo histograma e pelos quantis, eu diria que o valor 5 é um valor bastante alto e abrange boa parte dos dados. Isto irá remover aproximadamente **`r nrow(df_bg_raw |> dplyr::filter(min_players > 5 | min_players < 1))` observações**.
+
+Já para um número máximo, é um tanto mais complicado, porque existem jogos feitos para muitos jogadores, 10, 20 ou mais jogadores, assim como os jogos *solo* que são para apenas um jogador. Portanto, para esse caso, ainda vamos colocar um limite máximo hipotético de 20 jogadores. Neste caso estamos removendo **`r nrow(df_bg_raw |> dplyr::filter(max_players > 20 | max_players < 1))` observações**.
+
+#### Filtro
+
+```{r, min-max-filter}
+df_bg <- df_bg |> 
+  dplyr::filter(min_players <= 5 & min_players >= 1,
+                max_players <= 20 & max_players >= 1)
+```
+
+
+#### Distribuição do mínimo e máximo de jogadores na base de dados
+Após a aplicação do filtro, os novos dados são:
+
+```{r, min-max-filter-tendencia-central}
+quantis <- round(quantile(df_bg_raw$min_players), 0)
+media <- round(mean(df_bg_raw$min_players), 2)
+moda <- round(func_getmode(df_bg_raw$min_players), 0)
+
+df_tend_central_min <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Mínimo de jogadores` = c(media, quantis[3], moda, quantis[1:5]))
+
+quantis <- round(quantile(df_bg_raw$max_players), 0)
+media <- round(mean(df_bg_raw$max_players), 2)
+moda <- round(func_getmode(df_bg_raw$max_players), 0)
+
+df_tend_central_max <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Máximo de jogadores` = c(media, quantis[3], moda, quantis[1:5]))
+
+dplyr::inner_join(df_tend_central_min, df_tend_central_max, by="Medida")|> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+
+```
+
+```{r, min-max-filter-hist}
+(df_bg |> ggplot(aes(x = min_players)) +
+  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  labs(
+    x = "Mínimo de jogadores",
+    y = "Contagem"
+  ) + 
+  scale_x_discrete(limits=c(0,1,2,3,4,5))) /
+(df_bg |> ggplot(aes(x = max_players)) +
+  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  labs(
+    x = "Mínimo de jogadores",
+    y = "Contagem"
+  ) + 
+  scale_x_discrete(limits=c(0:20))
+)  +
+  patchwork::plot_annotation(
+  title = 'Histograma do mínimo e máximo de jogadores')
+```
+
+#### Mínimo
+
+Aqui podemos ver outra tendência interessante, no caso do número mínimo de jogadores, temos aproximadamente **`r paste0(round(nrow(df_bg |> dplyr::filter(min_players == 2))*100/nrow(df_bg), 0), "%")`** da nossa base com o número mínimo de **dois jogadores**, o que pode ser visto tanto pelo histograma quanto pela distribuição de média, moda, mediana e quartis, é um comportamento esperado, já que boa parte dos jogos lançados realmente é jogado em pelo menos dois jogadores, se observarmos temporalmente acredito que veríamos um crescimento de jogos com o número mínimo de um único jogador, sejam de jogos que podem ser jogados apenas *solo* ou jogos mais recentes com modo *solo*.
+
+#### Máximo
+
+Já para a quantidade máxima de jogadores, já é bem mais diverso, mas podemos ver um percentual grande que se enquadra em jogos para até **quatro jogadores** (**`r paste0(round(nrow(df_bg |> dplyr::filter(max_players == 4))*100/nrow(df_bg), 0), "%")`**) e uma porcentagem razoável que é para **seis jogadores** (**`r paste0(round(nrow(df_bg |> dplyr::filter(max_players == 6))*100/nrow(df_bg), 0), "%")`**), das demais categorias, **2 e 5 jogadores** tem percentuais próximos também (respectivamente **`r paste0(round(nrow(df_bg |> dplyr::filter(max_players == 2))*100/nrow(df_bg), 0), "%")` e `r paste0(round(nrow(df_bg |> dplyr::filter(max_players == 5))*100/nrow(df_bg), 0), "%")`**).
+
+### Tempo de jogo
+
+O tempo de jogo (*play_time*) é uma variável bastante interessante, porque dentro desta base de dados temos jogos muito  rápidos, jogos mais longos e ainda pudemos perceber alguns jogos com valores bastante fora dos padrões, que serão tratados como inconsistentes.
+
+
+```{r, play_time-tendencia-central}
+quantis <- round(quantile(df_bg$play_time), 0)
+media <- round(mean(df_bg$play_time), 2)
+moda <- round(func_getmode(df_bg$play_time), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Ano de lançamento` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, play_time-inconsistentes}
+df_bg_play_time <- df_bg_raw |> 
+  dplyr::select(name, play_time, year_published, rating_average, bgg_rank, complexity_average, mechanics, domains) |> 
+  dplyr::filter(play_time < 0 | play_time > 360)
+
+df_bg_play_time |> 
+  gt() |>
+  gt::cols_width(
+    tidyselect::matches(c("mechanics", "domains")) ~ px(300),
+    tidyselect::everything() ~ px(150)
+  ) |> 
+  gt::opt_interactive()
+
+```
+
+Verificamos que, **acima de 360 minutos**, temos **apenas `r nrow(df_bg_play_time)` jogos**, portanto delimitaremos este valor como limite, mesmo que, ao verificar na tabela de resultado, verifiquemos jogos que realmente possuam mais de 360 minutos e se tratem de jogos reais.
+
+#### Filtro
+
+```{r, play_time-filter}
+df_bg <- df_bg |> 
+  dplyr::filter(play_time > 0 & play_time <= 1000)
+```
+
+
+#### Distribuição do tempo de jogo na base de dados
+
+Após a aplicação do filtro temos:
+
+```{r, play_time-filter-tendencia-central}
+quantis <- round(quantile(df_bg$play_time), 0)
+media <- round(mean(df_bg$play_time), 2)
+moda <- round(func_getmode(df_bg$play_time), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Ano de lançamento` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, play_time-filter-histograma-boxplot}
+
+boxplot_play_time <- df_bg |> 
+  dplyr::select(name, play_time, year_published, rating_average, bgg_rank, 
+                complexity_average, mechanics, domains) |> 
+  ggplot(aes(x = play_time)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_x_continuous(breaks=seq(0, 360, by=50)) +
+  labs(
+    x = "",
+    y = "Tempo de jogo"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  coord_flip()
+
+hist_play_time <- df_bg |> 
+  dplyr::select(name, play_time, year_published, rating_average, bgg_rank, 
+                complexity_average, mechanics, domains) |> 
+  ggplot(aes(x = play_time)) +
+  geom_histogram(stat="count", fill = "#B7DFF7", binwidth = 10) +
+  theme_minimal() +
+  scale_x_continuous(breaks=seq(0, 360, by=50)) +
+  labs(
+    x = "Tempo de jogo",
+    y = "Contagem"
+  )
+
+(boxplot_play_time) /
+(hist_play_time) +
+  patchwork::plot_annotation(
+  title = 'Distribuição da variável tempo de jogo')
+
+```
+
+Os dois gráficos em conjunto com a análise da tabela de distribuições trazem visões interessantes, através do boxplot e dos quartis, podemos ver que metade dos dados se concentra entre 30 e 75 minutos (respectivamente **1º quartil e 3º quartil**), e notamos uma distribuição mais variada já que temos os valores de **moda 30, a mediana 45 e a média aproximadamente 63** . E olhando o histograma, vemos que alguns valores aparecem mais v ezes, pela grande diversidade de valores teríamos dificuldade em citar especificamente os valores, mas sabemos que os números fechados, como 30, 45, 60, 90, 120 minutos aparecem mais vezes.
+
+### Idade mínima
+
+A idade mínima (*min_age*) também é outra variável que tem um comportamento singular, jogos mais complexos são classificados como tendo idade mínima de 12 ou 14 anos, já jogos mais simples podem ter idade mínima de 4 à 6 anos, ainda que isso seja muito particular, e mesmo nos jogos mais simples que podem ser jogados por crianças, algumas vezes tem camadas de complexidade extras que só pessoas mais velhas conseguem perceber e aproveitar.
+
+```{r, min_age-tendencia-central}
+quantis <- round(quantile(df_bg_raw$min_age), 0)
+media <- round(mean(df_bg_raw$min_age), 2)
+moda <- round(func_getmode(df_bg_raw$min_age), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Ano de lançamento` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, min_age-inconsistentes}
+df_bg_min_age <- df_bg_raw |> 
+  dplyr::select(name, min_age, year_published, rating_average, bgg_rank, complexity_average, mechanics, domains) |> 
+  dplyr::filter(min_age > 17 | min_age < 4)
+
+df_bg_min_age |> 
+  gt() |>
+  gt::cols_width(
+    tidyselect::matches(c("mechanics", "domains")) ~ px(300),
+    tidyselect::everything() ~ px(150)
+  ) |> 
+  gt::opt_interactive()
+
+
+df_bg_min_age <- df_bg_raw |> 
+  dplyr::select(name, min_age, year_published, rating_average, bgg_rank, complexity_average, mechanics, domains) |> 
+  dplyr::filter(min_age == 0)
+```
+
+Observando os extremos podemos ver que uma quantidade grande de jogos não possui valores de idade mínima, e para estes, a **idade mínima atribuída de 0**, **são `r nrow(df_bg_raw |> dplyr::filter(min_age == 0))`** , já para **idade mínima entre 1 e 3 temos `r nrow(df_bg_raw |> dplyr::filter(min_age >= 1 & min_age <= 3))`** e para **idade mínima acima de 16 anos temos `r nrow(df_bg_raw |> dplyr::filter(min_age > 16))`**. Para idades acima de 16 anos, percebi que o que mais influência parece ser o tema (violência, bebidas ou algum cunho sexual), então manterei na base de dados jogos com idade mínima recomendada de 4 ou mais.
+
+#### Filtro
+
+```{r, min_age-filter}
+df_bg <- df_bg |> 
+  dplyr::filter(min_age > 3)
+```
+
+
+#### Distribuição das idades mínimas na base de dados
+
+Após a aplicação do filtro temos:
+
+```{r, min_age-filter-tendencia-central}
+quantis <- round(quantile(df_bg$min_age), 0)
+media <- round(mean(df_bg$min_age), 2)
+moda <- round(func_getmode(df_bg$min_age), 0)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Idade mínima` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, min_age-filter-histograma-boxplot}
+boxplot_min_age <- df_bg |> 
+  ggplot(aes(x = min_age)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "Idade mínima"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  coord_flip()
+
+hist_min_age <- df_bg |> 
+  ggplot(aes(x = min_age)) +
+  geom_histogram(fill = "#B7DFF7", binwidth = 2) +
+  theme_minimal() +
+  # scale_x_continuous(limits = seq(2, 25, 2)) +
+  scale_x_continuous(breaks = seq(2, 25, 2)) +
+  labs(
+    x = "Idade mínima",
+    y = "Contagem"
+  )
+# hist_min_age
+(boxplot_min_age) /
+(hist_min_age) +
+  patchwork::plot_annotation(
+  title = 'Distribuição da variável idade mínima recomendada')
+
+```
+
+Em geral as recomendações se dão através dos números pares (4, 6, 8, 10, 12, etc.), portanto no histograma decidi agrupar os conjuntos de dois à dois (4 e 5, 6 e 7, etc.), podemos ver boa parte da distribuição de idade entre 8 e 13 anos, cerca de `r paste0(round(nrow(df_bg |> dplyr::filter(min_age >= 8 & min_age <= 13))*100/nrow(df_bg), 0), "%")`, lembrando que esta classificação é feita pela própria desenvolvedora do jogo, portanto deve variar conforme país e demais aspectos que influênciam essa definição.
+
+### Número de avaliações e número de usuários que possuem os jogos
+
+As variáveis número de avaliações e número de usuários (respectivamente *users_rated* e *owned_users*) que possuem estes jogos, possivelmente existe uma relação entre elas, já que, para avaliar um jogo, um fator que exerce bastante peso é possuir o jogo (não necessário, porque um usuário pode por exemplo jogar o jogo de um amigo, e fazer uma avaliação, porém é menos comum).
+
+
+```{r, users_rated-tendencia-central}
+quantis <- round(quantile(df_bg_raw$users_rated), 0)
+media <- round(mean(df_bg_raw$users_rated), 2)
+moda <- round(func_getmode(df_bg_raw$users_rated), 0)
+
+df_tend_central_users <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Número de avaliações do jogo` = c(media, quantis[3], moda, quantis[1:5]))
+
+```
+
+Número de linhas com preenchimento *NA* na base de dados, para a variável "owned_users".
+
+```{r, owners_users-na}
+sum(is.na(df_bg_raw$owned_users))
+```
+
+Antes de criar as tabelas de tendência central, foi preciso remover as observações que possuíam valor *NA* na variável "owned_users".
+
+```{r, owners_users-tendencia-central_without_na}
+df_owned_users <- df_bg_raw[!is.na(df_bg_raw$owned_users), 12]
+quantis <- round(quantile(df_owned_users$owned_users), 0)
+media <- round(mean(df_owned_users$owned_users), 2)
+moda <- round(func_getmode(df_owned_users$owned_users), 0)
+
+df_tend_central_owners <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Quantidade de pessoas que possuem o jogo` = c(media, quantis[3], moda, quantis[1:5]))
+
+dplyr::inner_join(df_tend_central_users, df_tend_central_owners, by="Medida")|> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+
+```
+
+
+```{r, users_rated_owners-hist}
+hist_min <- df_bg_raw |> 
+  ggplot(aes(x = users_rated)) +
+  geom_histogram(fill = "#B7DFF7") +
+  theme_minimal() +
+  labs(
+    x = "Número de avaliações do jogo",
+    y = "Contagem"
+  ) #+ 
+  # scale_x_discrete(limits=c(0,1,2,3,4,5,6,7,8,9,10))
+
+hist_max <- df_owned_users |> 
+  ggplot(aes(x = owned_users)) +
+  geom_histogram(fill = "#B7DFF7") +
+  theme_minimal() +
+  labs(
+    x = "Número de usuários que possuem o jogo",
+    y = "Contagem"
+  )
+
+(hist_min) /
+  (hist_max) +
+  patchwork::plot_annotation(
+  title = 'Histogramas do número de avaliações e número de usuários que possuem o jogo')
+```
+
+O histograma e o boxplot para estes dados que possuem valores muito discrepantes não é mais adequado.
+
+#### Número de avaliações
+
+Já as medidas de tendência central são mais úteis, neste caso mostram a discrepância dos dados, apresentando a **moda como `r round(mean(df_bg_raw$users_rated), 0)`**, o valor que mais se repete, a **mediana como `r round(median(df_bg_raw$users_rated), 0)`**, o valor central e a **média como `r round(func_getmode(df_bg_raw$users_rated), 0)`**.
+
+
+#### Número de pessoas que possuem o jogo
+
+Para esta variável, o comportamento é muito parecido, as medidas de tendência central mostram novamente a discrepância dos dados, apresentando a **moda como `r round(mean(df_owned_users$owned_users), 0)`**, o valor que mais se repete, a **mediana como `r round(median(df_owned_users$owned_users), 0)`**, o valor central e a **média como `r round(func_getmode(df_owned_users$owned_users), 0)`**.
+
+#### Filtro
+
+```{r, owned-rated-filter}
+lines_before <- nrow(df_bg)
+quantis_rated <- round(quantile(df_bg_raw$users_rated)[1], 0)
+quantis_owners <- round(quantile(df_owned_users$owned_users)[1], 0)
+df_bg <- df_bg |> 
+  dplyr::filter(
+    users_rated >= quantis_rated,
+    owned_users >= quantis_owners
+  )
+```
+
+Para ambas as variáveis, como o objetivo é lidar com uma base de dados de jogos modernos, será optado por remover jogos com valores baixos, utilizaremos em ambos os casos, o primeiro quartil como valor mínimo, portanto a quantidade de jogos removidos seria de 25% do total. Mas, como outros filtros já haviam sido aplicados por outros problemas em diferentes variáveis, o número final de linhas removidas foi de apenas `r lines_before - nrow(df_bg)` linhas.
+
+### Nota média
+
+A nota (*rating_average*) é uma variável muito interessante, é um provável fator decisor na hora de um jogador procurar por jogos e na hora de efetuar a compra. Ela é composta através de uma média das avaliações dos usuários.
+
+```{r, rating_average-tendencia-central}
+quantis <- round(quantile(df_bg_raw$rating_average), 2)
+media <- round(mean(df_bg_raw$rating_average), 2)
+moda <- round(func_getmode(df_bg_raw$rating_average), 2)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Nota média` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, rating_average-inconsistentes}
+df_bg_rat_avg <- df_bg_raw |> 
+  dplyr::select(name, rating_average, users_rated, bgg_rank, complexity_average, mechanics, domains) |> 
+  dplyr::filter(rating_average > 9 | rating_average < 4)
+
+df_bg_rat_avg |> 
+  gt() |>
+  gt::cols_width(
+    tidyselect::matches(c("mechanics", "domains")) ~ px(300),
+    tidyselect::everything() ~ px(150)
+  ) |> 
+  gt::opt_interactive()
+
+```
+Como pudemos observar na tabela, jogos com avaliações muito altas (acima de 9) e muito baixas (abaixo de 4) são jogos com poucas avaliações e em posições ruins no ranking, com exceção de alguns casos de jogos já mais antigos como o War (que é um clássico, mas considerado um jogo de muita sorte e não muito bem visto por jogadores de jogos mais modernos) e o Jogo da Velha (por ser um jogo mais simples). Portanto, para termos uma base mais homogênea, faremos a remoção destes jogos também.
+
+#### Filtro
+
+```{r, rating_average-filter}
+lines_before <- nrow(df_bg)
+df_bg <- df_bg |> 
+  dplyr::filter(rating_average >= 4 & rating_average <= 9)
+```
+
+Novamente, a remoção foi de apenas `r lines_before - nrow(df_bg)` linhas, impactando pouco o nosso volume de dados.
+
+#### Distribuição das notas na base de dados
+
+Após a aplicação do filtro temos:
+
+```{r, rating_average-filter-tendencia-central}
+quantis <- round(quantile(df_bg$rating_average), 2)
+media <- round(mean(df_bg$rating_average), 2)
+moda <- round(func_getmode(df_bg$rating_average), 2)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Nota` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, rating_average-filter-histograma-boxplot}
+boxplot_rating_average <- df_bg |> 
+  ggplot(aes(x = rating_average)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "Nota média"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  coord_flip()
+
+hist_rating_average <- df_bg |> 
+  ggplot(aes(x = rating_average)) +
+  geom_histogram(fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  # scale_x_continuous(limits = seq(2, 25, 2)) +
+  scale_x_continuous(breaks = seq(4, 9, 1)) +
+  labs(
+    x = "Nota média",
+    y = "Contagem"
+  )
+# hist_rating_average
+(boxplot_rating_average) /
+(hist_rating_average) +
+  patchwork::plot_annotation(
+  title = 'Distribuição da variável Nota')
+
+```
+
+Podemos observar, tanto pelas medidas de tendência central quanto pelo histograma e boxplot, que praticamente metade das nossas notas se estão entre 6 e 7 (1º quartil `r quantis[1]` e 3º quartil `r quantis[3]`).
+
+
+### Complexidade
+
+A variável complexidade (*complexity_average*) tenta definir um número, de 0 à 5 para auxiliar no entendimento de o quão complexo pode ser jogar aquele jogo. Nem sempre um jogo complexo significa mais regras, mas muitas vezes é determinado pela quantidade de opções e quantidade de atributos, pontos, cartas, e outros componentes que o jogador precisa estar atento, tanto dele quanto dos demais jogadores para que se saia bem no jogo.
+Segundo o próprio site, a classificação dos jogos conforme a complexidade é a seguinte:
+
+- 1: Jogos leves.
+- 2: Jogos leves pra médios.
+- 3: Jogos médios.
+- 4: Jogos médios pra pesados.
+- 5: Jogos pesados.
+
+Além disso, como esse número também é votado por usuários, o valor de complexidade de um jogo pode mudar ao longo do tempo.
+
+```{r, complexity_average-tendencia-central}
+quantis <- round(quantile(df_bg_raw$complexity_average), 2)
+media <- round(mean(df_bg_raw$complexity_average), 2)
+moda <- round(func_getmode(df_bg_raw$complexity_average), 2)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Complexidade (de 1 à 5)` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, complexity_average-inconsistentes}
+df_bg_compl <- df_bg_raw |> 
+  dplyr::select(name, complexity_average, year_published, rating_average, bgg_rank) |> 
+  dplyr::filter(complexity_average < 1 | complexity_average > 4.5)
+  # dplyr::filter(complexity_average == 1)
+
+df_bg_compl |> 
+  gt() |>
+  gt::cols_width(
+    tidyselect::matches(c("mechanics", "domains")) ~ px(300),
+    tidyselect::everything() ~ px(150)
+  ) |> 
+  gt::opt_interactive()
+```
+
+Observando jogos com valores menores que 1, notei que muitos jogos que não possuem dados foram atribuídos um peso 0, portanto serão removidos. Além disso, os demais jogos parecem ter uma avaliação correta.
+
+#### Filtro
+
+
+```{r, complexity_average-filter}
+lines_before <- nrow(df_bg)
+df_bg <- df_bg |> 
+  dplyr::filter(complexity_average >= 1)
+```
+
+Novamente, a remoção foi de apenas `r lines_before - nrow(df_bg)` linhas, impactando pouco o nosso volume de dados.
+
+#### Distribuição da complexidade na base de dados
+
+Após a aplicação do filtro temos:
+
+```{r, complexity_average-filter-tendencia-central}
+quantis <- round(quantile(df_bg$complexity_average), 2)
+media <- round(mean(df_bg$complexity_average), 2)
+moda <- round(func_getmode(df_bg$complexity_average), 2)
+
+df_tend_central <- tibble(Medida = c("Média", "Mediana", "Moda", "0% (mínimo)", "25% (1º quartil)", "50% (2º quartil)", "75% (3º quartil)", "100% (máximo)"),
+                          `Complexidade (de 1 à 5)` = c(media, quantis[3], moda, quantis[1:5]))
+
+df_tend_central |> 
+  gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+```
+
+```{r, complexity_average-filter-histograma-boxplot}
+boxplot_complexity_average <- df_bg |> 
+  ggplot(aes(x = complexity_average)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "Complexidade"
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  coord_flip()
+
+hist_complexity_average <- df_bg |> 
+  ggplot(aes(x = complexity_average)) +
+  geom_histogram(fill = "#B7DFF7", binwidth = 1) +
+  theme_minimal() +
+  # scale_x_continuous(limits = seq(2, 25, 2)) +
+  scale_x_continuous(breaks = seq(0, 5, 1)) +
+  labs(
+    x = "Complexidade",
+    y = "Contagem"
+  )
+# hist_complexity_average
+(boxplot_complexity_average) /
+(hist_complexity_average) +
+  patchwork::plot_annotation(
+  title = 'Distribuição da variável Complexidade')
+
+```
+
+Aqui novamente por se tratarem de valores fixos, podemos observar muito bem no boxplot e no histograma que boa parte dos jogos são lançados com complexidade entre 1 e 3 (`r nrow(df_bg |> dplyr::filter(complexity_average <=3))` da nossa base filtrada), mas ainda vemos jogos mais complexos, e curiosamente, boa parte dos jogos mais bem rankeados tem um peso mais elevado.
+
+### Mecânicas e Domínios
+
+Por se tratarem de duas variáveis qualitativas nominais (respectivamente *mechanics* e *domains*), serão analisadas de forma conjunta, apresentando contagens e verificando quais aparecem mais na nossa base de dados.
+
+```{r, mechanics-count}
+## Função que limpa, separa strings e devolve um dataframe com a contagem de vezes que cada string aparece
+df_mechanics_count <- func_df_count_exp(col = df_bg$mechanics, colname = "mechanics", pattern = ", ")
+
+## Utilllizamos as 10 mecânicas que mais aparecem e criamos uma nova tabela para visualização
+df_mechanics_count |> 
+  dplyr::arrange(desc(count)) |> 
+  dplyr::slice_head(n = 10) |> 
+  gt::gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+
+```
+Os dados estão em inglês, mas traduzindo livremente, as mecânicas que mais aparecem em ordem são: Rolagem de dados, gerenciamento de mão, coleção de conjuntos, poderes variáveis, seleção de cartas, colocação de peças, tabuleiro modular, influência ou maioria de área, jogos cooperativos e pontos de ação. Ainda que é importante ressaltar que estas categorias não são excludentes, um jogo pode pertencer a mais de uma delas.
+
+Outro dado interessante é que aparecem `r nrow(df_mechanics_count)` tipos de mecânicas diferentes.
+
+```{r, domains-count}
+## Função que limpa, separa strings e devolve um dataframe com a contagem de vezes que cada string aparece
+df_domains_count <- func_df_count_exp(col = df_bg$domains, colname = "domains", pattern = ", ")
+
+## Utilllizamos as 10 mecânicas que mais aparecem e criamos uma nova tabela para visualização
+df_domains_count |> 
+  dplyr::arrange(desc(count)) |> 
+  dplyr::slice_head(n = 10) |> 
+  gt::gt() |> 
+  gt::tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  )
+
+```
+
+Os dados estão em inglês, mas traduzindo livremente temos: jogos estratégicos, jogos familiares, jogos de guerra, jogos temáticos, jogos abstratos, jogos infantis, jogos festivos e jogos customizáveis. Neste caso podemos ver que jogos estratégicos, jogos familiares e jogos de guerra são mais presentes. Ainda que é importante ressaltar que estas categorias não são excludentes, um jogo pode pertencer a mais de uma delas.
+
+Interessante que para esta variável temos apenas `r nrow(df_domains_count)` classes diferentes.
+
+
+### Ranking
+
+Por fim, avaliaremos a variável ranking (*bgg_rank*), apesar de númerica, se trata de uma variável ordinal, portanto não deve ser avaliada como uma variável numérica quantitativa. Para este escopo, será suficiente verificar se existe inconsistências na base de dados.
+Vale lembrar que, a posição no ranking não se deve exclusivamente da nota do jogo, mas é um cálculo feito que utiliza também o número de avaliações e de jogadores que possuem o jogo para a classificação. Por isso, é comum ver jogos nas posições mais altas com notas 8 e jogos com notas 10 em posições muito abaixo. Um ponto que irei analisar é a nota média das primeiras posições no ranking para termos uma visão da relação entre essas variáveis.
+
+```{r, ranking-vs-nota}
+df_bg_rank <- df_bg |> 
+  dplyr::select(id, name, bgg_rank, year_published, rating_average, complexity_average, play_time, users_rated, owned_users)
+
+## Utilllizamos as 10 mecânicas que mais aparecem e criamos uma nova tabela para visualização
+df_bg_rank |> 
+  dplyr::arrange((bgg_rank)) |> 
+  dplyr::slice_head(n = 100) |> 
+  gt::gt() |> 
+  gt::opt_interactive()
+```
+
+Podemos observar como mesmo os jogos em melhores posições não tem notas perfeitas, mas são jogos com muitas avaliações positivas (entre 7 e 10) e muitos usuários que possuem o jogo, além de, pelo menos nas primeiras 10 posições, serem jogos de médio para pesados.
+
+# Conclusão
+
+Finalizando a análise descritiva, agora temos mais entendimento da base de dados de jogos de tabuleiro avaliada, além de, através de decisões tomadas com base nas medidas apresentadas, já termos uma base mais adequada para um objetivo que é analisar dados sobre jogos de tabuleiros modernos.
