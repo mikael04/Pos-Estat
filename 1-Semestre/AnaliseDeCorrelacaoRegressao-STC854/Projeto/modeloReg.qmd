@@ -1,7 +1,7 @@
 ---
 title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
 author: "Mikael"
-cache: FALSE
+cache: TRUE
 theme: cerulean
 reference-location: margin
 toc: true
@@ -9,6 +9,7 @@ format:
   html:
     code-fold: true
     code-summary: "Mostrar o código"
+    page-layout: full
 editor: visual
 date: 09/11/2023
 date-format: long
@@ -17,11 +18,15 @@ lang: pt
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(ggplot2)
+library(dplyr)
+```
+
+```{r, rank}
+use_rank <- F
 ```
 
 # Introdução
-
-Introdução
 
 A história dos jogos de tabuleiro é longa e complexa, surgindo com o início da civilização humana. Os primeiros jogos de tabuleiro eram simples, geralmente representando uma batalha entre dois exércitos, usando ferramentas e componentes simples. Com o tempo, os jogos de tabuleiro tornaram-se mais robustos e variados, incorporando elementos de estratégia, sorte, negociação e até mesmo atuação.
 
@@ -39,28 +44,61 @@ Logo em seu princípio, para ajudar os jogadores a entenderem sobre os jogos lan
 
 O sucesso de um jogo de tabuleiro pode ser medida de diferentes formas, número de vendas, posições em ranking, recomendações de formadores de opinião e também por sua nota, como muitas dessas informações são de difícil acesso, e para casar com a disciplina de Análise de Regressão cursada, foi escolhida como objetivo de estudo a nota dos jogos.
 
-O objetivo deste projeto é fazer uma análise sobre a base de dados de jogos de tabuleiro, e tentar criar uma regressão multivariada que preveja a nota de um jogo de tabuleiro, baseada em alguns aspectos como, número de jogadores, tempo estimado de jogo, idade mínima recomendada, ano de publicação, número de avaliações, complexidade e número de pessoas que possuem o jogo. Para isso será utilizada uma base de dados disponibilizada no site: https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games
+# Objetivo
+
+Este projeto visa tentar entender melhor como podemos relacionar a nota dos jogos de tabuleiro, com as demais variáveis disponíveis no nosso banco de dados, o número máximo e mínimo de jogadores, ano de publicação, tempo de jogo, idade mínima recomendada, complexidade e quantidade de avaliações e de pessoas que possuem o jogo.
+
+O objetivo final é tentar criar uma equação que explique a nota dos jogos de tabuleiro de acordo com as demais informações disponíveis, isso será feito utilizando uma regressão multivariada e os testes apresentados na disciplina para verificar a adequação ou não aos pressupostos estatísticos.
 
 A nossa exploração inicial se dará na base de dados, observando seu tamanho, sua completude, e fazendo uma estatística descritiva de cada uma das variáveis.
 
+# Metodologia
+
+Os dados foram encontrados num site de acesso público, que possuía dados referentes ao portal BoardGameGeek, o maior portal de jogos de tabuleiro no mundo. Este site é usado por jogadores no mundo todo para buscar informações sobre os jogos, avaliar, tirar dúvidas e conversar com outras pessoas interessadas no jogo ou neste tipo de passatempo.
+
+Os dados podem ser encontrados através do link: https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games
+
+Para a análise foi utilizada a linguagem **R** em sua versão 4.1.3, através do software **RStudio** em sua versão 2023.06.1. Ao longo do projeto alguns pacotes para manipulação, visualização, modelagem e testes também foram utilizadas, notadamente o *dplyr* para manipulação, o *ggplot2* para visualização, o r base para modelagem e alguns testes contaram com outras bibliotecas.
+
+# Desenvolvimento
+
+A elaboração de um modelo de regressão sempre deve ser precedida de uma análise exploratória dos dados, ela consiste em analisar os dados coletados, entendendo sua estrutura e o problema que está sendo investigado, podendo possibilitar hipóteses preliminares a serem investigadas e ajudando a orientar o modelo. Ela também ajuda a identificar possíveis padrões e anomalias, como valores ausentes, valores inconsistentes, erro na coleta, etc, que poderiam prejudicar o desempenho do modelo. Ela também ajuda a escolher o modelo adequado, fornecendo informações que poderão ajudar na definição do modelo.
+
+## Análise exploratória
+
+Começando a análise exploratória dos dados, começaremos por carregar a base de dados e em seguida usar um pacote que faz uma análise exploratória de forma resumida, facilitando o entendimento dos dados.
+
 ```{r, leitura-dados, echo=FALSE}
-library(ggplot2)
-library(dplyr)
 dataset_bg <- tibble::as_tibble(readxl::read_excel(here::here("1-Semestre/AnaliseDeCorrelacaoRegressao-STC854/Projeto/Dados/BGG_Data_Set.xlsx"))) |> 
   dplyr::mutate(`Year Published` = as.numeric(`Year Published`))
 ```
 
-## Análise exploratória
+### Skimr
 
-```{r, descritiva-variaveis}
+Skimr é um pacote que tenta trazer informações sobre a base de dados de forma resumida, em formato de tabelas e relatório, bastante utilizado para análise exploratória.
+
+```{r, skim}
+#| column: page
+#| out-width: 80%
+#| fig-format: svg
+
 ## Usando o skimr
 
 skimr::skim(dataset_bg)
+```
 
+### Distribuição dos dados
+
+Além disso observaremos a distribuição de cada variável, investigando seus boxplots.
+
+```{r, descritiva-variaveis}
+#| column: page
+#| out-width: 100%
+#| fig-format: svg
 dataset_bg_boxplot <- dataset_bg |> 
   dplyr::select(-ID, -`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
 
-graf_boxplot_year <- dataset_bg_boxplot |> 
+graf_boxplot_year_published <- dataset_bg_boxplot |> 
   ggplot(aes(x = `Year Published`)) +
   geom_boxplot() +
   theme_minimal() +
@@ -75,7 +113,7 @@ graf_boxplot_year <- dataset_bg_boxplot |>
   )
 
 
-graf_boxplot_min_p <- dataset_bg_boxplot |> 
+graf_boxplot_min_players <- dataset_bg_boxplot |> 
   ggplot(aes(x = `Min Players`)) +
   geom_boxplot() +
   theme_minimal() +
@@ -89,7 +127,7 @@ graf_boxplot_min_p <- dataset_bg_boxplot |>
     axis.ticks = element_blank()
   )
 
-graf_boxplot_max_p <- dataset_bg_boxplot |> 
+graf_boxplot_max_players <- dataset_bg_boxplot |> 
   ggplot(aes(x = `Max Players`)) +
   geom_boxplot() +
   theme_minimal() +
@@ -173,7 +211,7 @@ graf_boxplot_compl <- dataset_bg_boxplot |>
     axis.ticks = element_blank()
   )
 
-graf_boxplot_own_users <- dataset_bg_boxplot |> 
+graf_boxplot_owned_users <- dataset_bg_boxplot |> 
   ggplot(aes(x = `Owned Users`)) +
   geom_boxplot() +
   theme_minimal() +
@@ -188,15 +226,20 @@ graf_boxplot_own_users <- dataset_bg_boxplot |>
   )
 
 
-# graf_boxplot_own_users
+# graf_boxplot_owned_users
 
 library(patchwork)
 
-(graf_boxplot_year | graf_boxplot_min_p | graf_boxplot_max_p | graf_boxplot_time) /
-(graf_boxplot_users_rated | graf_boxplot_avg_rate | graf_boxplot_compl | graf_boxplot_own_users)
+(graf_boxplot_year_published | graf_boxplot_min_players | graf_boxplot_max_players | graf_boxplot_time) /
+(graf_boxplot_users_rated | graf_boxplot_avg_rate | graf_boxplot_compl | graf_boxplot_owned_users) +
+  patchwork::plot_annotation(
+  title = 'Distribuição das variáveis')
+  
 
 
 ```
+
+Podemos ver diferentes distribuições conforme as variáveis numéricas, indicando que muitas delas tem muitos valores discrepantes e possivelmente terão que ser tratadas. Elas serão tratadas na seção de limpeza de dados logo em seguida.
 
 ## Selecionando variáveis
 
@@ -204,24 +247,38 @@ Por se tratar de um trabalho de regressão múltipla, optei por selecionar apena
 
 -   **ID**: Que será o identificador do jogo;
 -   **name**: Contendo o nome do jogo;
--   **year**: O ano de lançamento do jogo;
--   **min_p**: Número mínimo de jogadores para o jogo;
--   **max_p**: Número máximo de jogadores para o jogo;
--   **playtime**: O tempo médio de jogo;
+-   **year_published**: O ano de lançamento do jogo;
+-   **min_players**: Número mínimo de jogadores para o jogo;
+-   **max_players**: Número máximo de jogadores para o jogo;
+-   **play_time**: O tempo médio de jogo;
 -   **min_age**: A idade mínima recomendada;
--   **users_rat**: O número de usuários que avaliou o jogo;
--   **compl**: A complexidade do jogo, uma média dos valores atribuídos pelos jogadores;
--   **own_users**: Número de usuários que possuem o jogo;
--   **score**: A nota, calculada através da média das notas atribuídas pelos jogadores;
+-   **users_rated**: O número de usuários que avaliou o jogo;
+-   **complexity_average**: A complexidade do jogo, uma média dos valores atribuídos pelos jogadores;
+-   **owned_users**: Número de usuários que possuem o jogo;
+-   **rating_average**: A nota, calculada através da média das notas atribuídas pelos jogadores;
 
 ```{r, selecao-variaveis}
+dataset_bg_raw <- dataset_bg |> 
+  janitor::clean_names() |> 
+  dplyr::select(-id, -name, -mechanics, -domains)
+
+dataset_bg_raw_s_rank <- dataset_bg_raw |> 
+  dplyr::select(-bgg_rank)
 
 df_bg <- dataset_bg |>
-  dplyr::select(id = ID, name = Name, year = `Year Published`, min_p = `Min Players`, max_p = `Max Players`,
-                playtime = `Play Time`, min_age = `Min Age`, users_rat = `Users Rated`,
-                compl = `Complexity Average`, own_users = `Owned Users`,
-                score = `Rating Average`) |> 
-  dplyr::mutate(year = as.numeric(year))
+  dplyr::select(id = ID, name = Name, year_published = `Year Published`, min_players = `Min Players`, max_players = `Max Players`,
+                play_time = `Play Time`, min_age = `Min Age`, users_rated = `Users Rated`,
+                complexity_average = `Complexity Average`, owned_users = `Owned Users`,
+                rating_average = `Rating Average`, bgg_rank = `BGG Rank`) |> 
+  dplyr::mutate(year_published = as.numeric(year_published))
+
+df_bg_s_rank <- df_bg |> 
+  dplyr::select(-bgg_rank)
+
+if(!use_rank){
+  df_bg <- df_bg_s_rank
+  dataset_bg_raw <- dataset_bg_raw_s_rank
+}
 
 ```
 
@@ -234,20 +291,20 @@ Agora serão investigados os dados faltantes na base de dados, além disso serã
 Como possuíamos poucas observações com dados faltantes, eu julguei mais prático por remover estas observações da base de dados, concluíndo que fariam pouca diferença no conjunto de dados completo e no modelo criado. No total foram removidas 23 observações.
 
 ```{r, filter-data}
-nrow_year_na <- df_bg |> 
-  dplyr::filter(is.na(year)) |> 
+nrow_year_published_na <- df_bg |> 
+  dplyr::filter(is.na(year_published)) |> 
   nrow()
 
 ## Apenas uma observação sem ano, será removida
 
-nrow_year_own_users <- df_bg |> 
-  dplyr::filter(is.na(own_users)) |> 
+nrow_year_published_owned_users <- df_bg |> 
+  dplyr::filter(is.na(owned_users)) |> 
   nrow()
 
 ## 23 jogos pouco avaliados e menos conhecidos, também serão removidos
 
 df_bg <- df_bg |> 
-  dplyr::filter(!is.na(own_users) & !is.na(year))
+  dplyr::filter(!is.na(owned_users) & !is.na(year_published))
 
 ```
 
@@ -255,49 +312,66 @@ df_bg <- df_bg |>
 
 Para tornar mais homogêneo o meu banco de dados, optei também por remover alguns dados que divergem da realidade mercadológica atual, em algumas variáveis serão utilizados alguns filtros.
 
-#### Ano de lançamento
+#### Ano de lançamento (year_published)
 
-Optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do "Colonizadores de Catan", criado por "Klaus Teuber", conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual. 
+Optei por trabalhar apenas com jogos que foram lançados no ano de 1995 em diante, ano de lançamento do "Colonizadores de Catan", criado por "Klaus Teuber", conhecido como o pai dos jogos de tabuleiros modernos, para termos um recorte mais próximo da realidade mercadológica atual.
 
-#### Mínimo e máximo de jogadores
+#### Mínimo e máximo de jogadores (min_players e max_players)
 
 É comum vermos jogos que são feitos para um único jogador (chamados jogos *solo*), jogos que precisam de pelo menos dois ou três jogadores, e alguns poucos jogos que precisam de mais do que este número, portanto, como número mínimo de jogadores, aceitaremos jogos com valores de 1 à 5.
 
 Já para um número máximo, é um tanto mais complicado, porque existem jogos feitos para muitos jogadores, 10, 20 ou mais jogadores, assim como os jogos *solo* que são para apenas um jogador. Portanto vamos manter nesta variável jogos feitos para 1 até 20 jogadores, que deve abrangir boa parte do mercado atual.
 
-#### Duração do jogo
+#### Duração do jogo (play_time)
 
 No quesito duração dos jogos, também temos uma variação bem grande, com jogos sendo na casa de poucos minutos, à jogos que levam algumas horas, mas, para colocar um limite máximo, definiremos o valor de 300 minutos ou 5 horas, que já é bastante abrangente.
 
-#### Usuários que possuem o jogo e número de avaliações
+#### Idade mínima (min_age)
+
+A idade mínima também é outra variável que tem um comportamento singular, jogos mais complexos são classificados como tendo idade mínima de 12 ou 14 anos, já jogos mais simples podem ter idade mínima de 4 à 6 anos, ainda que isso seja muito particular, e mesmo nos jogos mais simples que podem ser jogados por crianças, algumas vezes tem camadas de complexidade extras que só pessoas mais velhas conseguem perceber e aproveitar.
+
+#### Usuários que possuem o jogo e número de avaliações (min_age)
 
 O número de usuários que possuem os jogos também varia bastante, mas é algo esperado porque temos jogos lançados a muitos anos, que fizeram muito sucesso, e jogos que recém foram lançados ou que não fizeram muito sucesso, portanto vamos remover apenas os jogos que possuem menos jogadores, definindo um limite mínimo de 100 jogadores e 100 avaliações.
 
-#### Nota média e complexidade
+#### Complexidade (complexity_average)
 
-Ainda que existam jogos com notas muito baixas e níveis de complexidade muito baixos, a distribuição parece ser mais uniforme e condizente com a realidade, portanto nenhum jogo será filtrado com base nessas variáveis.
+Observando a base de dados, notei que a distribuição da variável parece ser bastante consistente, o único problema que encontrei foi que, alguns jogos que possuíam poucas observações, parecem ter o número de complexidade 0, portanto removerei estas observações.
 
-#### Fim da limpeza
+#### Nota média (rating_average)
+
+Existem jogos com notas bastante baixas e jogos com notas muito altas, por ser uma variável
+
+#### Filtragem
+
+Finalizando a análise exploratória, vamos filtrar os dados conforme discutido anteriormente, removendo os valores que consideramos inconsistentes com base nas análises feitas.
 
 ```{r, demais-remocoes}
 df_bg_filt <- df_bg |> 
-  dplyr::filter(year >= 1995,
-                min_p > 1 & min_p <= 5,
-                min_p > 1 & max_p <= 20,
-                playtime > 0 & playtime <= 300,
-                users_rat > 100,
-                own_users > 100) |> 
+  dplyr::filter(year_published >= 1993,
+                min_players >= 1 & min_players <= 5,
+                max_players >= 1 & max_players <= 20,
+                min_age > 3,
+                play_time > 0 & play_time <= 1000,
+                users_rated > 100,
+                owned_users > 100,
+                complexity_average >= 1,
+                rating_average >= 4 & rating_average <= 9) |> 
   dplyr::select(-id, -name)
 ```
 
-Após concluir as filtragens dos dados, agora nossa base possui um total de `r nrow(df_bg_filt)` jogos, uma boa diminuição se considerarmos que o número inicial era de 20343 jogos, porém, agora temos uma base mais homogênea e mais condizente com o nosso objetivo de avaliar as notas dos jogos de tabuleiro modernos.
-Além disso, também removeremos as colunas ID e name, que se tratam apenas de identificadores, não podendo ser levados para as próximas análises.
+Após concluir as filtragens dos dados, agora nossa base possui um total de `r nrow(df_bg_filt)` jogos, uma boa diminuição se considerarmos que o número inicial era de 20343 jogos, porém, agora temos uma base mais homogênea e mais condizente com o nosso objetivo de avaliar as notas dos jogos de tabuleiro modernos. Além disso, também removeremos as colunas ID e name, que se tratam apenas de identificadores, não podendo ser levados para as próximas análises.
 
 ## Avaliando a correlação
 
+### Matriz de correlação
+
 ```{r, corr-matrix}
+#| column: page
+#| out-width: 80%
+#| fig-format: svg
 # library(gt)
-rxx <- cor(df_bg_filt[,1:8])
+rxx <- cor(df_bg_filt[,1:9])
 
 # heatmap(rxx)
 # rxx
@@ -305,25 +379,345 @@ rxx <- cor(df_bg_filt[,1:8])
 corrplot::corrplot(rxx)
 ```
 
-```{r, modelo-inicial-step}
-model1 <- lm(data = df_bg_filt, score ~ .)
-summary(model1)
-# modelsummary::modelsummary(model1)
+### VIF da correlação
+
+```{r, vif-correlacao}
+n_covariaveis <- 8
+
+df_vif <- data.frame(matrix(ncol = n_covariaveis, nrow = n_covariaveis))
+for(i in 1:n_covariaveis){
+  for(j in 1:n_covariaveis){
+    # if(i!=j && i<j){
+      # print(paste0("VIF [", i, ",",j, "]"))
+      # print(1/(1-(rxx[i,j])))
+    # }
+    df_vif[i, j] = 1/(1-(rxx[i,j]))
+  }
+}
+colnames(df_vif) <- c(colnames(df_bg_filt[,1:8]))
+rownames(df_vif) <- c(colnames(df_bg_filt[,1:8]))
+df_vif |> 
+  gt::gt(rownames_to_stub = T) |>
+  gt::tab_header(title = "Matriz VIF")
 ```
 
-```{r, modelo-step}
-step(model1)
+Tanto o VIF quanto o gráfico de correlação nos mostram uma correlação alta entre as variáveis número de jogadores que possuem o jogo e número de avaliações, o que é compreensível, já que é mais provável que um usuário que possua o jogo faça a avaliação, e quanto mais pessoas possuírem o jogo, mais chances do jogo ser avaliado por outros jogadores.
+
+## Primeiro modelo
+
+### Modelos
+
+```{r, modelo-inicial-step}
+model1 <- lm(data = df_bg_filt, rating_average ~ .)
+modelo_nulo <- lm(data = df_bg_filt, rating_average ~ 1)
+modelo_sem_tratamento <- lm(data = dataset_bg_raw, rating_average ~ .)
+```
+
+#### Modelo sem tratamento da base de dados
+
+```{r, modelo-sem-tratamento}
+# summary(modelo_sem_tratamento)
+sjPlot::tab_model(modelo_sem_tratamento)
+```
+
+#### Modelo com todas as variáveis
+
+```{r, modelo-total}
+# summary(model1)
+sjPlot::tab_model(model1)
+```
+
+```{r, modelos-step-final}
+# stats::step(modelo_sem_tratamento, direction = c("both"))
 # anova(model1)
 
-model_step <- lm(formula = score ~ year + min_p + max_p + playtime + min_age + 
-    users_rat + compl + own_users, data = df_bg_filt)
+modelo_step <- lm(formula = rating_average ~ year_published + min_players + 
+    play_time + min_age + users_rated + complexity_average, data = df_bg_filt)
 
-summary(model_step)
 
-model_final <- lm(formula = score ~  year + min_p + max_p + playtime + min_age + 
-    users_rat + compl, data = df_bg_filt)
+modelo_final <- lm(formula = rating_average ~ year_published + max_players + play_time + users_rated + complexity_average, data = df_bg_filt)
 
-summary(model_final)
-sjPlot::tab_model(model_final)
+if(use_rank){
+    ## modelo step c/ rank
+  modelo_step <- lm(formula = rating_average ~ year_published + min_players + max_players +
+      play_time + min_age + users_rated + bgg_rank + complexity_average, data = df_bg_filt)
+  ## modelo final c/ rank
+  modelo_final <- lm(formula = rating_average ~ year_published + play_time + min_age + users_rated + bgg_rank + complexity_average, data = df_bg_filt)
+}
 
+# summary(modelo_step)
+# sjPlot::tab_model(modelo_step)
+## Modelo final
+# summary(modelo_final)
+# sjPlot::tab_model(modelo_final)
 ```
+
+#### Modelo step
+
+```{r, modelo-step}
+sjPlot::tab_model(modelo_step)
+```
+
+#### Modelo selecionado
+
+```{r, modelo-selecionado}
+sjPlot::tab_model(modelo_final)
+```
+
+O primeiro modelo utiliza todas as variáveis que servirá como padrão a ser comparado.
+
+O modelo sugerido pelo step, avaliado através da métrica AIC, remove a variável de número de usuários que possuem o jogo (*owned_users*), e não melhora a performance geral do modelo.
+
+Por fim, o modelo selecionado fica com as variáveis ano de publicação (*year_published*), máximo de jogadores (*max_players*), tempo de jogo (*play_time*), número de avaliações (*users_rated*) e a complexidade do jogo (*complexity_average*). Foram removidas duas variáveis (*owned_users* e *min_age*) por terem seu p-valor acima de 0.05, o **R² ajustado** foi **de `r round(summary(modelo_step)$adj.r.squared, 4)` para `r round(summary(modelo_final)$adj.r.squared, 4)`**, melhorando um poucoa performance e tornando o modelo mais simples.
+
+### Análise de resíduos
+
+```{r, analise-residuos}
+#| column: page
+#| out-width: 100%
+#| fig-align: center
+#| fig-format: svg
+# Analise dos resíduos
+par(mfrow = c(2, 2))
+plot(modelo_final)
+
+performance::check_model(modelo_final, 
+            check = c("linearity", "qq", "homogeneity", "outliers"))
+```
+
+O primeiro gráfico de resíduos e valores ajustados nos mostra o comportamento dos resíduos, ficando próximo de uma linha reta, atestando independência dos resíduos e indicando que a aproximação por uma regressão linear múltipla é adequada. Porém, observamos muitos valores dentro do intervalo 5 à 8, e alguns poucos pontos com notas acima disto.
+
+O segundo gráfico testa a suposição de normalidade dos resíduos, aparentemente temos uma fuga nos dois extremos.
+
+O terceiro gráfico é para testar a suposição de homocedasticidade da variância dos resíduos, os nossos dados parecem ter uma variância homocedástica.
+
+E o quarto e último, a distância de cook, nos indica possíveis pontos de influência. Nos é indicado alguns pontos que podem ser investigados.
+
+#### Análise de distância de Cook
+
+```{r, distancia-cook}
+#| column: page
+#| out-width: 100%
+#| fig.align: center
+#| fig-format: svg
+par(mfrow = c(1,2))
+plot (modelo_final,4)
+plot (modelo_final,5)
+
+performance::check_model(modelo_final,
+                         check = c("outliers"))
+```
+
+#### Teste de normalidade
+
+##### Shapiro Wilk
+
+```{r, shapiroWilk}
+
+res <- residuals(modelo_final)
+# res
+
+## Shapiro para apenas 5 mil observações
+shapiro.test(modelo_final$residuals[1:5000])
+```
+
+Usando 5000 observações no teste Shapiro-Wilk, observamos que o teste não rejeitou a hipótese nula, ou seja, não podemos dizer que os resíduos possuem uma distribuição normal.
+
+##### Anderson Darling
+
+```{r, andersonDarling}
+## Anderson Darling para apenas 5 mil observações
+nortest::ad.test(res)
+```
+
+Usando o teste de Anderson Darling, para uma amostra com mais de 5 mil observações, tivemos um resultado parecido, também rejeitando a hipótese nula, ou seja, indicando que não há normalidade nos resíduos.
+
+#### Teste de homocedasticidade
+
+##### Breusch-Pagan
+
+```{r}
+lmtest::bptest(modelo_final)
+```
+
+Novamente, rejeitamos a hipótese nula, de que os residuos sejam homocedásticos, ou seja, que possuam uma variância constante.
+
+#### Teste de independência dos resíduos
+
+##### Durbin-Watson
+
+```{r}
+lmtest::dwtest(modelo_final)
+```
+
+Neste teste também rejeitamos a hipótese nula, de que os residuos sejam independentes, ou seja, o teste indica autocorrelação nos resíduos.
+
+## Novo modelo
+
+Para trabalhar de forma diferente com os dados, resolvi fazer mais um filtro, em jogos que tem pelo menos 2 mil jogadores como proprietários.
+
+```{r, novo-modelo}
+df_bg_filt_own <- df_bg_filt |>
+  dplyr::filter(owned_users > 2000)
+
+sjPlot::tab_model(lm(formula = rating_average ~ ., data = df_bg_filt_own))
+
+novo_modelo_final <- lm(formula = rating_average ~ year_published + max_players + users_rated + complexity_average, data = df_bg_filt_own)
+
+if(use_rank){
+  novo_modelo_final <- lm(formula = rating_average ~ year_published + play_time + min_age + users_rated + bgg_rank + complexity_average, data = df_bg_filt_own)
+}
+
+sjPlot::tab_model(novo_modelo_final)
+```
+
+### Analisando novos resíduos
+
+#### Teste de normalidade
+
+##### Shapiro Wilk
+
+```{r, new-model-shapiroWilk}
+
+res <- residuals(novo_modelo_final)
+# res
+
+## Shapiro para apenas 5 mil observações
+shapiro.test(novo_modelo_final$residuals)
+```
+
+Mesmo não tendo rejeitado novamente a hipótese nula, parece ter havido uma melhora no resultado, mas ainda está indicado que os resíduos não possuem uma distribuição normal.
+
+##### Anderson Darling
+
+```{r, new-model-andersonDarling}
+## Anderson Darling para apenas 5 mil observações
+nortest::ad.test(res)
+```
+
+Usando o teste de Anderson Darling o resultado foi parecido, uma pequena melhora, mas ainda rejeitando a hipótese nula, ou seja, indicando que não há normalidade nos resíduos.
+
+#### Teste de homocedasticidade
+
+##### Breusch-Pagan
+
+```{r, new-model-teste-breuch-pagan}
+lmtest::bptest(novo_modelo_final)
+```
+
+Novamente, rejeitamos a hipótese nula, de que os residuos sejam homocedásticos, ou seja, que possuam uma variância constante.
+
+#### Teste de independência dos resíduos
+
+##### Durbin-Watson
+
+```{r}
+lmtest::dwtest(novo_modelo_final)
+```
+
+Neste teste também rejeitamos a hipótese nula, de que os residuos sejam independentes, ou seja, o teste indica autocorrelação nos resíduos.
+
+### Análise de pontos de influência
+
+Tabela com diferentes métricas, avaliando se a observação pode ser considerada ponto de influência ou não.
+
+```{r, new-model-pontos-influencia}
+influ <- influence.measures(novo_modelo_final)
+# influ$is.inf
+# summary(influ)
+
+as.data.frame(influ$is.inf) |> 
+  as_tibble() |> 
+  gt::gt() |> 
+  gt::opt_interactive()
+```
+
+#### Removendo pontos de influência
+
+```{r, new-model-removendo-pontos-influ}
+
+## Removendo pontos de influência baseados no dffit
+df_sem_influ <- df_bg_filt_own[influ$is.inf[,6] != TRUE,]
+## Removendo pontos de influência baseados no hat
+df_sem_influ_ <- df_bg_filt_own[influ$is.inf[,9] != TRUE,]
+
+# modelo_completo_sem_influ <- lm(formula = rating_average ~ ., data = df_sem_influ)
+
+modelo_final_sem_influ <- lm(formula = rating_average ~ year_published + max_players + users_rated + complexity_average + owned_users, 
+                             data = df_sem_influ)
+
+sjPlot::tab_model(modelo_final_sem_influ, digits = 6, digits.p = 4, digits.rsq = 4, digits.re = 4)
+```
+
+Verificamos então novamente uma melhora, indo de `r round(summary(novo_modelo_final)$adj.r.squared, 4)` para `r round(summary(modelo_final_sem_influ)$adj.r.squared, 4)` no nosso R², removendo apenas `r nrow(df_bg_filt_own) - nrow(df_sem_influ)` observações baseadas no **dffit**.
+
+### Analisando novos resíduos
+
+#### Teste de normalidade
+
+##### Shapiro Wilk
+
+```{r, new-model-final-shapiroWilk}
+
+res <- residuals(modelo_final_sem_influ)
+# res
+
+## Shapiro para apenas 5 mil observações
+shapiro.test(modelo_final_sem_influ$residuals)
+```
+
+Mesmo não tendo rejeitado novamente a hipótese nula, parece ter havido uma melhora novamente no resultado, mas ainda está indicado que os resíduos não possuem uma distribuição normal.
+
+##### Anderson Darling
+
+```{r, new-model-final-andersonDarling}
+## Anderson Darling para apenas 5 mil observações
+nortest::ad.test(res)
+```
+
+Usando o teste de Anderson Darling o resultado foi parecido, um ganho ainda maior, mas ainda rejeitando a hipótese nula, ou seja, indicando que não há normalidade nos resíduos.
+
+#### Teste de homocedasticidade
+
+##### Breusch-Pagan
+
+```{r, new-model-final-teste-breuch-pagan-novo-modelo}
+lmtest::bptest(modelo_final_sem_influ)
+```
+
+Também rejeitamos a hipótese nula, de que os residuos sejam homocedásticos, ou seja, que possuam uma variância constante.
+
+#### Teste de independência dos resíduos
+
+##### Durbin-Watson
+
+```{r}
+lmtest::dwtest(modelo_final_sem_influ)
+```
+
+Neste teste também rejeitamos a hipótese nula, de que os residuos sejam independentes, ou seja, o teste indica autocorrelação nos resíduos.
+
+### Equação do modelo
+
+A equação final do modelo é:
+
+$$y = -75.587004 + 0.040664*x_1-0.032432*x_2+0.000041*x_3\\+0.380869*x_4-0.000014*x_5$$
+
+Para:
+
+-   $x_1$ = ano de publicação (year_published)
+-   $x_2$ = máximo de jogadores (max_players)
+-   $x_3$ = avaliações de usuários (users_rated)
+-   $x_4$ = complexidade (complexity_average)
+-   $x_5$ = usuários que possuem o jogo
+-   $y$ = nota do jogo (rating_average)
+
+# Conclusão
+
+Este trabalho que teve objetivo de desenvolver um modelo de regressão linear múltipla para explicar a variável nota atribuída de acordo com algumas as variáveis explicativas presentes nesta base de dados: ano de lançamento do jogo, número mínimo de jogadores, número máximo de jogadores, tempo médio de jogo, idade mínima recomendada, número de usuários que avaliou o jogo, complexidade do jogo e número de pessoas que possuem o jogo.
+
+Primeiro foi feita uma análise exploratória para o entendimento da base de dados, limpeza e estruturação dos dados. E então, uma análise de correlação premilinar já apontou algumas possíveis variáveis que poderiam ter maior influência no modelo.
+
+Alguns modelos foram gerados, testando combinações de variáveis e novos filtros nos dados, chegando ao resultado final de um modelo que, infelizmente não passou nos testes de análise de resíduos, mas conseguiu ter alguma melhora comparada modelo à modelo. E por fim chegou à um resultado.
+
+O modelo final utilizado parece ter atingido um bom resultado, nele foram utilizadas as variáveis ano de publicação (*year_published*), número máximo de jogadores (*max_players*), número de avaliações dos usuários (*users_rated*) e nível de complexidade (*complexity_average*) e após a remoção dos valores de influência, segundo o **dffit**, conseguimos uma melhora de resultado considerável, partindo de um **R²** de **`r round(summary(modelo_sem_tratamento)$adj.r.squared, 4)`** no primeiro modelo gerado sem tratamento de dados e sem remoção de pontos de influência para um **R²** de **`r round(summary(modelo_final_sem_influ)$adj.r.squared, 4)`** no modelo final.
