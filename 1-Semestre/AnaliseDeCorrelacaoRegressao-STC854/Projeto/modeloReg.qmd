@@ -95,6 +95,8 @@ Além disso observaremos a distribuição de cada variável, investigando seus b
 #| column: page
 #| out-width: 100%
 #| fig-format: svg
+#| warning: false
+#| 
 dataset_bg_boxplot <- dataset_bg |> 
   dplyr::select(-ID, -`BGG Rank`, -`Name`, -`Mechanics`, -`Domains`)
 
@@ -218,7 +220,7 @@ graf_boxplot_owned_users <- dataset_bg_boxplot |>
   coord_flip() +
   labs(
     x = "",
-    y = "Número de usuários que possuem"
+    y = stringr::str_wrap("Número de usuários que possuem", 15)
   ) +
   theme(
     axis.text.x = element_blank(),
