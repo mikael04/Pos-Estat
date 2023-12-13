@@ -23,7 +23,7 @@ library(dplyr)
 ```
 
 ```{r, rank}
-use_rank <- F
+use_rank <- f
 ```
 
 # Introdução
@@ -372,6 +372,9 @@ Após concluir as filtragens dos dados, agora nossa base possui um total de `r n
 #| fig-format: svg
 # library(gt)
 rxx <- cor(df_bg_filt[,1:9])
+if(use_rank){
+  rxx <- cor(df_bg_filt[,1:10])
+}
 
 # heatmap(rxx)
 # rxx
