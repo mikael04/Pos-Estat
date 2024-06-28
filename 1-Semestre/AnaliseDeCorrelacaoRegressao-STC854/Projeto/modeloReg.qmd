@@ -22,8 +22,10 @@ library(ggplot2)
 library(dplyr)
 ```
 
+
 ```{r, rank}
 use_rank <- F
+play_time_max <- 360
 ```
 
 # Introdução
@@ -350,11 +352,11 @@ Finalizando a análise exploratória, vamos filtrar os dados conforme discutido 
 
 ```{r, demais-remocoes}
 df_bg_filt <- df_bg |> 
-  dplyr::filter(year_published >= 1993,
+  dplyr::filter(year_published >= 1995,
                 min_players >= 1 & min_players <= 5,
                 max_players >= 1 & max_players <= 20,
                 min_age > 3,
-                play_time > 0 & play_time <= 1000,
+                play_time > 0 & play_time <= play_time_max,
                 users_rated > 100,
                 owned_users > 100,
                 complexity_average >= 1,
@@ -567,7 +569,7 @@ df_bg_filt_own <- df_bg_filt |>
 
 sjPlot::tab_model(lm(formula = rating_average ~ ., data = df_bg_filt_own))
 
-novo_modelo_final <- lm(formula = rating_average ~ year_published + max_players + users_rated + complexity_average, data = df_bg_filt_own)
+novo_modelo_final <- lm(formula = rating_average ~ year_published + max_players + users_rated + complexity_average + owned_users, data = df_bg_filt_own)
 
 if(use_rank){
   novo_modelo_final <- lm(formula = rating_average ~ year_published + play_time + min_age + users_rated + bgg_rank + complexity_average, data = df_bg_filt_own)
@@ -706,7 +708,14 @@ Neste teste também rejeitamos a hipótese nula, de que os residuos sejam indepe
 
 A equação final do modelo é:
 
-$$y = -75.587004 + 0.040664*x_1-0.032432*x_2+0.000041*x_3\\+0.380869*x_4-0.000014*x_5$$
+
+\begin{aligned}
+& \mathrm y = -75.587004 + 0.040664*x_1-0.032432*x_2+0.000041*x_3
+\\
+& \mathrm +0.380869*x_4-0.000014*x_5
+
+\end{aligned}
+
 
 Para:
 

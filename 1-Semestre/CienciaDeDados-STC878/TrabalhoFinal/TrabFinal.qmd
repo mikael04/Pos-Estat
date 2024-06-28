@@ -204,13 +204,13 @@ df_bg_raw |>
 
 <br>
 
-Observando alguns dos jogos que me são conhecidos, como o jogo da velha ("Tic-Tac-Toe") que é egípcio e Go que é um jogo muito antigo chinês, concluí que são mesmo jogos antigos e não dados preenchidos de forma inconsistente. Isso influência bastante a média, que é puxada para baixo pelos valores bastante altos "negativos". Então, como me propus a trabalhar com a análise descritiva de jogos de tabuleiros modernos, achei mais correto filtrar os jogos a partir de um determinado ano. E o ano escolhido foi o de lançamento do jogo "Catan", conhecido como o primeiro e provavelmente o mais famoso jogo de tabuleiro moderno, lançado em 1993.
+Observando alguns dos jogos que me são conhecidos, como o jogo da velha ("Tic-Tac-Toe") que é egípcio e Go que é um jogo muito antigo chinês, concluí que são mesmo jogos antigos e não dados preenchidos de forma inconsistente. Isso influência bastante a média, que é puxada para baixo pelos valores bastante altos "negativos". Então, como me propus a trabalhar com a análise descritiva de jogos de tabuleiros modernos, achei mais correto filtrar os jogos a partir de um determinado ano. E o ano escolhido foi o de lançamento do jogo "Catan", conhecido como o primeiro e provavelmente o mais famoso jogo de tabuleiro moderno, lançado em 1995.
 
 #### Filtro
 
 ```{r, year-filter}
 df_bg <- df_bg_raw |> 
-  dplyr::filter(year_published >= 1993)
+  dplyr::filter(year_published >= 1995)
 ```
 
 #### Distribuição do ano de publicação na base de dados
