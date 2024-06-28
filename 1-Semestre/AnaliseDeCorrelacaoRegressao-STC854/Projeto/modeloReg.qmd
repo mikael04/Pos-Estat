@@ -1,7 +1,7 @@
 ---
 title: "Criando modelo para predição de nota em jogos de tabuleiros modernos"
 author: "Mikael"
-cache: TRUE
+cache: FALSE
 theme: cerulean
 reference-location: margin
 toc: true
@@ -40,7 +40,7 @@ A história dos jogos de tabuleiro é uma história de criatividade, inovação 
 
 Ao longo dos anos, para auxiliar os jogadores a entenderem melhor esse número crescente de jogos e facilitar a comunicação entre diversas pessoas do hobbie, um website foi criado, o BoardGameGeek. Ele centraliza boa parte das discussões, informações e arquivos relacionados a jogos de tabuleiro a nível mundial. Trazendo portanto a maior base de dados relativos aos jogos de tabuleiro disponível atualmente.
 
-Logo em seu princípio, para ajudar os jogadores a entenderem sobre os jogos lançados, o site lançou uma forma colaborativa de atribuir uma nota aos jogos, onde os jogadores cadastrados no portal podem atribuir uma nota à um jogo, que vai de 0 à 10, além de deixar uma opinião para contribuir com a pesquisa dos demais jogadores sobre o determinado jogo. Essa nota se tornou um fator muito importante aos novos jogadores, que a tomam como base para decidir suas futuras aquisições, além de comparar com jogos próprios.
+Logo em seu princípio, para ajudar os jogadores a entenderem sobre os jogos lançados, o site lançou uma forma colaborativa de atribuir uma nota aos jogos, onde os jogadores cadastrados no portal podem atribuir uma nota à um jogo, que vai de 1 à 10, além de deixar uma opinião para contribuir com a pesquisa dos demais jogadores sobre o determinado jogo. Essa nota se tornou um fator muito importante aos novos jogadores, que a tomam como base para decidir suas futuras aquisições, além de comparar com jogos próprios.
 
 O sucesso de um jogo de tabuleiro pode ser medida de diferentes formas, número de vendas, posições em ranking, recomendações de formadores de opinião e também por sua nota, como muitas dessas informações são de difícil acesso, e para casar com a disciplina de Análise de Regressão cursada, foi escolhida como objetivo de estudo a nota dos jogos.
 
@@ -56,7 +56,7 @@ A nossa exploração inicial se dará na base de dados, observando seu tamanho, 
 
 Os dados foram encontrados num site de acesso público, que possuía dados referentes ao portal BoardGameGeek, o maior portal de jogos de tabuleiro no mundo. Este site é usado por jogadores no mundo todo para buscar informações sobre os jogos, avaliar, tirar dúvidas e conversar com outras pessoas interessadas no jogo ou neste tipo de passatempo.
 
-Os dados podem ser encontrados através do link: https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games
+Os dados podem ser encontrados através do link: <https://ieee-dataport.org/open-access/boardgamegeek-dataset-board-games>
 
 Para a análise foi utilizada a linguagem **R** em sua versão 4.1.3, através do software **RStudio** em sua versão 2023.06.1. Ao longo do projeto alguns pacotes para manipulação, visualização, modelagem e testes também foram utilizadas, notadamente o *dplyr* para manipulação, o *ggplot2* para visualização, o r base para modelagem e alguns testes contaram com outras bibliotecas.
 
