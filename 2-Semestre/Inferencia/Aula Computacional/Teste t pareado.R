@@ -30,11 +30,26 @@ dados$DiferencaPTS1 <- dados$Convulsoes_PT - dados$Convulsoes_S1
 shapiro.test(dados$DiferencaPTS1)
 
 
+dados$DiferencaPTS6 <- dados$Convulsoes_PT - dados$Convulsoes_S6
+
+shapiro.test(dados$DiferencaPTS6)
+
+dados$DiferencaS1S6 <- dados$Convulsoes_S1 - dados$Convulsoes_S6
+
+shapiro.test(dados$DiferencaS1S6)
+
+## Deveria ter dado normalidade, seguiremos apenas para fins didáticos,
+## mas tecnicamente os próximos testes não fazem mais sentido já que não temos normalidade dos dados
+## Testar a diferença (dados da convulsao antes, e convulsao depois)
+## Resultado rejeita a h0: dados não são normais
+
+
 # Passo 4: Realizacao do teste t pareado
 #H0: As médias dos dois grupos são iguais
 #H1: As médias dos dois grupos não são iguais
 t.test(dados$Convulsoes_PT, dados$Convulsoes_S1, paired = TRUE)
 
+## Rejeita h0, ou seja, as médias não são iguais (médias diferentes)
 
 # Passo 5 (opcional): Visualizacao da distribuicao dos dados
 

@@ -40,16 +40,18 @@ x<-dados%>%
 y<-dados%>%
   filter(Posicao_Sala == "Frente")
 
+## Precisa testar se as variâncias são iguais ou diferentes, para saber qual método utilizar
+### (teste c/ variancias desconhecidas e iguais, ou desconhecidas e diferentes)
 #H0: As variâncias dos grupos são iguais
 #H1: As variâncias dos grupos não são iguais
-var.test(x$Nota_Biol,y$Nota_Biol)
-var.test(x$Nota_Fis,y$Nota_Fis)
-var.test(y$Nota_Hist,x$Nota_Hist)
+var.test(x$Nota_Biol,y$Nota_Biol) ## Não rejeita h0, var iguais
+var.test(x$Nota_Fis,y$Nota_Fis) ## Rejeita h0, var diferentes
+var.test(y$Nota_Hist,x$Nota_Hist) ## Rejeita h0, var diferentes
 
 # Passo 5: Realizacao do teste t para amostras independentes
 #H0: As médias dos grupos são iguais
 #H1: As médias dos grupos não são iguais
-t.test(Nota_Biol ~ Posicao_Sala, dados, var.equal=TRUE)
+t.test(Nota_Biol ~ Posicao_Sala, dados, var.equal=TRUE) ## Faz o teste conforme o parametro var.equal (pegando o resultado do teste anterior)
 t.test(Nota_Fis ~ Posicao_Sala, dados, var.equal=FALSE)
 t.test(Nota_Hist ~ Posicao_Sala, dados, var.equal=FALSE)
 

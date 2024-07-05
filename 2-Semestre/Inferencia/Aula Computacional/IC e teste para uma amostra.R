@@ -7,6 +7,7 @@
 if(!require(dplyr)) install.packages("dplyr") # Instalaçao do pacote caso nao esteja instalado
 library(dplyr)                                # Carregamento do pacote
 
+setwd("2-Semestre/Inferencia/Aula Computacional/")
 
 # Passo 2: Carregar o banco de dados
 
@@ -31,10 +32,10 @@ glimpse(dados)                          # Visualizacao de um resumo dos dados
 shapiro.test(dados$Altura)
 
 
-# Passo 4 - Intervalo de confiança 
-# Amostra provém da distribuição normal e a variância é desconhecida
+# Passo 4 - Intervalo de confiança
+# Amostra provém da distribuição normal e a variância populacional é desconhecida
 alpha<-0.05
-var_interesse<-dados$Altura 
+var_interesse<-dados$Altura
 n<-length(var_interesse)
 
 (LI<-mean(var_interesse)-qt(1-alpha/2, n-1)*sd(var_interesse)/sqrt(n))
@@ -44,14 +45,16 @@ n<-length(var_interesse)
 # Passo 5: Realizacao do teste t para uma amostra com IC
 # H0: mu=167
 # H1: mu!=167
-t.test(dados$Altura, mu = 167, conf.level = 0.95)
+t.test(dados$Altura, mu = 167, conf.level = 0.95, alternative = "two.sided")
+t.test(dados$Altura, mu = 165, conf.level = 0.95, alternative = "greater")
 
+## tc -> região de não rejeição de h0, p-valor de 0.4883 -> corrobora a rejeição de h0
 
 # Observacao:
   # O teste bicaudal eh o default; caso deseje unicaudal, necessario incluir:
     # alternative = "greater" (maior) ou alternative = "less" (menor)
   # Exemplo: t.test(dados$Altura, mu = 167, alternative = "greater")
-    # Nesse caso, o teste verificara se os dados indicam que e media eh 
+    # Nesse caso, o teste verificara se os dados indicam que e media eh
     # maior que a media testada
 
 # Passo 6 (opcional): Visualizacao da distribuicao dos dados
@@ -65,7 +68,7 @@ boxplot(dados$Altura, ylab = "Altura (cm)")
 
 nmasculino<-sum(dados$Genero=="M")
 phat<- nmasculino/n
-  
+
 # Passo 2 - Obter o intervalo de confiança
 alpha<-0.05
 
@@ -74,6 +77,8 @@ alpha<-0.05
 
 # Passo 3 -  Realizacao do teste da proporção para uma amostra com IC
 prop.test(nmasculino, n=n, p=0.6)
+
+##  H0: Testando que a proporção é igual a 0.6, H1: prop != 0.6
 
 # Proporção das pessoas que tem Ensino superior como Grau de instrução
 nsuperior<-sum(dados$Grau_de_Instruçao=="Superior")
@@ -86,5 +91,7 @@ alpha<-0.05
 (LS<-phat+qnorm(1-alpha/2)*sqrt(phat*(1-phat)/(n-1)))
 
 # Passo 3 -  Realizacao do teste da proporção para uma amostra com IC
-prop.test(nsuperior, n=n, p=0.5)
+prop.test(nsuperior, n=n, p=0.3, alternative = "greater")
 
+## Proporção de pessoas que tem ensino superior é maior que 0.3,
+## nesse caso rejeitamos a h0: De que a proporção da população é menor ou igual à 0.3
