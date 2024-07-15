@@ -1,0 +1,13 @@
+Pneu	Bloco	consumo
+A	I	30
+B	I	32
+C	I	33
+D	I	35
+A	II	29
+B	II	30
+C	II	31
+D	II	33
+A	III	25
+B	III	26
+C	III	30
+D	III	31
