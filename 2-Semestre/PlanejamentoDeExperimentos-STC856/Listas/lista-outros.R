@@ -1,31 +1,36 @@
 # Exemplo DIC ----
+# Exemplo 1 Lista DIC
 
 ## Dados ----
 
 rm(list=ls())
-setwd("2-Semestre/PlanejamentoDeExperimentos-STC856/Scripts/")
-dados <- read.table('data-raw/ExemploDic.txt', header=TRUE)
+# setwd("2-Semestre/PlanejamentoDeExperimentos-STC856/Scripts/")
+# dados <- read.table('data-raw/ExemploDic.txt', header=TRUE)
+
+trat <- c(rep("A", 5), rep("B", 5), rep("C", 5))
+des <- c(130, 129, 128, 126, 130,
+         125, 131, 130, 129, 127,
+         135, 129, 131, 128, 130)
+dados <- data.frame(trat, des)
+rep <- 5
 
 ## Graus de Liberdade ----
 
-GL_trat <- length(unique(dados$medicamentos))-1
-GL_total <- length(dados$pressao)-1
+GL_trat <- length(unique(dados$trat))-1
+GL_total <- nrow(dados)-1
 
 GL_res <- GL_total - GL_trat
 
 ## Soma de quadrados ----
-T_a <- sum(dados$pressao[dados$medicamentos=="A"])
-T_b <- sum(dados$pressao[dados$medicamentos=="B"])
-T_c <- sum(dados$pressao[dados$medicamentos=="C"])
-T_d <- sum(dados$pressao[dados$medicamentos=="D"])
-T_e <- sum(dados$pressao[dados$medicamentos=="E"])
-T_t <- sum(dados$pressao[dados$medicamentos=="T"])
+T_a <- sum(dados$des[dados$trat=="A"])
+T_b <- sum(dados$des[dados$trat=="B"])
+T_c <- sum(dados$des[dados$trat=="C"])
 
-T_total <- sum(T_a+T_b+T_c+T_d+T_e+T_t)
+T_total <- sum(T_a+T_b+T_c)
 
-(SQ_trat <- (T_a^2+T_b^2+T_c^2+T_d^2+T_e^2+T_t^2)/(GL_trat+1) - T_total^2/(GL_total+1))
+(SQ_trat <- (T_a^2+T_b^2+T_c^2)/(rep) - T_total^2/(GL_total+1))
 
-(SQ_total <- sum(dados$pressao^2) - T_total^2/30)
+(SQ_total <- sum(dados$des^2) - T_total^2/(GL_total+1))
 
 (SQ_res <- SQ_total - SQ_trat)
 
@@ -41,47 +46,63 @@ T_total <- sum(T_a+T_b+T_c+T_d+T_e+T_t)
 
 ## F tabelado ----
 
-(qf(0.95, GL_trat, GL_res))
+(F_tab <- qf(0.99, GL_trat, GL_res))
+
+(F0 > F_tab)
+## False
+
+## Como é falso, rejeitamos a hipótese nula, ou seja, pelo teste
+
 
 ## Conferindo resultado ----
 
-a0 <- ExpDes::crd(dados$medicamentos, dados$pressao, quali = TRUE, mcomp="tukey", sigF = 0.05)
+a0 <- ExpDes::crd(dados$trat, dados$des, quali = TRUE, mcomp="tukey", sigF = 0.05)
 
 # Exemplo DBC ----
+# Exemplo 1 Lista DBC
 
 ## Dados ----
 
 rm(list=ls())
-dados <- read.table('data-raw/ExemploDbc.txt', header=TRUE)
+# setwd("2-Semestre/PlanejamentoDeExperimentos-STC856/Scripts/")
+# dados <- read.table('data-raw/ExemploDbc.txt', header=TRUE)
+trat <- c(rep(c("A", "B", "C", "D", "E", "F"), 3))
+bloco <- c(rep("I", 6), rep("II", 6), rep("III", 6))
+producao <- c(2.9, 8, 5.6, 7.7, 4.3, 5.5,
+              3.2, 10.6, 6.0, 8.8, 6.5, 5.1,
+              2.4, 9.8, 6.7, 7.9, 5.6, 6.9)
+
+dados <- data.frame(trat, bloco, producao)
 
 ## Graus de liberdade ----
-GL_trat <- length(unique(dados$Pneu))-1
-GL_bloc <- length(unique(dados$Bloco))-1
-GL_total <- length(dados$consumo)-1
+GL_trat <- length(unique(dados$trat))-1
+GL_bloc <- length(unique(dados$bloco))-1
+GL_total <- length(dados$producao)-1
 
 GL_res <- GL_total - GL_trat - GL_bloc
 
 ## Soma de quadrados ----
 ### Tratamentos ----
-(T_t1 <- sum(dados$consumo[dados$Pneu=="A"]))
-(T_t2 <- sum(dados$consumo[dados$Pneu=="B"]))
-(T_t3 <- sum(dados$consumo[dados$Pneu=="C"]))
-(T_t4 <- sum(dados$consumo[dados$Pneu=="D"]))
+(T_t1 <- sum(dados$producao[dados$trat=="A"]))
+(T_t2 <- sum(dados$producao[dados$trat=="B"]))
+(T_t3 <- sum(dados$producao[dados$trat=="C"]))
+(T_t4 <- sum(dados$producao[dados$trat=="D"]))
+(T_t5 <- sum(dados$producao[dados$trat=="E"]))
+(T_t6 <- sum(dados$producao[dados$trat=="F"]))
 
-### Blocos ----
-(T_b1 <- sum(dados$consumo[dados$Bloco=="I"]))
-(T_b2 <- sum(dados$consumo[dados$Bloco=="II"]))
-(T_b3 <- sum(dados$consumo[dados$Bloco=="III"]))
+### blocos ----
+(T_b1 <- sum(dados$producao[dados$bloco=="I"]))
+(T_b2 <- sum(dados$producao[dados$bloco=="II"]))
+(T_b3 <- sum(dados$producao[dados$bloco=="III"]))
 
 (T_total <- sum(T_t1+T_t2+T_t3+T_t4))
 (T_total <- sum(T_b1+T_b2+T_b3))
 
-(SQ_trat <- (T_t1^2+T_t2^2+T_t3^2+T_t4^2)/(GL_bloc+1) - T_total^2/(GL_total+1))
-
+(SQ_trat <- (T_t1^2+T_t2^2+T_t3^2+T_t4^2+T_t5^2+T_t6^2)/(GL_bloc+1) - T_total^2/(GL_total+1))
 
 (SQ_bloc <- (T_b1^2+T_b2^2+T_b3^2)/(GL_trat+1) - T_total^2/(GL_total+1))
 
-(SQ_total <- sum(dados$consumo^2) - T_total^2/(GL_total+1))
+(SQ_total <- sum(dados$producao^2) - T_total^2/(GL_total+1))
 
 (SQ_res <- SQ_total - SQ_trat - SQ_bloc)
 
@@ -107,22 +128,16 @@ GL_res <- GL_total - GL_trat - GL_bloc
 
 ## CV ----
 
-media_geral <- mean(dados$consumo)
+media_geral <- mean(dados$producao)
 
 (CV <- sqrt(QM_res)/media_geral*100)
 
 ## Conferindo resultados ----
 
-a0 <- ExpDes::rbd(dados$Pneu, dados$Bloco, dados$consumo, mcomp="tukey", sigT=0.05)
+a0 <- ExpDes::rbd(dados$trat, dados$bloco, dados$producao, mcomp="tukey", sigT=0.05)
 
-# Lista 4 DQL ----
-## Exercício 3
+# DQL ----
 
-# Fator -> bacilos
-# Tipos de bacilos -> Tratamentos
-# UE -> 1L de leite
-## Não homogêneo, variação de gordura e grau de acidez (2 controles) - DQL
-##
 ## Dados ----
 rm(list=ls())
 dados <- data.frame(
@@ -310,9 +325,9 @@ T_total <- sum(T_r1+T_r2+T_r3+T_r4)
 
 ## F tabelado ----
 
-(qtukey(0.95, GL_trat, GL_res))
+(qf(0.95, GL_trat, GL_res))
 
-(qtukey(0.95, GL_rep, GL_res))
+(qf(0.95, GL_rep, GL_res))
 
 ## Conferindo resultados ----
 
@@ -327,8 +342,7 @@ print(tukey_result)
 
 ## Calculando a diferença mínima significativa ----
 
-(dms <- qtukey(0.95, GL_trat, GL_res)*sqrt(QM_res/(GL_trat+1)))
-# Delta = 4,44
+(dms <- qf(0.95, GL_trat, GL_res)*sqrt(QM_res/(GL_trat+1)))
 
 # (qf(0.95, 5, 12)*sqrt(296.11/(4)))
 
@@ -339,7 +353,6 @@ med_4 <- mean(dados$Cochonilhas[dados$Tratamento=="D"])
 med_5 <- mean(dados$Cochonilhas[dados$Tratamento=="E"])
 med_6 <- mean(dados$Cochonilhas[dados$Tratamento=="F"])
 
-## Ordenando médias
 medias <- order(c(med_1, med_2, med_3, med_4, med_5, med_6), decreasing = TRUE)
 
 # a
@@ -361,3 +374,120 @@ med_5 - med_1
 # C -   c
 # E      d
 # A       e
+
+## Tukey exemplo de sala -----
+# DQL 5x5, i = 5, j = 5
+# SQ_res = 34116
+## Delta = q(i, gl_res, alfa)*sqrt(QM_res/rep)
+## Delta = q(5, 12, 5%) * sqrt(2.843/5)
+## QM_res = SQ_res/GL_res = 34116/12 = 2,843
+## q(5, 12, 5%) -> 4,51
+## Delta = 107,54
+q(0.95, 5, 12)
+
+sqrt(2843/5)
+
+delta = 107.54
+ma = 604.8
+mb = 509.8
+mc = 469.8
+md = 394
+me = 346.8
+
+ma - mb > delta # a
+ma - mc > delta # para o "a", começa o "b"
+mb - mc > delta # b
+mb - md > delta # para o "b", começa o "c"
+mc - md > delta # c
+mc - me > delta # para o "c", começa o "d"
+md - me > delta # "d"
+
+# ma = 604,8  a
+# mb = 509,8  ab
+# mc = 469,8   b
+# md = 394
+# me = 346,8
+
+
+### Tukey exercício 1
+
+## Delta = qtukey(6, 15, 5%) * sqrt(QM_res/rep)
+## Delta = q(6,15, 5%) * sqrt(3,7358/4)
+## Delta = 4,44
+
+
+delta = 4.44
+
+mf = 43.425
+md = 26.250
+mb = 25.700
+mc = 20.350
+me = 16.775
+ma = 12.775
+
+mf - md > delta
+## TRUE, para o teste e começa o próximo teste
+
+md - mb > delta
+## FALSE, continua b
+md - mc > delta
+## TRUE, para o b
+
+mb - mc > delta
+## TRUE, para o c, começa o próximo
+
+mc - me > delta
+## FALSE, continua o d
+mc - ma > delta
+## TRUE, para o d, começa a próxima
+
+me - ma > delta
+## FALSE, continua o e
+
+## Englobei a última letra, para o teste
+
+## mf = 43,425    a
+## md = 26,250     b
+## mb = 25,700     bc
+## mc = 20,350       d
+## me = 16,775
+## ma = 12,775
+
+## Questão 3.6 ----
+## Delta = qtukey(5, 12, 5%) * sqrt(QM_res/5)
+## Delta = 4,51
+# 111.72/sqrt(3068.1667/5)
+# qtukey(0.95, 5, 12)
+
+delta = 111.72
+
+mb = 869
+mc = 816
+md = 788
+me = 710
+ma = 679
+
+mb - mc > delta
+## Falso, continua a
+mb - md > delta
+## Falso, continua a
+mb - me > delta
+## True, para o a, começa o
+
+mc - md > delta
+## Falso, continua b
+mc - me > delta
+## Falso, continua b
+mc - ma > delta
+## True, para o b, começa o c
+
+md - me > delta
+## Falso, continua c
+md - ma > delta
+## Falso, continua c, como englobamos o último, paramos o teste
+
+# mb  a
+# mc  ab
+# md  abc
+# me   bc
+# ma    c
