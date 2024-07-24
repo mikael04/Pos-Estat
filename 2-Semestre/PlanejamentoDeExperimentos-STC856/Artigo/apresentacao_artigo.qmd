@@ -4,6 +4,10 @@ format: html
 editor: visual
 ---
 
+## Objetivo
+
+Verificar o efeito da carbonatação no efeito de preservação do leite cru (viscosidade e multiplicação de microorganismos)
+
 ## Metodologia
 
 Não precisa falar muito da metodologia de como foi feito, mas é preciso especificar bem o tipo de experimento (DIC, DBC, DQL, etc)

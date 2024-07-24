@@ -229,6 +229,7 @@ ggplot(dados, aes(x=Grau_de_Acidez, y=Teor_de_Gordura, label=Bacilo)) +
         plot.title = element_text(size=14, face="bold"))
 
 # Tukey ----
+## 5a lista, tukey, ex: 1
 
 rm(list=ls())
 ## Dados ----
@@ -304,9 +305,9 @@ T_total <- sum(T_r1+T_r2+T_r3+T_r4)
 
 ## F tabelado ----
 
-(qf(0.95, GL_trat, GL_res))
+(qtukey(0.95, GL_trat, GL_res))
 
-(qf(0.95, GL_rep, GL_res))
+(qtukey(0.95, GL_rep, GL_res))
 
 ## Conferindo resultados ----
 
@@ -332,7 +333,7 @@ med_4 <- mean(dados$Cochonilhas[dados$Tratamento=="D"])
 med_5 <- mean(dados$Cochonilhas[dados$Tratamento=="E"])
 med_6 <- mean(dados$Cochonilhas[dados$Tratamento=="F"])
 
-          medias <- order(c(med_1, med_2, med_3, med_4, med_5, med_6), decreasing = TRUE)
+medias <- order(c(med_1, med_2, med_3, med_4, med_5, med_6), decreasing = TRUE)
 
 # a
 med_6 - med_4

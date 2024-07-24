@@ -132,7 +132,7 @@ media_geral <- mean(dados$producao)
 
 (CV <- sqrt(QM_res)/media_geral*100)
 
-## Conferindo resultados ----
+  ## Conferindo resultados ----
 
 a0 <- ExpDes::rbd(dados$trat, dados$bloco, dados$producao, mcomp="tukey", sigT=0.05)
 
@@ -414,7 +414,7 @@ md - me > delta # "d"
 ## Delta = qtukey(6, 15, 5%) * sqrt(QM_res/rep)
 ## Delta = q(6,15, 5%) * sqrt(3,7358/4)
 ## Delta = 4,44
-
+qtukey(0.95, 6, 15) * sqrt(3.7358/4)
 
 delta = 4.44
 
