@@ -58,7 +58,7 @@ T_total <- sum(T_a+T_b+T_c)
 
 a0 <- ExpDes::crd(dados$trat, dados$des, quali = TRUE, mcomp="tukey", sigF = 0.05)
 
-# Exemplo DBC ----
+      # Exemplo DBC ----
 # Exemplo 1 Lista DBC
 
 ## Dados ----

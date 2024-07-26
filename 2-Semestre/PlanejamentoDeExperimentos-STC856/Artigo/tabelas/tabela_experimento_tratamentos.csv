@@ -1,0 +1,18 @@
+Época de Aplicação,Dose (m³/ha),Nº tratamento
+I. - 40 dias antes do plantio + no plantio,,
+,50,1
+,100,2
+,200,3
+II. - 40 dias antes do plantio,,
+,50,4
+,100,5
+,200,6
+III. - No plantio,,
+,50,7
+,100,8
+,200,9
+IV. - 30 dias após o plantio,,
+,50,10
+,100,11
+,200,12
+Testemunha absoluta,0,13

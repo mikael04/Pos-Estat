@@ -1,0 +1,144 @@
+---
+title: "Apresentacao artigo"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+## Introdução
+
+A produção de farinha de mesa a partir de raízes de mandioca é uma atividade tradicional em muitas regiões do Brasil. Ela é um produto de grande importância na alimentação da população brasileira, sendo utilizada em diversas preparações culinárias. A farinha de mesa é obtida a partir da raiz de mandioca, que é triturada, prensada e torrada. O crescimento desta atividade agrícula na Cooperativa dos Cafeicultores de Centenário do Sul, PR, fez com que houvesse uma prepocupação com a produção já que, deste processo surge um subproduto, chamado de manipueira, que é descartado no meio ambiente, além disso surgie como opção mais ecológica utilizar a manipueira como um suplemento para o solo no plantio de outras culturas da região. Este estudo visa observar o uso da manipueira como suplemento para o solo usando a técnica de fertirrigação em culturas de algodão e milho em diferentes épocas do plantio.
+
+
+## Metodologia
+
+<!-- Não precisa falar muito da metodologia de como foi feito, mas é preciso especificar bem o tipo de experimento (DIC, DBC, DQL, etc) -->
+O estudo foi feito em uma fazenda numa área do Paraná, onde foram plantadas culturas de algodão e milho. O experimento foi realizado em delineamento em blocos casualizados (DBC), com doze tratamentos (uma combinação de doses de manipueira e época de plantio) e mais um controle (chamado de testemunha) e dois blocos (duas cultivares, o algodão e o milho).
+
+```{r}
+tratamentos <- read.csv("tabelas/tabela_experimento_trat.csv")
+
+library(gt)
+gt::gt(tratamentos) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) |> 
+  gt::cols_label(
+    tratamento = "Tratamento",
+    dose = "Dose de Manipueira (m³/ha)",
+    epoca = "Época de aplicação"
+  )
+  
+ 
+
+```
+
+```{r}
+dados <- read.csv("tabelas/dados_teste_2_blocos.csv")
+
+library(gt)
+gt::gt(dados) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) |> 
+  gt::cols_label(
+    Tratamento = "Tratamento",
+    Stand = "Stand",
+    Prod = "Produção"
+  )
+
+```
+
+
+## Delineamento em Blocos Casualizado (DIC)
+
+Expressão matemática:
+
+$$ y_{ij} = \mu + \tau_i + \beta_j + \epsilon_{ij}$$
+
+Sendo:
+
+$y_{ij}$ = observação da variável resposta no i-ésimo tratamento e j-ésima repetição
+
+$\mu$ = média geral
+
+$\tau_i$ = efeito do i-ésimo tratamento ($i = 1, 2$)
+
+$\beta_j$ = efeito do j-ésimo bloco ($j = 1, 2$)
+
+$\epsilon_{ij}$ = erro aleatório associado à observação $y_{ij}$
+
+## Resultados do artigo
+
+```{r}
+resultados <- read.csv("tabelas/resultados_artigo.csv") |> 
+  janitor::clean_names()
+
+gt::gt(resultados) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) |> 
+  gt::cols_label(
+    epoca_de_aplicacao = "Época de aplicação",
+    dose_m_ha = "Dose (m³/ha)",
+    algodao_em_caroco_stand_n_plantas_prod_m = "Algodão (Stand)",
+    algodao_em_caroco = "Algodão (%)",
+    algodao_em_caroco_producao_kg_ha = "Algodão (Produção kg/ha)",
+    milho_em_graos_stand_n_plantas_prod_m = "Milho (Stand)",
+    milho_em_graos = "Milho (%)",
+    milho_em_graos_producao_kg_ha = "Milho (Produção kg/ha)"
+  )
+
+# resultados$algodao_em_caroco_stand_n_plantas_prod_m
+```       
+
+- A aplicação de doses crescentes de manipueira no solo inibiu a emergência das plantas de algodão e milho, em todas as épocas, em grandes quantidades de manipueira. Portanto, seria viável o uso dela na fertirrigação numa dose limite de 50m³/ha em uma única aplicação.
+
+- Doses superiores a 50m³/ha de manipueira devem ser aplicadas no mínimo 40 dias antes do plantio.
+
+- Na aplicação em pós-emergência (30 dias) o milho se mostoru mais tolerante para as doses estudadas.
+
+- Na área a ser aplicada a manipueira, deverá ser aumentada a densidade de plantio.
+
+
+## Resultados (meus)
+
+Os resultados obtidos estão apresentados na tabela abaixo:
+
+```{r}
+ExpDes::rbd(dados$Tratamento, dados$Bloco, dados$Prod, mcomp="tukey", sigT=0.05)
+
+ExpDes::rbd(dados$Tratamento, dados$Bloco, dados$Stand, mcomp="tukey", sigT=0.05)
+```
+
+- Utilizando como variável resposta Produção, nós possuímos diferença significativa entre os tratamentos.
+- Já para a variável resposta Stand, nós não possuímos variação entre os tratamentos, ou seja, não há diferença significativa entre as aplicações de manipueira.
+- Em ambos os casos, a diferença de culturas (blocos) foi significativa, indicando que cada cultivar respondeu de forma diferente à aplicação de manipueira.
+
+- Utilizando o teste de Tukey, com nível de significância de 5%, o melhor resultado para a produção foi o tratamento XIII (testemunha), tratamento VII (dose 50m³/ha e aplicação no plantio), tratamento V (dose 100m³/ha e aplicação 40 dias antes do plantio), tratamento IV (dose 50m³/ha e aplicação 40 dias antes do plantio), tratamento I (dose 50m³/ha e aplicação 40 dias antes do plantio + no plantio), tratamento X (dose 50m³/ha e aplicação 30 dias após o plantio), tratamento VI (dose 50m³/ha e aplicação no plantio), tratamento XI (dose 50m³/ha e aplicação 30 dias após o plantio) e tratamento VIII (dose 100m³/ha e aplicação no plantio).
+
+
+XIII - Testemunha
+VII - Dose 50m³/ha e aplicação no plantio
+V - Dose 100m³/ha e aplicação 40 dias antes do plantio
+IV - Dose 50m³/ha e aplicação 40 dias antes do plantio
+I - Dose 50m³/ha e aplicação 40 dias antes do plantio + no plantio
+X - Dose 50m³/ha e aplicação 30 dias após o plantio
+VI - Dose 50m³/ha e aplicação no plantio
+XI - Dose 50m³/ha e aplicação 30 dias após o plantio
+VIII - Dose 100m³/ha e aplicação no plantio

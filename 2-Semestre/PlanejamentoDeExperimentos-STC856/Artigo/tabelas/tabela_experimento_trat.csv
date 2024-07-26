@@ -1,0 +1,14 @@
+tratamento,dose,epoca
+1,50,I. - 40 dias antes do plantio + no plantio
+2,100,I. - 40 dias antes do plantio + no plantio
+3,200,I. - 40 dias antes do plantio + no plantio
+4,50,II. - 40 dias antes do plantio
+5,100,II. - 40 dias antes do plantio
+6,200,II. - 40 dias antes do plantio
+7,50,III. - No plantio
+8,100,III. - No plantio
+9,200,III. - No plantio
+10,50,IV. - 30 dias após o plantio
+11,100,IV. - 30 dias após o plantio
+12,200,IV. - 30 dias após o plantio
+13,0,Testemunha absoluta

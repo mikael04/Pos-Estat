@@ -1,0 +1,38 @@
+---
+title: "Apresentacao artigo"
+format: html
+editor: visual
+---
+
+## Introdução
+
+Na busca por diferentes fontes de proteína para consumo das populações humanas, a criação de coelhos possui grande potencial de crescimento. A carne de coelho é considerada uma carne branca, com baixo teor de gordura e colesterol, sendo uma excelente opção para quem busca uma alimentação saudável. Além disso, a criação de coelhos é uma atividade que demanda pouco espaço e baixo investimento inicial, o que a torna uma opção viável para pequenos produtores rurais. O experimento proposto foi realizado na Universidade Federal da Paraíba. O intuito deste experimento é testar um composto de farinha de *Tenebrio molitor* como substituto do farelo de soja na dieta de coelhos em crescimento.
+
+## Desenvolvimento
+
+O  protocolo  desta  pesquisa  foi  submetido  à  Comissão  de  Ética  no  Uso  de  Animais -CEUA  da Universidade Federal da Paraíba, que analisou e aprovou sob o número de registro 3778020518.
+
+Foram utilizados 20 coelhos da raça Lionhead, com idade média inicial de 87 dias e peso vivo médio inicial de 0,868 kg. Antes de iniciar  o  experimento, os animais foram avaliadosclinicamente, pesados e tratados com sulfaquinoxalina a 0,04% na água. Realizou-se a desinfecção das gaiolas com lança chamas.
+
+## Metodologia
+
+<!-- Não precisa falar muito da metodologia de como foi feito, mas é preciso especificar bem o tipo de experimento (DIC, DBC, DQL, etc) -->
+
+O delineamento utilizado foi o Delineamento Inteiramente Casualizado (DIC), com 2 tratamentos (usando farinha de *Tenebrio molitor* ou farelo de soja, além de, em ambos os casos a dieta convencional) e 10 repetições. Os tratamentos foram distribuídos de forma aleatória entre as repetições. Os dados coletados foram submetidos à análise de variância e teste de médias.            
+
+## Delineamento Inteiramente Casualizado (DIC)
+
+Expressão matemática:
+
+$$ y_{ij} = \mu + \tau_i + \epsilon_{ij}$$
+
+Sendo:
+
+$y_{ij}$ = observação da variável resposta no i-ésimo tratamento e j-ésima repetição
+$\mu$ = média geral $
+$\tau_i$ = efeito do i-ésimo suplemento ($i = 1, 2$) 
+$\epsilon_ijk$ = erro aleatório associado à observação $y_{ijk}$
+
+## Resultados
+
+Os resultados obtidos estão apresentados na tabela abaixo:                

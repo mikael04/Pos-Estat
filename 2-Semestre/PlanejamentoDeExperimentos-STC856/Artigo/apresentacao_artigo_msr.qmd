@@ -1,0 +1,38 @@
+---
+title: "Apresentacao artigo"
+format: html
+editor: visual
+---
+
+## Introdução
+
+Com o intuito de preservar o leite cru, o Ministério da Agricultura publicou a Instrução Normativa nº 51 em 2002, que estabelece, entre outros aspectos, parâmetros físico-químicos e microbiológicos para o leite cru.
+
+O leite cru é um produto que pode ser contaminado por diversos microorganismos, como bactérias, fungos e leveduras. O processo de refrigeração contribui para diminuir a multiplicação de microorganismos, mas não é suficiente para inibir o crescimento de todos os microorganismos.
+
+Alguns estudos tem sugerido que a carbonatação pode ser um método eficaz para inibir o crescimento de microorganismos. A carbonatação é um método de preservação que pode ser utilizado para inibir o crescimento desses microorganismos e consiste na aplicação de dióxido de carbono em conjunto com o armazenamento refrigerado para aumentar o tempo útil do leite cru. 
+
+## Objetivo
+
+Verificar o efeito da carbonatação no efeito de preservação do leite cru (viscosidade e multiplicação de microorganismos) em combinação com duas .
+
+## Metodologia
+
+Não precisa falar muito da metodologia de como foi feito, mas é preciso especificar bem o tipo de experimento (DIC, DBC, DQL, etc)
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

@@ -1,0 +1,51 @@
+---
+title: "Apresentacao artigo"
+format: html
+editor: visual
+---
+
+## Introdução
+
+O crescimento na produção de leite no Brasil tem sido bastante significativo, mesmo que o consumo interno não tenha crescido no mesmo ritmo. E atualmente nota-se uma tendência para produção de leite a pasto, pela diminução de custos. Com isso, a adição de suplementos alimentares para o gado leiteiro tem sido uma prática comum. O objetivo deste trabalho é avaliar a eficácia de um suplemento alimentar energético para gado leiteiro, comparando a produção de leite de vacas que receberam o suplemento com a produção de leite de vacas que não receberam o suplemento.
+
+## Objetivo
+
+O objetivo deste trabalho é avaliar a eficácia de um suplemento alimentar energético, mineral e múltipla no desempenho e custo de produção de vacas de leite mantidas em pastagens, levando em conta os aspectos técnicos nutricionais, mas também econômicos em vista de atingir metas produtivas com mínimo de custos e máxima eficiência.
+
+## Metodologia
+
+<!-- Não precisa falar muito da metodologia de como foi feito, mas é preciso especificar bem o tipo de experimento (DIC, DBC, DQL, etc) -->
+O experimento foi conduzido em uma chácara próxima a Cuiabá, Mato Grosso, com 5 vacas leiteiras da raça Giroloando e com a gramínea *Bracharia brizantina cv. Xaraés*. As vacas possuíam idade de 6 anos, peso corporal médio de 460kg e aproximadamente 4 meses após o parto.
+Os suplementos utilizados foram:
+-   Mistura mineral (MM) *ad libitum*;
+-   Suplemento energético (milho triturado) 1kg/vaca/dia;Suplemento energético (SE) fornecido a 2 e 4kg animal/dia;
+-   Suplemento múltiplo (SM) fornecido a 2 e 4kg animal/dia.
+
+Os animais foram submetidos a controle de ecto e parasitas no início e meio do experimento.
+
+Os suplementos foram fornecidos duas vezes ao dia em porções iguais, monitorando-se a sobra de suplementos.
+
+Para medir a produção de leite por animal, foi usada uma balança digital.
+
+A coleta de amostras da forragem também foi feita, para avaliar a disponibilidade total de matéria seca de forragem e disponibilidade por hectare de: folha verde, folha secaa, colmo verde e colmo seco.
+
+Para avaliação econômica, o valor atrubuído aos ingredientes foi obtido por cotação de preço no mercado local.
+
+O delineamento utilizado foi o delineamento quadrado latino
+
+## Delineamento quadrado latino
+
+Expressão matemática:
+
+$$ y_{ijk} = \mu + \alpha_i + \beta_j + P_k + \epsilon_ijk$$
+
+Sendo:
+
+$\mu$ = média geral
+$\alpha_i$ = efeito do i-ésimo suplemento ($i = 1, 2, 3, 4, 5$)
+$\beta_j$ = efeito do j-ésimo tratamento ($j = 1, 2, 3, 4, 5$)
+$P_k$ = efeito do k-ésimo período ($k = 1, 2, 3, 4, 5$)
+$\epsilon_ijk$ = erro aleatório associado à observação $y_{ijk}$
+
+
+## Modelo matemático
