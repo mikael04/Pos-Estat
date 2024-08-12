@@ -14,12 +14,12 @@ library(psych)                                # Carregamento do pacote
 # Importante: selecionar o diretorio de trabalho (working directory)
 # Isso pode ser feito manualmente: Session > Set Working Directory > Choose Directory
 # Ou usando a linha de codigo abaixo:
-# setwd("C:/Users/ferna/Desktop")
+# setwd("")
 
-dados <- read.csv('Banco de Dados 4.csv', sep = ';', dec = ',', fileEncoding = "latin1") %>%
+dados <- read.csv('2-Semestre/Inferencia-STC853/Aula Computacional/Banco de Dados 4.csv', sep = ';', dec = ',', fileEncoding = "latin1") %>%
   rename(Convulsoes_PT = Convulsões_PT, Convulsoes_S1 = Convulsões_S1,
                      Convulsoes_S6 = Convulsões_S6, Genero = Gênero)
-View(dados)                                              # Visualizacao dos dados em janela separada
+# View(dados)                                              # Visualizacao dos dados em janela separada
 glimpse(dados)                                                 # Visualizacao de um resumo dos dados
 
 # Passo 3: Verificacao da normalidade dos dados

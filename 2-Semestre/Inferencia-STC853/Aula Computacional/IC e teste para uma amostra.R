@@ -7,7 +7,7 @@
 if(!require(dplyr)) install.packages("dplyr") # Instalaçao do pacote caso nao esteja instalado
 library(dplyr)                                # Carregamento do pacote
 
-setwd("2-Semestre/Inferencia/Aula Computacional/")
+setwd("2-Semestre/Inferencia-STC853/Aula Computacional/")
 
 # Passo 2: Carregar o banco de dados
 
