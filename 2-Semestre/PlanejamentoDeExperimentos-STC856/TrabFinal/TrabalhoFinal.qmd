@@ -1,0 +1,200 @@
+---
+title: "Trabalho Final"
+subtitle: "Planejamento de experimentos"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-08-10"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(scipen = 99999)
+```
+
+# Questão 1
+
+![Exercício 1](imgs/q1.png)
+
+## Criando base de dados
+
+```{r, dados-q1}
+blocos <- factor(rep(1:4, each = 5))
+tratamentos <- rep(c(0, 25, 50, 75, 100), times = 4)
+producao <- c(8.38, 7.15, 10.07, 9.55, 9.14, 
+              5.77, 9.78, 9.73, 8.98, 10.17, 
+              4.9, 9.99, 7.92, 10.24, 9.75, 
+              4.54, 10.70, 9.48, 8.66, 9.50)
+
+dados_q1 <- data.frame(blocos, tratamentos, producao)
+```
+
+## a) Fazendo ANOVA
+
+```{r, anova-q1}
+anova <- ExpDes::rbd(dados_q1$tratamento, dados_q1$blocos, dados_q1$prod, quali = FALSE, mcomp = "tukey", sigT = 0.05)
+```
+
+Resultados:
+
+- **p-valor dos tratamentos = 0.00747**, **tratamento** foi **significativo** usando o teste de fisher e o nível de confiança de 5%, ou seja, existiu diferença entre as tratamentos de adubação e a produção de milho.
+
+- **p-valor dos blocos = 0.96383**, os **blocos não** foram **significativos** usando o teste de fisher e o nível de confiança de 5%, ou seja, não existiu diferença entre os blocos a produção de milho entre os blocos.
+
+- Temos um **Coeficiênte de Variação bom** (<20%).
+
+- O **teste de normalidade (Shapiro-Wilk) considerou os resíduos normais** (p-valor de 0.9243707, aceitando a hipótese nula de que os resíduos são normais)
+
+- O **teste de homocedasticidade (Bartlett) considerou os resíduos homocedásticos** (p-valor de 0.3495592, aceitando a hipótese nula de que os resíduos tem variância constante)
+
+## b) Regressão
+
+### Modelo linear
+
+Equação: $producao = 7,2325 + 0,0297 * tratamento$
+
+- **p-valor do tratamento = 0,0037**, no modelo linear o componente linear do tratamento foi significativo usando o teste de fisher e o nível de confiança de 5%.
+- **R2 ajustado = 0,551788 -> 55,18%** da variabilidade da produção é explicada pelo tratamento, ou seja, a regressão não foi muito satisfatória para explicar a produção no modelo linear
+
+### Modelo quadrático
+
+Equação: $producao = 6,3343 + 0,1016 * tratamento -0,0003 * tratamento^2$
+
+- **p-valor do tratamento = 0,0045**, no modelo quadrático o componente linear do tratamento foi significativo usando o teste de fisher e o nível de confiança de 5%.
+- **p-valor do tratamento^2 = 0,0245**, no modelo quadrático o componente quadrático do tratamento foi significativo usando o teste de fisher e o nível de confiança de 5%.
+- **R2 ajustado = 0,833462 -> 83,35%** da variabilidade da produção é explicada pelo tratamento, ou seja tivemos uma grande melhora na predição, o modelo já explica cerca de 85% da produção de milho, seguiremos com o modelo cúbico.
+
+### Modelo cúbico
+
+Equação: $producao = 5,9505 + 0,2116 * tratamento -0,0038 * tratamento^2 + 0,00002 * tratamento^3$
+
+- **p-valor do tratamento = 0,0076**, no modelo cúbico o **componente linear** do tratamento foi **significativo** usando o teste de fisher e o nível de confiança de 5%.
+- **p-valor do tratamento^2 = 0,0433**, no modelo cúbico o **componente quadrático** do tratamento foi **significativo** usando o teste de fisher e o nível de confiança de 5%.
+- **p-valor do tratamento^3 = 0,0882**, no modelo cúbico o **componente cúbico** do tratamento **não** foi **significativo** usando o teste de fisher e o nível de confiança de 5%.
+- **R2 ajustado = 0,980359 -> 98,04%** da variabilidade da produção é explicada pelo tratamento.
+- **O modelo cúbico tem excelente ajuste aos dados**, explicando 98% da variação.
+- Seria preciso ainda verificar, caso possível, em novos dados, caso não esteja acontecendo o fenômeno de sobreajuste.
+
+## c) Melhor modelo de regressão
+
+O melhor **modelo** de regressão foi o **cúbico**, que explicou 98% da variabilidade da produção.
+
+## d) Equação de regressão
+
+A equação de regressão do modelo cúbico, que obteve melhor resultado é: 
+
+$$produção = 5,9505 + 0,2116 * tratamento -0,0038 * tratamento^2 + 0,00002 * tratamento^3$$
+
+## e) Gráfico de dispersão e regressão
+
+```{r, grafico-q1}
+library(ggplot2)
+# Gráfico de dispersão com curva ajustada
+ggplot(dados_q1, aes(x = tratamentos, y = producao)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 3), se = FALSE) +
+  labs(title = "Produção x Tratamento", x = "Tratamento", y = "Produção") +
+  theme_minimal()
+```
+
+# 2) Exercício Fatorial
+
+![Exercício 2](imgs/q2.png)
+
+## Criando base de dados
+
+```{r, dados-q2}
+
+escola <- factor(rep(c("E1", "E2", "E3"), 4))
+professor <- factor(rep(c("A", "B", "C", "D"), 3))
+bloco1 <- c(6.4, 4.8, 4.9, 5.3, 6.8, 5.6, 5.0, 7.8, 9.2, 9.5, 6.8, 7.5)
+bloco2 <- c(6.9, 5.8, 5.5, 6.2, 5.7, 5.5, 5.2, 6.5, 7.9, 8.8, 7.8, 6.9)
+bloco3 <- c(5.9, 5.5, 5.2, 4.8, 5.2, 5.9, 4.8, 6.8, 7.3, 9.2, 7.0, 7.7)
+bloco4 <- c(6.1, 5.8, 5.6, 5.0, 5.3, 6.6, 5.8, 7.0, 7.6, 9.3, 7.3, 7.6)
+bloco5 <- c(6.7, 5.6, 4.8, 5.2, 5.5, 5.9, 4.2, 6.9, 8.0, 9.2, 7.6, 7.8)
+
+# Criar data frame
+dados_q2 <- data.frame(escola, professor, bloco1, bloco2, bloco3, bloco4, bloco5)
+
+## Transformando no formato long
+dados_q2_long <- tidyr::pivot_longer(dados_q2, cols = starts_with("bloco"), names_to = "bloco", values_to = "nota")
+
+```
+
+## a) e b) Fazendo ANOVA, interpretando resultados e demais desdobramentos
+
+```{r, anova-q2}
+anova <- ExpDes::fat2.rbd(
+  dados_q2_long$escola, dados_q2_long$professor, dados_q2_long$bloco, dados_q2_long$nota, quali=c(TRUE,TRUE), mcomp="tukey",
+  fac.names=c("escola", "professor"),sigT = 0.05,sigF = 0.05)
+
+## Outra forma de fazer anova
+anova_fac <- aov(nota ~ bloco+professor*escola, data = dados_q2_long)
+summary(anova_fac)
+
+```
+
+Resultados:
+
+- **p-valor dos blocos = 0.396**, os blocos não foram significativos, não existiu diferença entre as médias dos alunos nos blocos.
+- **p-valor das escolas = 0.20225**, as notas entre as escolas não foram significativas à 5% de confiança. Ou seja, não houve diferença entre as notas dos alunos entre as diferentes escolas.
+- **p-valor dos professores = 0.0000023**, as notas entre professores foram significativos à 5%. Ou seja,  existiu diferença entre as médias dos alunos entre os diferentes professores.
+- **p-valor da interação escola e professor = 0.00000**, a interação entre professores e escolas foi significativa à 5%. Ou seja, a combinação entre professores e escola fez diferença nas notas dos alunos.
+
+- Temos um **Coeficiênte de Variação excelente** (<10%).
+- O **teste de normalidade (Shapiro-Wilk) considerou os resíduos normais** (p-valor de 0.9243707, aceitando a hipótese nula de que os resíduos são normais).
+
+## c) Comparando as médias usando Tukey
+
+```{r, tukey-q2}
+ExpDes::fat2.rbd(
+  dados_q2_long$escola, dados_q2_long$professor, dados_q2_long$bloco, dados_q2_long$nota, quali=c(TRUE,TRUE), mcomp="tukey",
+  fac.names=c("escola", "professor"),sigT = 0.05,sigF = 0.05)
+```
+
+Observando os resultados do teste de Tukey, podemos tirar algumas conclusões:
+
+### Comparando escolas dentro dos níveis de professores
+![](imgs/tukey_escolas_por_professor.png)
+
+- Comparando as **escolas no professor A**, a escola **E1** teve **melhor resultado** (grupo "a"), enquanto que as escolas E2 e E3 tiveram resultados semelhantes (grupo "b").
+- Comparando as **escolas no professor B**, a escola **E1** teve **melhor resultado** (grupo "a"), enquanto que as escolas E2 e E3 tiveram resultados semelhantes (grupo "b").
+- Comparando as **escolas no professor C**, a escola **E1** teve **melhor resultado** (grupo "a"), enquanto que as escolas E2 e E3 tiveram resultados semelhantes (grupo "b").
+- Comparando as **escolas no professor D**, a escola **E1** teve **melhor resultado** (grupo "a"), enquanto que as escolas E2 e E3 tiveram resultados semelhantes (grupo "b").
+
+### Comparando professores dentro dos níveis de escolas
+
+![](imgs/tukey_professores_por_escola.png)
+
+- Comparando os **professores na escola E1**, o **professor A** teve **melhor resultado** (grupo "a"), o professores B teve o segundo melhor resultado (grupo "b"), e os professores C e D tiveram resultados semelhantes (grupo "c").
+- Comparando os **professores na escola E2**, os **professores A e B** tiveram o **melhor resultado** (grupo "a") e os professores C e D tiveram resultados semelhantes e inferiores (grupo "b").
+- Comparando os **professores na escola E3**, os **professores A e B** tiveram o **melhor resultado** (grupo "a") e os professores C e D tiveram resultados semelhantes e inferiores (grupo "b").
+
+## d) Identificar a melhor escola para o professor B
+
+![Gráfico de interação para o professor B](imgs/tukey_escola_professor_b.png)
+
+Comparando pelo teste de Tukey feito anteriormente, olhando a interação entre escola e professor, a **escola E1** foi a melhor escola para o professor B, com média superior aos demais professores (grupo "a", com média 9.2).                        
+
+## e) Identificar o melhor professor para a escola E3
+
+![Gráfico de interação para a escola E3](imgs/tukey_professor_escola_e3.png)
+
+Comparando pelo teste de Tukey feito anteriormente, olhando a interação entre escola e professor, os **professores A e B** tiveram melhor resultado, com média superior aos demais professores (grupo "a", com média 8 para o professor A e média 7.5 para o professor B).
+
+

@@ -1,0 +1,17 @@
+vendedor	vendas
+a	29
+a	27
+a	31
+a	29
+a	32
+a	30
+b	27
+b	27
+b	30
+b	28
+c	30
+c	30
+c	31
+c	27
+c	29
+

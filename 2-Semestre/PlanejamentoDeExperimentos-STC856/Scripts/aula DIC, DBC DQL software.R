@@ -11,7 +11,7 @@ library(agricolae)  ## Para analisar os pressupostos
 ## Exemplo de DIC
 ############################################################################################
 # Leitura dos dados
-setwd("2-Semestre/PlanejamentoDeExperimentos-STC856/Scripts/")
+# setwd("2-Semestre/PlanejamentoDeExperimentos-STC856/Scripts/")
 dados <- read.table('data-raw/ExemploDic.txt', header=TRUE)
 dados
 attach(dados)
@@ -109,7 +109,7 @@ str(dados)                ## mostra a estrutura (síntese) do objeto
 #
 #------------------------------------------------------------------------------------------
 # Fazendo a análise de variância
-      a0 <- latsd(trat, linha, coluna, resp, quali = TRUE, mcomp = "tukey", sigT = 0.05, sigF = 0.05)
+a0 <- latsd(trat, linha, coluna, resp, quali = TRUE, mcomp = "tukey", sigT = 0.05, sigF = 0.05)
 #
 #Outra forma de fazer a análise de variância
 a1 <- lm(resp ~ trat+linha+coluna, data=dados)
