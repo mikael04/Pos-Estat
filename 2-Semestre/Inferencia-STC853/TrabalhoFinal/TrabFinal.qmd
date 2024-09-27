@@ -1,0 +1,317 @@
+---
+title: "Trabalho Final"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-08-04"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(scipen = 99999)
+```
+
+# Introdução
+
+Após a implementação do programa bolsa família em 2003, houve uma melhora significativa na qualidade de vida de muitas famílias brasileiras menos favorecidas, o impacto deste programa na saúde já é muito estudado e reconhecido cientificamente, portanto o primeiro objetivo deste estudo será avaliar a melhora na saúde dos recém nascidos, utilizando o peso ao nascer, um indicador de saúde do recém nascido, obtido do Sistema de Informações dos Nascidos Vivos. Além disso, tem estado em voga a discussão sobre a desigualdade racial no Brasil, e como isso impacta em diversos aspectos da vida dos brasileiros, inclusive na saúde, portanto diversos estudos sobre como o impacto da raça/cor influência na saúde do indivíduo tem sido conduzidos. Neste trabalho avaliaremos como a raça/cor da mãe pode influenciar em questões de saúde para o nascido vivo, utilizando novamente a variável de peso ao nascer obtida do SINASC.
+
+# Objetivo
+
+Este relatório tem o objetivo de construir análises sobre: I - O impacto do programa bolsa família na melhora da qualidade de vida dos recém nascidos. E para isto será avaliado a diferença entre o peso dos recém nascidos em 2003 e 2019. II - A relação entre a raça/cor da mãe e a saúde do nascido vivo. III - Estimação de intervalos de confiança para a média do peso dos recém nascidos. IV - Estimação pontual
+
+Os dados utilizados serão do Sistema de Informação dos Nascidos Vivos (SINASC).
+
+# Metodologia
+
+Como possuímos os dados da população completa de nascidos vivos no Brasil, primeiramente faremos uma redução da base de dados, para que possamos realizar as análises em cima de dados amostrais, simulando um estudo onde não possuímos o conjunto populacional. Para determinar o tamanho da amostra, utilizaremos os conceitos estudados na disciplina de Inferência Estatística.
+
+Após cálculo do tamanho da amostra, faremos uma amostragem para cada um dos problemas utilizados, e então realizaremos os testes de normalidade dos dados, para então começarmos as análises.
+
+As análises consistirão em duas partes:
+
+I - Calcular um intervalo de confiança para a média do peso dos recém nascidos com base na amostra de 2019, e então fazer uma estimação pontual para o peso.
+
+II - Realizar dois testes de comparação de média usando teste de hipótese, o primeiro (a) Verificar se houve um aumento do peso médio dos recém nascidos entre 2003 e 2019. E o segundo (b) Verificar se existe uma diferença entre a média de peso dos recém nascidos de mães negras e brancas.
+
+Os dados serão obtidos diretamente do OpenDataSUS, e então serão tratados e analisados. Para diminuir o espaço em disco utilizado, manteremos apenas os dados de 2003, e depois de 2010 à 2019, apenas as variáveis utilizadas para análise, que são: Peso ao nascer, Idade da mãe, Raça/cor da mãe e Número de consultas pré-natal. (Link de acesso: <https://opendatasus.saude.gov.br/dataset/sistema-de-informacao-sobre-nascidos-vivos-sinasc>)
+
+# Referêncial teórico
+
+Para este trabalho, utilizaremos alguns conceitos estudados na disciplina de Inferência Estatística, como o cálculo do tamanho da amostra, e a construção de intervalos de confiança. Além disso, utilizaremos conceitos de testes de hipótese, com o teste t-student para comparação de médias em duas amostras.
+
+Inicialmente, como temos os dados da população, faremos um cálculo de quantos indivíduos precisaríamos caso quiséssemos fazer algum tipo de estudo com esta população. O cálculo do tamanho de amostra, como nossa população é maior que 10000, será feito através da fórmula:
+
+$$n = \left(\frac{z_{\alpha/2} * \sigma}{e   }\right)^2$$
+
+Então faremos os testes de normalidade dos dados, para garantir que possamos seguir com as análises e utilizar os testes de hipótese, em seguida faremos uma análise exploratória, para entendermos melhor a distribuição dos dados.
+
+Além disso, por possuírmos uma amostra consideravelmente grande, entre 1.9 milhões e 17 milhões, dependendo dos dados que estão sendo utilizados, mesmo não passando nos testes de normalidade, utilizaremos o Teorema Central do Limite, que nos garante que a distribuição amostral da média é aproximadamente normal, mesmo que a distribuição da população não seja.
+
+Para verificar normalidade dos dados, utilizaremos o teste de Shapiro Wilk, (Anderson-Darling, Lilliefors e Pearson).
+
+A seguir, faremos a estimação pontual e a construção do intervalo de confiança para a média do peso dos recém nascidos, como já temos os dados da população, vamos utilizar a fórmula de cálculo com variância conhecida, usando os dados da amostra de 2019.
+
+E por fim, testaremos duas hipóteses, para os dois problemas tratados, definindo a hipótese nula e alternativa, definindo o nosso nível de confiança e usar o teste-t para avaliar se aceitamos ou rejeitamos a hipótese nula.
+
+# Começando a análise
+
+## Lendo os dados do SINASC de 2010 à 2019
+
+```{r lendo-dados}
+## Link para download dos dados: https://drive.google.com/drive/folders/1WJxIc0b2Z70hBBu6Qoqewc-wL58GqdHj?usp=sharing
+## Link para download do projeto: https://drive.google.com/drive/folders/1_0OZeD-n4eBJ1Y-D3jIjW2fmpGWPlBPm?usp=sharing
+## Lendo dados
+df_sinasc_2010_2019 <- data.table::fread("dados/sinasc.csv") |> 
+  dplyr::mutate(ano = as.integer(substr(DTNASC, 5, 8))) |> 
+  dplyr::select(-DTNASC)
+
+df_sinasc_2003 <- data.table::fread("dados/sinasc_2003.csv") |> 
+  dplyr::mutate(ano = as.integer(substr(DTNASC, 5, 8))) |> 
+  dplyr::select(-DTNASC)
+```
+
+## Tratamento de dados
+
+Como estamos lidando com a variável peso e trabalharemos com os valores de anos específicos, faremos um tratamento removendo valores que poderíamos considerar inconsistentes. Para o ano é simples, como estamos trabalhando com uma base de 2003, e outra de 2010 à 2019, apenas filtraremos a variável "**ano**" para estes valores. Para o peso, consideraremos apenas valores entre 500g e 6000g, que já são valores considerados bastante extremos para um recém nascido, assim removendo possíveis inconsistências no nosso banco de dados.
+
+```{r tratamento-dados}
+## Tratamento de dados
+df_sinasc_2003 <- df_sinasc_2003 |> 
+  dplyr::filter(ano == 2003, PESO >= 1000 & PESO <= 6000)
+
+df_sinasc_2010_2019 <- df_sinasc_2010_2019 |>
+  dplyr::filter(ano >= 2010 & ano <= 2019, 
+                PESO >= 1000 & PESO <= 6000,
+                !is.na(RACACORMAE))
+
+df_sinasc_2019 <- df_sinasc_2010_2019 |>
+  dplyr::filter(ano == 2019)
+```
+
+## Calculando tamanho da amostra
+
+Para o cálculo do tamanho da amostra, utilizaremos os valores de **margem de erro** como **100g** e o **nível de confiança de 5%**,  a fórmula:
+
+```{r calculo-tamanho-amostra}
+
+## Calculando tamanho da amostra (para população de 2003)
+nivel_conf <- 0.95
+marg_erro <- 100
+n_2003 = ceiling((qnorm(nivel_conf)*sd(df_sinasc_2003$PESO)/marg_erro)^2)
+
+## Calculando tamanho da amostra para 2019
+n_2019 = ceiling((qnorm(nivel_conf)*sd(df_sinasc_2019$PESO)/marg_erro)^2)
+
+n_2010_2019 = ceiling((qnorm(nivel_conf)*sd(df_sinasc_2010_2019$PESO)/marg_erro)^2)
+```
+
+Neste caso, se quiséssemos trabalhar com amostras da nossa população, nosso estudo poderia contar com 78 à 83 indivíduos, para que pudéssemos realizar testes estatísticos válidos, além, claro, de que os demais pressupostos fossem atendidos.
+
+## Retirando uma amostra da aleatória
+
+Então, mesmo que a nossa amostra precise de um tamanho muito menor, como temos uma base relativamente grande, iremos tirar 10000 observações para cada base de dados.
+
+```{r amostragem}
+## Amostragem
+set.seed(42)
+df_teste_2003 <- df_sinasc_2003 |> 
+  dplyr::sample_n(10000)
+
+df_teste_2019 <- df_sinasc_2019 |> 
+  dplyr::sample_n(10000)
+
+df_teste_2010_2019 <- df_sinasc_2010_2019 |> 
+  dplyr::sample_n(10000)
+```
+## Testando normalidade dos dados para variáveis utilizadas
+
+### Peso
+
+#### 2003
+```{r teste-normalidade-peso-2003}
+## Não usaremos Shapiro-Wilk por possuírmos mais que 5 mil observações na nossa base de dados
+# shapiro.test(df_teste_2003$PESO)
+nortest::ad.test(df_teste_2003$PESO)
+
+plot(density(df_teste_2003$PESO), ylab='Densidade', xlab='Amostra X', main='')
+```
+
+#### 2019
+```{r teste-normalidade-peso-2019}
+## 2019
+# shapiro.test(df_teste_2019$PESO)
+nortest::ad.test(df_teste_2019$PESO)
+plot(density(df_teste_2019$PESO), ylab='Densidade', xlab='Amostra X', main='')
+```
+
+#### 2010-2019
+```{r teste-normalidade-peso-2010-2019}
+# shapiro.test(df_teste_2010_2019$PESO)
+nortest::ad.test(df_teste_2010_2019$PESO)
+plot(density(df_teste_2010_2019$PESO), ylab='Densidade', xlab='Amostra X', main='')
+```
+
+Nos testes de normalidade, todos os valores de p-valor foram todos menores que 0.05, portanto teremos que rejeitar a hipótese nula de que os dados são normais.
+Porém, para prosseguir com os testes de hipótese, utilizaremos o Teorema Central do Limite, que nos garante que a distribuição amostral da média é aproximadamente normal, contanto que usemos um tamanho amostral grande (n > 30), mesmo que a distribuição da população não seja.
+
+As análises gráficas também corroboram com o Teorema, apresentando uma distribuição que se aproxima da normal.
+
+## Análise exploratória das variáveis
+
+### Tabela geral
+```{r tabela-geral}
+## 2003
+gtsummary::tbl_summary(df_teste_2003)
+
+## 2019
+gtsummary::tbl_summary(df_teste_2019)
+
+## 2010-2019
+gtsummary::tbl_summary(df_teste_2010_2019)
+```
+
+### Gráficos
+#### Peso
+
+```{r analise-exploratoria-peso}
+
+library(ggplot2)
+
+## 2011
+ggplot2::ggplot(df_teste_2003, ggplot2::aes(x = PESO)) +
+  geom_histogram(bins = 30, fill = "#407D97", color = "black") +
+  labs(title = "Distribuição do Peso ao nascer em 2003",
+       x = "Peso",
+       y = "Frequência") +
+  theme_minimal()
+
+## 2019
+ggplot2::ggplot(df_teste_2019, ggplot2::aes(x = PESO)) +
+  geom_histogram(bins = 30, fill = "#407D97", color = "black") +
+  labs(title = "Distribuição do Peso ao nascer em 2009",
+       x = "Peso",
+       y = "Frequência") +
+  theme_minimal()
+
+## 2010-2019
+ggplot2::ggplot(df_teste_2010_2019, ggplot2::aes(x = PESO)) +
+  geom_histogram(bins = 30, fill = "#407D97", color = "black") +
+  labs(title = "Distribuição do Peso ao nascer em 2010-2019",
+       x = "Peso",
+       y = "Frequência") +
+  theme_minimal()
+
+## Juntando dados para o boxplot
+df_boxplot <- rbind(
+  df_teste_2003 |> dplyr::select(ano, PESO),
+  df_teste_2019 |> dplyr::select(ano, PESO)
+)
+df_boxplot <- rbind(
+  df_boxplot,
+  df_teste_2010_2019 |> dplyr::mutate(ano = "2010-2019") |> dplyr::select(ano, PESO)
+  )
+library(ggplot2)
+ggplot(df_boxplot, aes(x = ano, y = PESO)) +
+  geom_boxplot(fill = "#407D97", color = "black") +
+  labs(title = "Distribuição do Peso ao nascer entre 2003, 2019 e 2010 à 2019",
+       x = "Ano",
+       y = "Peso") +
+  theme_minimal()
+
+```
+
+#### Raça/cor da mãe
+
+```{r analise-exploratoria-racacor}
+df_teste_2010_2019 |> 
+  dplyr::mutate(RACACORMAE_nome = case_when(
+    RACACORMAE == 1 ~ "Branca",
+    RACACORMAE == 2 ~ "Preta",
+    RACACORMAE == 3 ~ "Amarela",
+    RACACORMAE == 4 ~ "Parda",
+    RACACORMAE == 5 ~ "Indígena",
+  )) |> ggplot2::ggplot(aes(x = RACACORMAE_nome)) +
+  geom_bar(fill = "#407D97", color = "black") +
+  labs(title = "Distribuição da Raça/cor da mãe em 2003",
+       x = "Raça/cor",
+       y = "Frequência") +
+  theme_minimal()
+
+```
+
+## Intervalo de confiança
+
+Agora iremos fazer um intervalo de confiança para a média do peso dos recém nascidos, utilizando a amostra dos dados de 2010 à 2019, e então faremos uma estimação pontual para o peso.
+
+```{r intervalo-confianca}
+
+## Usando a função do teste t
+t.test(df_teste_2010_2019$PESO, conf.level = 0.95)$conf.int
+
+
+## Usando cálculo manual
+alpha<-0.05
+n<-length(df_teste_2010_2019$PESO)
+
+(LI<-mean(df_teste_2010_2019$PESO)-qt(1-alpha/2, n-1)*sd(df_teste_2010_2019$PESO)/sqrt(n))
+(LS<-mean(df_teste_2010_2019$PESO)+qt(1-alpha/2, n-1)*sd(df_teste_2010_2019$PESO)/sqrt(n))
+
+print(paste0("Limite inferior = ", LI, " Limite superior = ", LS, "\n"))
+```
+Ou seja, por ambas as formas de calcular, teremos que o nosso intervalo de confiança para a média do peso dos recém nascidos em 2010 à 2019 é de [3130.5, 3133.5], com 95% de confiança.
+
+## Estimação pontual
+
+
+Para a estimação pontual, como possuímos uma distribuição aproximada da normal, utilizaremos a fórmula da média amostral para calcular uma distribuição normal, que é:
+
+$$\bar{X} = \frac{\sum_{i=1}^{n} X_i}{n}$$
+
+```{r estimacao-pontual}
+sum(df_teste_2010_2019$PESO)/n
+```
+
+O valor é de peso médio para a amostra de recém nascidos de 2010 à 2019 é de 3204.60g.
+
+## Teste de hipótese
+
+### Verificando se houve um aumento do peso médio dos recém nascidos entre 2003 e 2019
+
+Para este teste, utilizaremos um teste de hipótese para comparação de médias em duas amostras, onde a hipótese nula é que não houve diferença entre as médias, e a hipótese alternativa é que houve um aumento. Usaremos um nível de significância de 5% e o teste t para avaliar a hipótese.
+
+```{r teste-hipotese-a}
+t.test(df_teste_2003$PESO, df_teste_2019$PESO, alternative = "greater", conf.level = 0.95)
+```
+Portanto, podemos ver que as médias de peso são bastante próximas nas nossas duas amostras, e o teste confirma dizendo que não há rejeição de H0, ou seja, para o nível de significância de 5%, não existe diferença significativa entre as médias de peso dos nascidos vivos entre estes dois anos.
+
+### Verificando se existe uma diferença entre a média de peso dos recém nascidos de mães negras e brancas
+
+Para este teste, utilizaremos um teste de hipótese para comparação de médias em duas amostras, onde a hipótese nula é que não houve diferença entre as médias, e a hipótese alternativa é que existe diferença entre a média de peso dos nascidos entre as diferentes raça/cor. Usaremos um nível de significância de 5% e o teste t para avaliar a hipótese.
+
+```{r teste-hipotese-b}
+## Mantendo apenas as raças brancas e negras
+df_teste_2010_2019 <- df_teste_2010_2019 |> 
+  dplyr::filter(RACACORMAE %in% c(1, 2))
+
+t.test(df_teste_2010_2019$PESO ~ df_teste_2010_2019$RACACORMAE, conf.level = 0.95)
+``` 
+E novamente, o teste não rejeita a hipótese nula, ou seja, para o nível de significância de 5%, não existe diferença significativa entre as médias de peso dos nascidos vivos entre mães brancas e negras.
+
+# Conclusão
+
+Então, após a realização das análises, garantimos utilizando o teorema central do limite a normalidade das nossas amostras, mas mesmo assim, utilizando o teste *t-student* com nível de significância de 5%, podemos concluir que não houve diferença significativa entre as médias de peso dos recém nascidos entre 2003 e 2019, e também não houve diferença significativa entre as médias de peso dos recém nascidos de mães brancas e negras.

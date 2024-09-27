@@ -1,0 +1,66 @@
+##########################################################################################
+#  Fatoriais: 2k sem repetição
+##########################################################################################
+###
+## FATORIAL COMPLETO
+require(ExpDes)
+
+Reagentes <- rep(c("R15","R25"),each=6); Reagentes
+Catalizador <- rep(c("C","S"),each=3,2); Catalizador
+resp <- c(18, 19,23,28,25,27,31,30,29,36,32,32)
+
+mdic <- fat2.crd(Reagentes, Catalizador, resp, quali=c(TRUE,TRUE), mcomp="tukey",
+                 fac.names=c("Reagentes","Catalizador"),sigT = 0.05,sigF = 0.05)
+
+#fat2.brd   # comand para fatorial two-way em blobo
+# O pacote ExpDes aprensenta a análise para 3 fatores também, 
+#além de outros fatorias
+
+###FATORIAL 2K SEM REPETIÇÃO
+
+A <- rep(c(-1,1),8);A
+B <- rep(c(-1,1),each=2,4);B
+C <- rep(c(-1,1),each=4,2);C
+D <- rep(c(-1,1),each=8);D
+resp <- c(45,71,48,65,68,60,80,65,43,100,45,104,75,86,70,96)
+
+# Transformando os os vetores em fatores
+
+A <- as.factor(A)
+B <- as.factor(B)
+C <- as.factor(C)
+D <- as.factor(D)
+
+abcd<- data.frame(A,B,C,D,resp)
+abcd
+abcd.av <- aov(resp~A*B*C*D,data=abcd)
+abcd.av
+summary(abcd.av)
+
+efeitos <- abcd.av$eff[2:16]/2
+efeitos
+
+#Gráficos
+par(mfrow = c(1, 2))
+c <- qqnorm(efeitos,col = 2, pch = 19, datax=T)
+linha <- qqline(efeitos, datax=T)
+#identify(c$x,c$y,labels=names(c$x))
+
+# QQnorm com bandas de confiança
+#Simula sob a hipótese nula
+c <- qqnorm(efeitos,col = 2, pch = 19, datax=T)
+L <- replicate(n = 2999,
+               expr = {
+                 # Retorna a amostra ordenada.
+                 sort(rnorm(2^4 - 1, mean = 0, sd = 1))
+               })
+
+#Determina intervalos de confiança quantílicos para cada esatística de
+# ordem.
+ic <- apply(cbind(L, sort(efeitos)),
+            MARGIN = 1,
+            FUN = quantile,
+            probs = c(0.025, 0.5, 0.975))
+matlines(x = sort(c$x), y = t(ic),
+         type = "l", lty = 2, col = 1)
+

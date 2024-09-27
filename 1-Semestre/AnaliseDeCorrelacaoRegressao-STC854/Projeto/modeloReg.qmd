@@ -22,7 +22,6 @@ library(ggplot2)
 library(dplyr)
 ```
 
-
 ```{r, rank}
 use_rank <- F
 play_time_max <- 360
@@ -708,15 +707,14 @@ Neste teste também rejeitamos a hipótese nula, de que os residuos sejam indepe
 
 A equação final do modelo é:
 
-
+```{=tex}
 \begin{aligned}
 & \mathrm y = -75.587004 + 0.040664*x_1-0.032432*x_2+0.000041*x_3
 \\
 & \mathrm +0.380869*x_4-0.000014*x_5
 
 \end{aligned}
-
-
+```
 Para:
 
 -   $x_1$ = ano de publicação (year_published)

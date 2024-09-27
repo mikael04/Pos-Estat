@@ -1,0 +1,13 @@
+Reagentes	Catalizador Tempo	
+R15	C	18
+R15	C	19
+R15	C	23
+R15	S	28
+R15	S	25
+R15	S	27
+R25	C	31
+R25	C	30
+R25	C	29
+R25	S	36
+R25	S	32
+R25	S	32
