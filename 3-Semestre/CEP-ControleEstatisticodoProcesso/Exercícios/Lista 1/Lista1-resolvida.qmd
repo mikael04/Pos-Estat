@@ -1,0 +1,179 @@
+---
+title: "Lista 1"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+```
+
+# Exercício 1:
+
+![](imgs/ex1.png)
+
+```{r}
+#| warning: false
+#| column: screen
+#| out-width: 100%
+#| fig-format: svg
+
+# Defeitos e quantidades conforme a imagem
+defeitos <- c("Micro Furos", "Opacidade", "Espessura Maior", "Espessura Menor", 
+              "Largura Incorreta", "Adesão entre Faces", "Grumos", "Outros")
+quantidade <- c(5, 67, 43, 182, 30, 130, 9, 19)
+
+# Criando o dataframe
+df <- data.frame(Defeito = defeitos, Quantidade_de_Bobinas = quantidade) |> 
+  janitor::clean_names()
+
+## add a column with the accumulated relative frequency
+df_ggplot <- df |> 
+  dplyr::arrange(desc(quantidade_de_bobinas)) |> 
+  dplyr::mutate(acumulado_rel = round(cumsum(quantidade_de_bobinas)/sum(quantidade_de_bobinas), 2),
+                acumulado_abs = cumsum(quantidade_de_bobinas))
+
+
+y2 <- c("  0%", " 10%", " 20%", " 30%", " 40%", " 50%", " 60%", " 70%", " 80%", " 90%", "100%")
+
+## plot
+df_ggplot |> 
+  ggplot2::ggplot(aes(x = forcats::fct_reorder(defeito, quantidade_de_bobinas, .desc = T))) +
+  ggplot2::geom_col(aes(y = quantidade_de_bobinas),
+                    fill = "skyblue") + 
+  ggplot2::geom_point(aes(y = acumulado_abs), color = rgb(0, 1, 0), pch=16, size=1) +
+  ggplot2::geom_path(aes(y = acumulado_abs, group=1), colour="slateblue1", lty=3, size=0.9) +
+  ggplot2::labs(title = "Quantidade de defeitos por tipo de defeito",
+                x = "Defeitos",
+                y = "Quantidade de bobinas") +
+  ggplot2::theme_minimal()
+
+# ## plot
+# df_ggplot |> 
+#   ggplot2::ggplot(aes(x = forcats::fct_reorder(defeito, quantidade_de_bobinas, .desc = T))) +
+#   ggplot2::geom_col(aes(y = quantidade_de_bobinas),
+#                     fill = "skyblue") + 
+#   ggplot2::geom_line(aes(x = y = acumulado_rel*100), color = "red") +
+#   ggplot2::labs(title = "Quantidade de defeitos por tipo de defeito",
+#                 x = "Defeitos",
+#                 y = "Quantidade de bobinas") +
+#   ggplot2::theme_minimal()
+
+## plot
+df_ggplot <- df |> 
+  dplyr::arrange(desc(quantidade_de_bobinas)) |> 
+  dplyr::mutate(acumulado_rel = round(cumsum(quantidade_de_bobinas)/sum(quantidade_de_bobinas), 2),
+                acumulado_abs = cumsum(quantidade_de_bobinas),
+                defeito_int = 1:nrow(df))
+
+nr <- nrow(df_ggplot)
+N <- sum(df_ggplot$quantidade_de_bobinas)
+
+ggplot(df_ggplot) +
+  geom_col(aes(x = forcats::fct_reorder(defeito, defeito_int, .desc = F), y = quantidade_de_bobinas, fill = defeito_int)) +
+  geom_line(aes(x = defeito_int, y = acumulado_abs, color = defeito_int)) + 
+  geom_point(aes(x = defeito_int, y = acumulado_abs), color = df_ggplot$defeito_int, pch = 19) +
+  scale_y_continuous(breaks = seq(0, N, N/10), limits = c(-0.02 * N, N * 1.02)) +
+  scale_x_discrete(breaks = df_ggplot$defeito) +
+  guides(fill = FALSE, color = FALSE) +
+  annotate("rect", xmin = nr + 0.55, xmax = nr + 1, ymin = -0.02 * N, ymax = N * 1.02, fill = "white") +
+  annotate("text", x = nr + 0.8, y = seq(0, N, N/10), label = y2, size = 3.5) +
+  geom_segment(x = nr + 0.55, xend = nr + 0.55, y = -0.02 * N, yend = N * 1.02, color = "grey50") +
+  theme_bw() +
+  labs(title = "Gráfico de pareto", y = "Frequência",
+       x = "Defeitos")
+
+```
+
+
+# Exercício 2:
+
+![](imgs/ex2.png)
+
+![Fluxograma de abastecimento](imgs/fluxograma-abastecimento.png)
+![Diagrama de causa e efeito](imgs/diagrama-causa-efeito.png)
+
+# Exercício 3:
+
+![](imgs/ex3.png)
+
+## Lista de verificação
+  
+![Lista de verificação](imgs/lista-verificacao.png)
+
+# Exercício 4:
+
+![](imgs/ex4.png)
+
+```{r}
+#| warning: false
+# Valores
+
+valores <- c(184, 182, 169, 167, 181, 170, 162, 167, 160, 166, 176, 156, 172, 187, 172, 184, 172, 170, 177, 172, 163, 187, 184, 166, 168, 176, 159, 180, 189, 170, 179, 169, 169, 181, 180, 164, 177, 180, 175, 182, 165, 173, 173, 167, 171, 176, 172, 164, 184, 172)
+
+# Criando o dataframe
+df <- data.frame(viscosidades = valores)
+
+## Calculo de classes c/ regra de Sturges
+
+n <- nrow(df)
+k <- ceiling(1 + 3.322 * log10(n))
+
+# Histograma
+
+ggplot(df, aes(x = viscosidades)) +
+  geom_histogram(binwidth = k, fill = "skyblue", color = "black") +
+  labs(title = "Histograma de Viscosidades",
+       x = "Viscosidades",
+       y = "Frequência") +
+  theme_minimal()
+
+# Classes
+min <- min(df$viscosidades)
+max <- max(df$viscosidades)
+
+amplitude <- max - min + 2 # + 2 porque precisamos para o seq que a divisão seja exata
+```
+
+Valores do intervalo: 
+
+```{r}
+# Valores do intervalo
+seq(min, max+2, by = amplitude/k)
+```
+
+# Exercício 5:
+                
+![](imgs/ex5.png)
+
+```{r}
+# Criar os vetores com os dados
+temperatura <- c(17, 19, 19, 20, 22, 22, 23, 23, 25, 25)
+rendimento <- c(0.20, 0.25, 0.30, 0.35, 0.40, 0.60, 0.50, 0.60, 0.55, 0.65)
+
+# Criar o data frame
+tabela <- data.frame(Temperatura = temperatura, Rendimento = rendimento)
+
+# Gráfico de dispersão
+
+ggplot(tabela, aes(x = Temperatura, y = Rendimento)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +  # Adicionar linha de regressão
+  labs(title = "Gráfico de dispersão + Linha de regressão linear  ",
+       x = "Temperatura",
+       y = "Rendimento") +
+  theme_minimal()
+
+```
