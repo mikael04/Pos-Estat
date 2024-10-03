@@ -26,3 +26,29 @@ D(T1) -> Diferença 1
 
 Forecasting exemplo:
 https://cran.rstudio.com/web/packages/sweep/vignettes/SW01_Forecasting_Time_Series_Groups.html
+
+Avaliar modelos concorrentes.
+
+D(t1) -> uma diferença
+
+Coef
+Phi1 = 0,29
+Deta1 = -0,76
+Deta2 = -0,14
+
+tcalc  (coef/std. err.)
+AR(1) = 2,13
+MA(1) = -5,18
+MA(2) = -1,20
+
+p-valor
+0,034
+0,000
+0,230
+
+
+
+Tabela: (FOTO)
+
+Modelo           |  Coeficiente  |  P-valor  |  AIC  |  BIC  |  Resíduos  |  Autocorrelação  |  Correlação Parcial  |  Estacionariedade
+ARIMA (1, 0, 0)  |u=129, phi1 =0,64
