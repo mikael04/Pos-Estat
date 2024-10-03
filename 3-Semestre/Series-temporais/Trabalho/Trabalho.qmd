@@ -1,0 +1,72 @@
+---
+title: "Trabalho"
+subtitle: "Dados de Queimadas"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-10-01"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(scipen = 99999)
+```
+
+# Introdução
+
+Neste trabalho, vamos analisar os dados de queimadas no Brasil. Os dados foram obtidos do portal BDQueimadas do INPE (Instituto Nacional de Pesquisas Espaciais) e estão disponíveis em [https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/#exportar-dados](https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/#exportar-dados).       
+
+O intuito é analisar a quantidade de focos de queimadas por mês e ano, tentando identificar se houve um aumento no número de queimadas ao longo dos últimos anos.
+
+# Carregando os dados
+
+```{r, dados}
+dados_2023_2024 <- data.table::fread("dados/focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv")
+
+df_queimadas_2023_2024 <- dados_2023_2024 |> 
+  dplyr::arrange(Estado, Municipio, DataHora)
+
+## Verificando quantas informações temos cada município
+df_queimadas_2023_2024_ag_mun_sat <- df_queimadas_2023_2024 |> 
+  dplyr::group_by(Municipio, Satelite) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
+  dplyr::select(Estado, Municipio, Satelite, n) |> 
+  dplyr::ungroup()
+
+df_top_22 <- df_queimadas_2023_2024_ag_mun_sat |> 
+  # head(22)
+  dplyr::slice(1:22)
+
+dados_2014_2015 <- data.table::fread("dados/focos_qmd_inpe_2014-10-01_2015-10-01_41.322529.csv")
+
+df_queimadas_2014_2015 <- dados_2014_2015 |> 
+  dplyr::arrange(Estado, Municipio, DataHora)
+
+## Verificando quantas informações temos cada município
+df_queimadas_2014_2015_ag_mun_sat <- df_queimadas_2014_2015 |> 
+  dplyr::group_by(Municipio, Satelite) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
+  dplyr::select(Estado, Municipio, Satelite, n)
+
+## Observando um município
+df_mun <- dados |> 
+  dplyr::filter(Municipio == "FEIJÓ")
+
+```
