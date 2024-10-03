@@ -1,0 +1,28 @@
+1 - Avalia a distribuição dos dados e estima um modelo
+
+2 - Avaliar o coeficiente, se é entre 0 e 1;
+
+3 - Avaliar o p-valor -> prob -> precisa ser menor que 0,05.
+
+3.1 - Avaliar os critérios do resultado, se está aumentando (piora do modelo, Ac Bc) (isso serve para avaliar os diferentes modelos)
+
+4 - Avaliar os resíduos, se são ruídos brancos (é ruído branco se não existe autocorrelação e autocorrelação parcial), depois avaliar se os ruídos tem distribuição normal e então avaliar a distribuição (gráfica) dos resíduos.
+
+
+
+Resíduo = real - previsto
+
+Verificar ruído branco: Estatística Q de correlação, avaliar autocorrelação e correlação parcial
+
+Verificar se a série é estacionária (se possui alguma diferença, d1, d2, etc.)
+
+Ordem: Olha o gráfico, estima um modelo, avalia os parâmetros do modelo, analisa os resíduos (precisa ser ruído branco),
+
+Avaliar ruído branco, verificar se autocorrelação e correlação parcial estão dentro do traço
+
+AR(6) é um modelo de ordem 1, com defasagem 6.
+
+D(T1) -> Diferença 1
+
+Forecasting exemplo:
+https://cran.rstudio.com/web/packages/sweep/vignettes/SW01_Forecasting_Time_Series_Groups.html
