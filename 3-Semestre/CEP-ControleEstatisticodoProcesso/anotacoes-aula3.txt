@@ -1,0 +1,9 @@
+a) Dois pontos acima do limite de controle superior.
+b)
+- Os primeiros 9 pontos consecutivos estão fora de controle.
+c)
+- 6 pontos diminuindo, ao final do gráfico
+e)
+- 2 de 3 pontos consecutivos na zona A ou além dela.
+f)
+- 4 de 5 pontos consecutivos na zona B. pontos ao final, logo após o descontrole da c).
