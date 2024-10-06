@@ -6,7 +6,7 @@ library(forecast)
 library(ggplot2)
 
 ## True se os dados forem rodados do pendrive no notebook, F se rodar no PC no projeto
-data_notebook <- T
+data_notebook <- F
 
 if(data_notebook){
   data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/"
@@ -14,8 +14,9 @@ if(data_notebook){
   data_path <- ""
 }
 
-proj_path <- "3-Semestre/Series-Temporais/Trabalho/"
+proj_path <- "3-Semestre/Series-temporais/Trabalho/"
 
+getwd()
 # Importando os dados
 ## PARÁ Mun: SÃO FÉLIX DO XINGU Satelite: NPP-375 N Contagens: 35732
 dados_2022_2023 <- data.table::fread(paste0(data_path, proj_path, "dados/focos_qmd_inpe_2022-10-01_2023-10-01_45.900864.csv")) |>

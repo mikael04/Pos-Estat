@@ -99,7 +99,7 @@ ggplot(df_ggplot) +
 
 
 # Exercício 2:
-
+  
 ![](imgs/ex2.png)
 
 ![Fluxograma de abastecimento](imgs/fluxograma-abastecimento.png)

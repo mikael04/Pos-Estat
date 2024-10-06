@@ -1,0 +1,248 @@
+---
+title: "Lista 2"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+```
+
+# Exercício 1:
+
+![](imgs/ex1.png)
+  
+```{r}
+
+## Dados    
+dados_1 <- data.frame(
+  Amostra = 1:20,
+  X1 = c(15, 14, 9, 8, 14, 9, 15, 14, 11, 11, 13, 10, 8, 15, 13, 14, 8, 8, 13, 9),
+  X2 = c(10, 14, 14, 6, 8, 10, 10, 16, 7, 14, 8, 15, 12, 12, 16, 8, 10, 14, 15, 7),
+  X3 = c(8, 10, 9, 9, 9, 7, 12, 11, 16, 11, 9, 8, 14, 14, 9, 8, 16, 10, 8, 15),
+  X4 = c(9, 6, 11, 13, 12, 13, 12, 10, 10, 12, 5, 10, 9, 6, 5, 12, 9, 9, 8, 8)
+)
+
+## Calculando média e desvio padrão
+
+dados_cep_1 <- dados_1 |> 
+  dplyr::rowwise() |>
+  dplyr::mutate(media = mean(c_across(X1:X4)),
+                amplitude = max(c_across(X1:X4)) - min(c_across(X1:X4)))
+
+```
+
+## Cálculos para gráfico de controle da média usando amplitude
+```{r}
+## Média geral
+media_geral <- mean(dados_cep_1$media)
+## Para 4 observações na amostra
+a2 <- 0.729
+amplitude_geral <- mean(dados_cep_1$amplitude)
+## Limite inferior
+LIC <- media_geral - a2 * amplitude_geral
+## Limite superior
+LSC <- media_geral + a2 * amplitude_geral
+```
+
+## Gráfico de controle da média
+      
+```{r}
+#! warning: F
+ggplot(dados_cep_1, aes(x = Amostra, y = media)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = media_geral, color = "blue") +
+  geom_hline(yintercept = LSC, color = "red") +
+  geom_hline(yintercept = LIC, color = "red") +
+  labs(title = "Gráfico de controle da Média",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+Pela observação do gráfico de média associado à amplitude, não há nenhuma amostra fora dos limites de controle.
+
+## Cálculos para gráfico de controle da amplitude
+```{r}
+## Para 4 observações na amostra
+d3 <- 0
+d4 <- 2.282
+## Amplitude geral já calculada
+## Limite inferior
+LIC <- d3 * amplitude_geral
+## Limite superior
+LSC <- d4 * amplitude_geral
+```
+
+## Gráfico de controle da amplitude
+
+```{r}
+ggplot(dados_cep_1, aes(x = Amostra, y = amplitude)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = amplitude_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle da Amplitude",
+       x = "Amostras",
+       y = "Amplitude") +
+  theme_minimal()
+```
+
+Pela observação do gráfico de amplitude, não há nenhuma amostra fora dos limites de controle.
+
+# Exercício 2:
+
+![](imgs/ex2.png)
+
+## Cálculos para gráfico de controle da média usando desvio padrão
+```{r}
+dados_cep_1 <- dados_cep_1 |> 
+  dplyr::rowwise() |>
+  dplyr::mutate(media = mean(c_across(X1:X4)),
+                desvio_padrao = sd(c_across(X1:X4)))
+
+            a3 <- 1.628 ## Para 4 observações na amostra
+media_geral <- mean(dados_cep_1$media)
+desvio_padrao_geral <- mean(dados_cep_1$desvio_padrao)
+## Limite inferior
+LIC <- media_geral - a3 * desvio_padrao_geral
+## Limite superior
+LSC <- media_geral + a3 * desvio_padrao_geral
+  
+```
+
+## Gráfico de controle da média
+
+```{r}
+ggplot(dados_cep_1, aes(x = Amostra, y = media)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = media_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle da Média",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
+
+## Cálculos para gráfico de controle do desvio padrão
+
+```{r}
+## Para 4 observações na amostra
+b3 <- 0
+b4 <- 2.266 
+## Desvio padrão geral já calculado
+## Limite inferior
+LIC <- b3 * desvio_padrao_geral
+## Limite superior
+LSC <- b4 * desvio_padrao_geral
+```
+
+## Gráfico de controle do desvio padrão
+
+```{r}
+ggplot(dados_cep_1, aes(x = Amostra, y = desvio_padrao)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = desvio_padrao_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle do Desvio Padrão",
+       x = "Amostras",
+       y = "Desvio Padrão") +
+  theme_minimal()
+```
+  
+Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
+
+# Exercício 3:
+
+![](imgs/ex3.png)
+
+## Cálculos para gráfico de controle de medidas individuais usando amplitude móvel
+
+```{r}
+dados_3 <- data.frame(
+  Amostra = 1:25,
+  x = c(116, 190, 136, 128, 144, 110, 141, 115, 145, 111, 77, 147, 207, 142, 68, 
+        160, 122, 153, 184, 133, 173, 152, 195, 99, 125)
+)
+
+# dados_media_movel <- dados_3 |> 
+#   dplyr::mutate(amplitude_movel = zoo::rollmean(x, k = 2, fill = NA, align = "right"))
+dados_amplitude_movel <- dados_3 |>
+  dplyr::mutate(amplitude_movel = abs(x-lag(x)))
+
+## Média geral
+media_geral <- mean(dados_amplitude_movel$x)
+## Média das amplitudes móveis
+amplitude_media_geral <- mean(dados_amplitude_movel$amplitude_movel, na.rm = TRUE)
+d2 <- 1.128 # Para 2 observações (medidas individuais usando amplitude móvel usamos d2)
+
+## Limite inferior
+LIC <- media_geral - 3 * (amplitude_media_geral/d2)
+## Limite superior
+LSC <- media_geral + 3 * (amplitude_media_geral/d2)
+```
+
+## Gráfico de controle de medidas individuais usando a média associada a amplitude móvel
+
+```{r}
+ggplot(dados_amplitude_movel, aes(x = Amostra, y = x)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = media_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle de medidas individuais",
+       subtitle = "Usando a média associada amplitude móvel",
+       x = "Amostras",
+       y = "Medidas") +
+  theme_minimal()
+```
+
+Pela observação do gráfico associado à amplitude móvel, não há nenhuma amostra fora dos limites de controle.
+
+## Cálculos para gráfico de controle de medidas individuais usando desvio padrão móvel
+
+```{r}
+d3 <- 0 ## Para amplitude móvel
+d4 <- 3.267 ## Para amplitude móvel
+
+## Limite inferior
+LIC <- d3 * amplitude_media_geral
+## Limite superior
+LSC <- d4 * amplitude_media_geral
+```
+
+## Gráfico de controle de medidas individuais usando desvio padrão móvel
+
+```{r}
+ggplot(dados_amplitude_movel, aes(x = Amostra, y = amplitude_movel)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = amplitude_media_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle para amplitudes móveis",
+       x = "Amostras",
+       y = "Amplitude") +
+  theme_minimal()
+```
