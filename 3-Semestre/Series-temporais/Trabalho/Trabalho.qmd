@@ -24,6 +24,7 @@ format:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
+library(ggplot2)
 options(scipen = 99999)
 ```
 
@@ -66,7 +67,88 @@ df_queimadas_2014_2015_ag_mun_sat <- df_queimadas_2014_2015 |>
   dplyr::select(Estado, Municipio, Satelite, n)
 
 ## Observando um município
-df_mun <- dados |> 
-  dplyr::filter(Municipio == "FEIJÓ")
+df_mun <- df_queimadas_2014_2015_ag_mun_sat |> 
+  dplyr::filter(Municipio == "SÃO FÉLIX DO XINGU",
+                Satelite == "NPP-375")
+
+```
+
+## Análise inicial
+
+### Verificando a quantidade de focos de queimadas por mês e ano de 2014/10 à 2015/9
+```{r, analise-inicial}
+## Verificando a quantidade de focos de queimadas por mês e ano
+format(lubridate::ymd_hms(df_queimadas_2014_2015[1,1]), "%Y-%m")
+
+df_queimadas_2014_2015_sample <- df_queimadas_2014_2015 |> 
+  dplyr::sample_n(1000) |> 
+  dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
+  dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+  dplyr::group_by(Ano_mes) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(Ano_mes = as.factor(Ano_mes))
+
+queimadas_ano_mes <- df_queimadas_2014_2015|> 
+  dplyr::sample_n(1000) |> 
+  dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
+  dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+  dplyr::group_by(Ano_mes) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::ungroup()
+
+queimadas_ano_mes |> 
+  ggplot(aes(x = Ano_mes, y = n)) +
+  geom_col(position = "dodge", fill = "#407D97") +
+  labs(title = "Focos de queimadas por mês e ano",
+       x = "Ano/Mês",
+       y = "Quantidade de focos") +
+  theme_minimal()
+```
+### Verificando estado com mais focos de incêncio em 2014/10 à 2015/9
+
+```{r, estado-mais-focos-2014-2014}
+df_estado <- df_queimadas_2014_2015 |> 
+  dplyr::group_by(Estado) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::arrange(desc(n))
+
+df_estado |>
+  ggplot(aes(x = n, y = reorder(Estado, n))) +
+  geom_col(fill = "#407D97") +
+  labs(title = "Focos de queimadas por estado",
+       x = "Estado",
+       y = "Quantidade de focos") +
+  theme_minimal()
+```
+
+### Verificando estado com mais focos de incêncio em 2023/10 à 2024/9
+
+```{r, estado-mais-focos-2023-2024}
+df_estado_2023_2024 <- df_queimadas_2023_2024 |> 
+  dplyr::group_by(Estado) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::arrange(desc(n))
+
+df_estado_2023_2024 |>
+  ggplot(aes(x = n, y = reorder(Estado, n))) +
+  geom_col(fill = "#407D97") +
+  labs(title = "Focos de queimadas por estado",
+       x = "Estado",
+       y = "Quantidade de focos") +
+  theme_minimal()
+```
+
+## Preparando dados
+
+Para esta avaliação, usaremos os dados apenas de um estado, pelos dados analisados anteriormente, os estados com maior número de focos de incêndio são o Pará e Mato Grosso, pelos dados coletados.
+Portanto, faremos uma primeira análise com dados apenas do Pará.
+
+```{r, preparando-dados}
+# Usando dados apenas de um município
+## Município selecionado
+Municipio = "SÃO FÉLIX DO XINGU"
+df_mun <- data.frame()
+# for(i)
 
 ```
