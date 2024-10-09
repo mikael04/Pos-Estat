@@ -26,6 +26,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 options(scipen = 99999)
+data_from <- "local"
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/mikael/Netac-Dados/Projetos/R/Pos-Estat"
+}
 ```
 
 # Introdução
@@ -37,7 +45,7 @@ O intuito é analisar a quantidade de focos de queimadas por mês e ano, tentand
 # Carregando os dados
 
 ```{r, dados}
-dados_2023_2024 <- data.table::fread("dados/focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv")
+dados_2023_2024 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv"))
 
 df_queimadas_2023_2024 <- dados_2023_2024 |> 
   dplyr::arrange(Estado, Municipio, DataHora)
@@ -54,7 +62,7 @@ df_top_22 <- df_queimadas_2023_2024_ag_mun_sat |>
   # head(22)
   dplyr::slice(1:22)
 
-dados_2014_2015 <- data.table::fread("dados/focos_qmd_inpe_2014-10-01_2015-10-01_41.322529.csv")
+dados_2014_2015 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2014-10-01_2015-10-01_41.322529.csv"))
 
 df_queimadas_2014_2015 <- dados_2014_2015 |> 
   dplyr::arrange(Estado, Municipio, DataHora)
@@ -93,6 +101,7 @@ queimadas_ano_mes <- df_queimadas_2014_2015|>
   dplyr::sample_n(1000) |> 
   dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
   dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+  dplyr::filter(Ano_mes != "2015-10") |> 
   dplyr::group_by(Ano_mes) |> 
   dplyr::summarise(n = n()) |> 
   dplyr::ungroup()
@@ -147,8 +156,59 @@ Portanto, faremos uma primeira análise com dados apenas do Pará.
 ```{r, preparando-dados}
 # Usando dados apenas de um município
 ## Município selecionado
-Municipio = "SÃO FÉLIX DO XINGU"
-df_mun <- data.frame()
-# for(i)
+estado_sel <- "MATO GROSSO"
+satelite_sel <- "NPP-375"
+## Lendo todos os arquivos da pasta dados
+files <- list.files("dados/", full.names = T)
+## Lendo os arquivos e selecionando apenas dados do estado e Satelite selecionados
+df_queimadas_pa <- lapply(files, function(x){
+  dados <- data.table::fread(x)
+  dados |> 
+    dplyr::filter(Estado == estado_sel,
+                  Satelite == satelite_sel)
+})
+## Unindo todos os dados
+df_queimadas_pa <- dplyr::bind_rows(df_queimadas_pa)
+## Removendo linhas duplicadas
+df_queimadas_pa <- df_queimadas_pa |> 
+  dplyr::distinct()
+
+## Verificando a quantidade de focos de queimadas por mês e ano
+df_queimadas_pa_anomes <- df_queimadas_pa |> 
+  dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
+  dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+  dplyr::group_by(Ano_mes) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(Ano_mes = Ano_mes)
+
+
+
+```
+
+```{r, visualizacoes}
+
+## Fazendo gráfico de linhas da série temporal
+df_queimadas_pa_anomes |>
+  mutate(Ano_mes = paste0(Ano_mes, "-01")) %>%       # Create "YYYY-MM-01"
+  mutate(Ano_mes = lubridate::ymd(Ano_mes))   |> 
+  ggplot(aes(x = Ano_mes, y = n, group = 1)) +
+  geom_line() +
+  labs(title = paste0 ("Focos de queimadas por mês e ano", "no ", estado_sel),
+       x = "Ano/Mês",
+       y = "Quantidade de focos") +
+  theme_minimal() +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year")
+
+```
+
+```{r, forecast}
+## Autocorrelação dos dados de focos de queimadas no estado selecionado
+forecast::Acf(df_queimadas_pa_anomes$n, type = "correlation", main = "Autocorrelação para volume de queimadas no mês", lag.max = 15)
+
+## Autocorrelação parcial dos dados de focos de queimadas no estado selecionado
+forecast::Acf(df_queimadas_pa_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 15)
+
+forecast::forecast(df_queimadas_pa_anomes$n)
 
 ```

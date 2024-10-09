@@ -1,0 +1,107 @@
+---
+title: "Análise do ganho de recursos em um Gacha"
+subtitle: "Dados do jogo SLA"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-10-10"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+# data_from <- "local"
+data_from <- "cloud"
+sheet_url <- "https://docs.google.com/spreadsheets/d/1UC_f22LUEmEGjkpi9M6n-IBcDuY2KrcUxFY229hDMko/edit?gid=821217509#gid=821217509"
+
+```
+
+```{css}
+#| echo: false
+p {
+  text-align: justify
+}
+```
+
+# Introdução
+
+Neste trabalho, vamos analisar os dados de aquisição de recursos em um jogo gacha. O objetivo é verificar se houve um aumento no número de recursos adquiridos ao longo dos dias, e tentar identificar se há alguma tendência de crescimento.
+Os dados foram colhidos por mim, em uma conta que faz gastos mensais mínimos, comprando o que chamam de "passes mensais".
+
+Um jogo gacha é um jogo eletrônico que implementa um sistema de monetização (compra de itens) que é semelhante a um jogo de azar. Normalmente, esses jogos são gratuitos, mas para adquirir itens especiais, é necessário gastar dinheiro real. É um formato muito popular no oriente e principalmente no mercado mobile, mas atualmente os jogos tem sido lançado em suas versões para o mundo todo e também suportando outras plataformas, como computadores e consoles.
+
+# Carregando os dados
+
+```{r, dados}
+## Ler dados da planilha do googlesheets
+if(data_from == "local"){
+  dados <- read.csv("dados.csv", sep = ";", dec = ",")
+} else {
+  dados <- googlesheets4::read_sheet(sheet_url, sheet = "SerieTemporal_Essencia")
+}
+```
+
+## Análise inicial
+
+### Verificando o mínimo e máximo e a quantidade de dados
+
+```{r, analise-inicial}
+
+min_s_extra <- min(dados$`Ganho S/Extra`)
+max_s_extra <- max(dados$`Ganho S/Extra`)
+min_c_extra <- min(dados$`Ganho C/Extra`)
+max_c_extra <- max(dados$`Ganho C/Extra`)
+min_total <- min(dados$`Ganho total`)
+max_total <- max(dados$`Ganho total`)
+
+n <- nrow(dados)
+
+## Faça uma tabela c/ os dados de mínimo e máximo e a quantidade de dados
+tabela <- data.frame(
+  min_s_extra = min_s_extra,
+  max_s_extra = max_s_extra,
+  min_c_extra = min_c_extra,
+  max_c_extra = max_c_extra,
+  min_total = min_total,
+  max_total = max_total,
+  n = n
+)
+
+tabela |> 
+  gt::gt() |>
+  gt::fmt_number(
+    columns = vars(min_s_extra, max_s_extra, min_c_extra, max_c_extra, min_total, max_total, n),
+    decimals = 0
+  )
+```
+
+### Verificando estado com mais focos de incêncio em 2023/10 à 2024/9
+
+```{r, estado-mais-focos-2023-2024}
+
+```
+
+## Preparando dados
+
+Para esta avaliação, usaremos os dados apenas de um estado, pelos dados analisados anteriormente, os estados com maior número de focos de incêndio são o Pará e Mato Grosso, pelos dados coletados.
+Portanto, faremos uma primeira análise com dados apenas do Pará.
+
+```{r, preparando-dados}
+
+```
