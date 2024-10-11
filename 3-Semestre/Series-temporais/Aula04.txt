@@ -1,0 +1,38 @@
+Série em nível:
+Sërie com dados como coletados
+
+Inversão de sinais na autocorrelação (FAC) indica sazonalidade.
+
+
+ARMA maxima verossimilhança (OPG - BHHH)
+coeficiente de covariancia computado usando "outer product of gradiants"
+
+
+Cuidar essas estatísticas -> Quanto menor esses valores melhor
+AC
+BC
+Han
+
+Correlograma dos resíduos -> Se não for branco (ou seja, estar dentro do intervalo d confiança, que é 2x o desvio padrão do rk), tem que fazer ajustes no modelo
+
+Comparar o valor ajustado e os resíduos (gráfico dos resíduos, do valor real e do modelo ajustado)
+
+
+Quebra estrutural, diferença não capta o movimento, quando tem uma "quebra" de tendência da série.
+
+
+Não decai rápido pra 0 no graf FAC -> indica que precisa de uma diferençá, não é estacionário
+Indício de modelo fracionário
+
+
+Akaike info criterism
+Schwarz criterion
+Hannan-Quinn criterion
+
+
+A média móvel capta os erros, podendo ser sazonal (média móvel sazonal)
+
+Fazer primeiro o teste de diferença, teste de raízes unitárias
+
+
+Testar as diferenças, se não for estacionário, testar a sazonalidade, se não for sazonal, testar a média móvel
