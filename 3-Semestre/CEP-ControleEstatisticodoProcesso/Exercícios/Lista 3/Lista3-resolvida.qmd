@@ -1,0 +1,164 @@
+---
+title: "Lista 3"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+```
+
+# Lista 3.
+## a) Gráfico de controle para a média e amplitude
+
+```{r}
+## Dados    
+dados <- openxlsx::read.xlsx("Atividade 3.xlsx", sheet = "Planilha2")
+# dados <- read.csv("dados_lista03.csv")
+
+## Calculando média e desvio padrão
+dados <- dados |> 
+  dplyr::rowwise() |>
+  dplyr::mutate(media = mean(c_across(x1:x5)),
+                amplitude = max(c_across(x1:x5)) - min(c_across(x1:x5))) |> 
+  dplyr::ungroup()
+
+```
+
+### Cálculos para gráfico de controle da média usando amplitude
+```{r}
+## Média geral
+media_geral <- mean(dados$media)
+## Para 5 observações na amostra
+a2 <- 0.577
+amplitude_geral <- mean(dados$amplitude)
+## Limite inferior
+LIC <- media_geral - a2 * amplitude_geral
+## Limite superior
+LSC <- media_geral + a2 * amplitude_geral
+```
+
+### Gráfico de controle da média relacionado à amplitude
+      
+```{r}
+#! warning: F
+ggplot(dados, aes(x = Amostra, y = media)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = media_geral, color = "blue") +
+  geom_hline(yintercept = LSC, color = "red") +
+  geom_hline(yintercept = LIC, color = "red") +
+  labs(title = "Gráfico de controle da Média relacionado à amplitude",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+Pela observação do gráfico de média associado à amplitude, não há nenhuma amostra fora dos limites de controle.
+
+### Cálculos para gráfico de controle da amplitude
+```{r}
+## Para 5 observações na amostra
+d3 <- 0
+d4 <-2.114
+## Amplitude geral já calculada
+## Limite inferior
+LIC <- d3 * amplitude_geral
+## Limite superior
+LSC <- d4 * amplitude_geral
+```
+
+## Gráfico de controle da amplitude
+
+```{r}
+ggplot(dados, aes(x = Amostra, y = amplitude)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = amplitude_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle da Amplitude",
+       x = "Amostras",
+       y = "Amplitude") +
+  theme_minimal()
+```
+
+Pela observação do gráfico de amplitude, não há nenhuma amostra fora dos limites de controle.
+
+## b) Gráfico de controle para a média e desvio padrão
+
+### Cálculos para gráfico de controle da média usando desvio padrão
+```{r}
+dados <- dados |> 
+  dplyr::rowwise() |>
+  dplyr::mutate(media = mean(c_across(x1:x5)),
+                desvio_padrao = sd(c_across(x1:x5)))
+
+a3 <- 1.427 ## Para 5 observações na amostra
+media_geral <- mean(dados$media)
+desvio_padrao_geral <- mean(dados$desvio_padrao)
+## Limite inferior
+LIC <- media_geral - a3 * desvio_padrao_geral
+## Limite superior
+LSC <- media_geral + a3 * desvio_padrao_geral
+  
+```
+
+### Gráfico de controle da média relacionado ao desvio padrão
+
+```{r}
+ggplot(dados, aes(x = Amostra, y = media)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = media_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle da Média relacionado ao desvio padrão",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
+
+### Cálculos para gráfico de controle do desvio padrão
+
+```{r}
+## Para 4 observações na amostra
+b3 <- 0
+b4 <- 2.266 
+## Desvio padrão geral já calculado
+## Limite inferior
+LIC <- b3 * desvio_padrao_geral
+## Limite superior
+LSC <- b4 * desvio_padrao_geral
+```
+
+### Gráfico de controle do desvio padrão
+
+```{r}
+ggplot(dados, aes(x = Amostra, y = desvio_padrao)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = desvio_padrao_geral, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle do Desvio Padrão",
+       x = "Amostras",
+       y = "Desvio Padrão") +
+  theme_minimal()
+```
+  
+Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
