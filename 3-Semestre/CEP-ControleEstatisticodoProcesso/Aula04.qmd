@@ -1,0 +1,237 @@
+---
+title: "Aula 04"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+```
+
+# Aula 04 - Exemplo de proporção c/ amostra de tamanho constante
+
+## Lendo dados
+
+```{r}
+dados_01 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 1") |> 
+  dplyr::rename(n_defeituosos = `Número.de.Defeituosos.(Di)`)
+head(dados)
+
+```
+
+## Manipulações
+
+```{r}
+## Média
+p_medio <- mean(dados_01$pi)
+
+## Tamanho do subgrupo
+n <- 50
+
+## Erro padrão
+valor_ep = sqrt(p_medio*(1-p_medio)/n)
+
+## LIC
+LIC <- media_dados - 3*valor_ep
+## LSC
+LSC <- media_dados + 3*valor_ep
+```
+
+## Gráfico
+
+```{r}
+
+
+ggplot(dados_01, aes(x = 1:30, y = pi)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = p_medio, color = "blue") +
+  geom_hline(yintercept = LSC, color = "red") +
+  geom_hline(yintercept = LIC, color = "red") +
+  labs(title = "Gráfico de controle para proporção com tamanho de amostr constante",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+# Exemplo 2 - Gráfico de controle para proporção com amostras de tamanho diferente
+
+```{r}
+dados_02 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 2") |> 
+  janitor::clean_names() |> 
+  dplyr::mutate(pi = esponjas_fora_dos_padroes/esponjas_produzidas)
+
+## Média
+p_medio <- mean(dados_02$pi)
+
+## Valor erro padrão
+dados_02 <- dados_02 |> 
+  dplyr::mutate(valor_ep = 3*sqrt(p_medio*(1-p_medio)/esponjas_produzidas))
+
+## Limite inferior de controle
+dados_02 <- dados_02 |> 
+  dplyr::mutate(LIC = p_medio - 3*sqrt(p_medio*(1-p_medio)/esponjas_produzidas),
+                LSC = p_medio + 3*sqrt(p_medio*(1-p_medio)/esponjas_produzidas))
+
+```
+
+## Gráfico
+
+```{r}
+ggplot(dados_02, aes(x = 1:nrow(dados_02), y = pi)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = p_medio, color = "blue") +
+  geom_line(aes(y = LSC, color = "#FF0000")) +
+  geom_line(aes(y = LIC, color = "#FF0001")) +
+  labs(title = "Gráfico de controle para proporção com amostras de tamanho diferente",
+       x = "Amostras",
+       y = "Média",
+       color = "Legenda") +
+  scale_color_manual(values = c("LSC" = "#FF0000", "LIC" = "#FF0001")) +
+  theme_minimal()
+```
+
+
+# Exemplo 3 - Gráfico de controle para o número de defeitos
+
+```{r}
+dados_03 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 3") |> 
+  janitor::clean_names()
+
+## Quartos na amostra
+n_amostras_diarias <- 200
+
+dados_03 <- dados_03|> 
+  dplyr::mutate(pi = quartos_nao_conf/n_amostras_diarias)
+
+## Média de quartos com problemas
+p_medio <- mean(dados_03$quartos_nao_conf)
+
+## Proporção média
+prop_medio <- mean(dados_03$pi)
+
+## Valor erro padrão
+valor_ep = 3*sqrt(p_medio*(1-prop_medio))
+
+## Limite inferior de controle
+LIC <- p_medio - valor_ep
+## Limite superior de controle
+LSC <- p_medio + valor_ep
+```
+
+## Gráfico
+
+```{r}
+ggplot(dados_03, aes(x = 1:nrow(dados_03), y = quartos_nao_conf)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = p_medio, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle para o número de defeitos",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+# Exemplo 4 - Gráfico de controle para o número médio de defeitos por unidade (Gráfico U)
+
+```{r}
+dados_04 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 4") |> 
+  janitor::clean_names()
+
+## U médio é o número médio de defeitos por unidade
+
+## n = 5 (5 placas por hora na amostra
+## 20 amostras de 5 placas pra calculo do número médio de defeitos por unidade
+## n = tamanho do subgrupo
+n = 5
+
+dados_04 <- dados_04 |> 
+  dplyr::mutate(u = numero_de_defeitos/5)
+
+## Média de U
+u_medio <- mean(dados_04$u)
+
+## Erro padrão
+valor_ep = 3*sqrt(u_medio/n)
+
+## Limite inferior de controle
+LIC <- u_medio - valor_ep
+## Como o limite calculado foi negativo, iremos considerar 0 porque não é possível um número de defeitos negativo
+LIC <- ifelse(LIC < 0, 0, LIC)
+## Limite superior de controle
+LSC <- u_medio + valor_ep
+
+
+```
+
+## Gráfico
+
+```{r}
+ggplot(dados_04, aes(x = 1:nrow(dados_04), y = u)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = u_medio, color = "blue") +
+  geom_hline(yintercept = LIC, color = "red") +
+  geom_hline(yintercept = LSC, color = "red") +
+  labs(title = "Gráfico de controle para o número médio de defeitos por unidade",
+       x = "Amostras",
+       y = "Média") +
+  theme_minimal()
+```
+
+# Exemplo 5 - Gráfico de controle para o número de defeitos por unidade para amostras de tamanho variado
+
+```{r}
+dados_05 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 5") |> 
+  janitor::clean_names()
+
+## U médio é o número médio de defeitos por unidade
+dados_05 <- dados_05 |> 
+  dplyr::mutate(u = no_de_defeitos/no_de_unidades)
+
+## Média de U
+u_medio <- mean(dados_05$u)
+
+## Erro padrão
+dados_05 <- dados_05 |> 
+  dplyr::mutate(valor_ep = 3*sqrt(u_medio/no_de_unidades))
+
+## Limite inferior e superior de controle
+dados_05 <- dados_05 |> 
+  dplyr::mutate(LIC = u_medio - 3*sqrt(u_medio/no_de_unidades),
+                LSC = u_medio + 3*sqrt(u_medio/no_de_unidades))
+```
+
+## Gráfico
+
+```{r}
+ggplot(dados_05, aes(x = 1:nrow(dados_05), y = u)) +
+  geom_point() +
+  geom_line() +
+  geom_hline(yintercept = u_medio, color = "blue") +
+  geom_line(aes(y = LIC, color = "LIC")) +
+  geom_line(aes(y = LSC, color = "LSC")) +
+  labs(title = "Gráfico de controle para o número de defeitos por unidade para amostras de tamanho variado",
+       x = "Amostras",
+       y = "Média",
+       color = "Legenda") +
+  # scale_color_manual(values = c("LSC" = "#FF0000", "LIC" = "#FF0001")) +
+  scale_color_manual(values = c("LIC" = "red", "LSC" = "red")) +
+  theme_minimal()
+```
