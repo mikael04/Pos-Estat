@@ -28,7 +28,7 @@ options(scipen = 99999)
 ```{r}
 dados_01 <- openxlsx::read.xlsx("exemplos GCA2.xlsx", sheet = "exemplo 1") |> 
   dplyr::rename(n_defeituosos = `Número.de.Defeituosos.(Di)`)
-head(dados)
+head(dados_01)
 
 ```
 
@@ -45,9 +45,9 @@ n <- 50
 valor_ep = sqrt(p_medio*(1-p_medio)/n)
 
 ## LIC
-LIC <- media_dados - 3*valor_ep
+LIC <- p_medio - 3*valor_ep
 ## LSC
-LSC <- media_dados + 3*valor_ep
+LSC <- p_medio + 3*valor_ep
 ```
 
 ## Gráfico
