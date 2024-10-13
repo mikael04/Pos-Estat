@@ -63,7 +63,12 @@ ggplot(dados, aes(x = Amostra, y = media)) +
   labs(title = "Gráfico de controle da Média relacionado à amplitude",
        x = "Amostras",
        y = "Média") +
-  theme_minimal()
+  theme_minimal() +
+  ggplot2::theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::annotate("text", x = 0, y = media_geral, label = "Média", color = "blue", vjust = -0.5, hjust = 0.7) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "red", vjust = 1.5, hjust = 1.0) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "red", vjust = -0.5, hjust = 1.0)
 ```
 
 Pela observação do gráfico de média associado à amplitude, não há nenhuma amostra fora dos limites de controle.
@@ -92,7 +97,12 @@ ggplot(dados, aes(x = Amostra, y = amplitude)) +
   labs(title = "Gráfico de controle da Amplitude",
        x = "Amostras",
        y = "Amplitude") +
-  theme_minimal()
+  theme_minimal() +
+  ggplot2::theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::annotate("text", x = 0, y = amplitude_geral, label = "Amplitude geral", color = "blue", vjust = -0.5, hjust = 0.2) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "red", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "red", vjust = -0.5, hjust = 1.0)
 ```
 
 Pela observação do gráfico de amplitude, não há nenhuma amostra fora dos limites de controle.
@@ -128,7 +138,12 @@ ggplot(dados, aes(x = Amostra, y = media)) +
   labs(title = "Gráfico de controle da Média relacionado ao desvio padrão",
        x = "Amostras",
        y = "Média") +
-  theme_minimal()
+  theme_minimal() +
+  ggplot2::theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::annotate("text", x = 0, y = media_geral, label = "Média", color = "blue", vjust = -0.5, hjust = 0.7) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "red", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "red", vjust = -0.5, hjust = 1.0)
 ```
 
 Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
@@ -158,7 +173,167 @@ ggplot(dados, aes(x = Amostra, y = desvio_padrao)) +
   labs(title = "Gráfico de controle do Desvio Padrão",
        x = "Amostras",
        y = "Desvio Padrão") +
-  theme_minimal()
+  theme_minimal() +
+  ggplot2::theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::annotate("text", x = 0, y = desvio_padrao_geral, label = "Desvio padrão geral", color = "blue", vjust = -0.5, hjust = 0.2) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "red", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "red", vjust = -0.5, hjust = 1.0)
 ```
   
 Pela observação do gráfico associado ao desvio padrão, não há nenhuma amostra fora dos limites de controle.
+
+
+## c) Avaliação dos critérios de decisão
+
+Os critérios de decisão que indicam descontrole na amostra são:
+I) 1 ou mais pontos acima do LSC ou abaixo do LIC;
+II) 9 pontos consecutivos na zona C ou no mesmo lado do LC;
+III) 6 pontos consecutivos, todos aumentando ou todos diminuindo;
+IV) 14 pontos consecutivos alternando para cima e para baixo;
+V) 2 de 3 pontos consecutivos na zona A ou além dela;
+VI) 4 de 5 pontos consecutivos na zona B ou além dela;
+VII) 15 pontos consecutivos na zona C (tanto acima quanto abaixo do LC);
+VIII) 8 pontos consecutivos na zona B.
+
+### Calculando as zonas de controle e fazendo os gráficos para as médias
+
+```{r}
+## Calculando as zonas de controle
+zona_a_inf <- media_geral - 3 * desvio_padrao_geral
+zona_a_sup <- media_geral + 3 * desvio_padrao_geral
+zona_b_inf <- media_geral - 2 * desvio_padrao_geral
+zona_b_sup <- media_geral + 2 * desvio_padrao_geral
+zona_c_inf <- media_geral - desvio_padrao_geral
+zona_c_sup <- media_geral + desvio_padrao_geral
+
+## Recalculando os limites de controle
+## Limite inferior
+LIC <- media_geral - a3 * desvio_padrao_geral
+## Limite superior
+LSC <- media_geral + a3 * desvio_padrao_geral
+
+
+## Gráfico de controle da média relacionado ao desvio padrão
+ggplot(dados, aes(x = Amostra, y = media)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::geom_hline(yintercept = media_geral, color = "blue") +
+  ggplot2::geom_hline(yintercept = c(LSC, LIC), linetype = "solid", color = "brown") +
+  ggplot2::geom_hline(yintercept = c(zona_a_sup, zona_a_inf), linetype = "dashed", color = "red") +
+  ggplot2::geom_hline(yintercept = c(zona_b_sup, zona_b_inf), linetype = "dashed", color = "gold") +
+  ggplot2::geom_hline(yintercept = c(zona_c_sup, zona_c_inf), linetype = "dashed", color = "darkgreen") +
+  ggplot2::labs(title = "Gráfico de controle da Média relacionado ao desvio padrão",
+       x = "Amostras",
+       y = "Média") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                 panel.grid.minor = ggplot2::element_blank()) +
+  ggplot2::annotate("text", x = 0, y = media_geral, label = "Média", color = "blue", vjust = -0.5, hjust = 0.7) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "brown", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "brown", vjust = -0.5, hjust = 1.0) +
+  ggplot2::annotate("text", x = Inf, y = zona_a_sup, label = "A", color = "red", vjust = -0.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = Inf, y = zona_a_inf, label = "A", color = "red", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = Inf, y = zona_b_sup, label = "B", color = "gold", vjust = -0.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = Inf, y = zona_b_inf, label = "B", color = "gold", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = Inf, y = zona_c_sup, label = "C", color = "darkgreen", vjust = -0.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = Inf, y = zona_c_inf, label = "C", color = "darkgreen", vjust = 1.5, hjust = 1.1)
+```
+
+  
+### I) 1 ou mais pontos acima do LSC ou abaixo do LIC
+
+Não existem pontos abaixo dos limites inferiores e superiores de controle.
+
+### II) 9 pontos consecutivos na zona C ou no mesmo lado do LC
+
+Não temos 9 pontos consecutivos na zona C ou no mesmo lado do LC.
+
+### III) 6 pontos consecutivos, todos aumentando ou todos diminuindo
+
+Não temos 6 pontos consecutivos, todos aumentando ou todos diminuindo.
+
+### IV) 14 pontos consecutivos alternando para cima e para baixo
+
+Não temos 14 pontos consecutivos alternando para cima e para baixo.
+    
+### V) 2 de 3 pontos consecutivos na zona A ou além dela
+
+Não temos 2 de 3 pontos consecutivos na zona A ou além dela.
+  
+### VI) 4 de 5 pontos consecutivos na zona B ou além dela
+
+Não temos 4 de 5 pontos consecutivos na zona B ou além dela.
+  
+### VII) 15 pontos consecutivos na zona C (tanto acima quanto abaixo do LC)
+
+Temos 15 pontos consecutivos na zona C, indicando uma possível falta de controle.
+
+### VIII) 8 pontos consecutivos na zona B
+
+Não temos 8 pontos consecutivos na zona B.
+
+## d) Dado que as especificações são 1000 +- 20 gramas encontre o Cp e Cpk
+
+Cálculo do $C_p$ e $C_{pk}$
+
+```{r}
+## Limite inferior e superior de especificação
+LIE <- 1000 - 20
+LSE <- 1000 + 20
+
+## Cálculo do Cp
+Cp <- (LSE - LIE) / (6 * desvio_padrao_geral)
+
+## Cálculo do Cpk
+Cpk <- min((LSE - media_geral) / (3 * desvio_padrao_geral), 
+           (media_geral - LIE) / (3 * desvio_padrao_geral))
+```
+
+Avaliando os resultados temos que o $C_p$ é `r Cp`, indicando que o processo é incapaz de atender a especificação e o $C_{pk}$ é `r Cpk`, também indicando que o processo é incapaz de atender a especificação.
+
+## e) Considere as 125 observações como uma única amostra e faça o GC para medidas individuais
+
+### Cálculos para gráfico de controle para medidas individuais
+
+```{r}
+## Ajustando base de dados
+dados_individuais <- dados |> 
+  dplyr::select(-media, -desvio_padrao, - amplitude) |> 
+  tidyr::pivot_longer(cols = -Amostra, names_to = "Variavel", values_to = "Valor") |> 
+  dplyr::select(-Variavel, -Amostra, x = Valor)
+
+## Calculando a média móvel
+dados_individuais <- dados_individuais |>
+  dplyr::mutate(amplitude_movel = abs(x-lag(x)))
+
+## Média geral
+media_geral <- mean(dados_individuais$x)
+## Média das amplitudes móveis
+amplitude_media_geral <- mean(dados_individuais$amplitude_movel, na.rm = TRUE)
+d2 <- 1.128 ## Para 2 observações (medidas individuais)
+
+## Limites de controle
+LIC <- media_geral - 3 * (amplitude_media_geral / d2)
+LSC <- media_geral + 3 * (amplitude_media_geral / d2)
+```
+
+### Gráfico de controle para medidas individuais
+
+```{r}
+ggplot(dados_individuais, aes(x = 1:nrow(dados_individuais), y = x)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::geom_hline(yintercept =  media_geral, color = "blue") +
+  ggplot2::geom_hline(yintercept = c(LSC, LIC), linetype = "solid", color = "brown") +
+  ggplot2::labs(title = "Gráfico de controle para medidas individuais",
+       subtitle = "Usando a média associada amplitude móvel",
+       x = "Amostras",
+       y = "Valor") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::annotate("text", x = 0, y = media_geral, label = "Média", color = "blue", vjust = -0.5, hjust = 0.7) +
+  ggplot2::annotate("text", x = 0, y = LIC, label = "LIC", color = "brown", vjust = 1.5, hjust = 1.1) +
+  ggplot2::annotate("text", x = 0, y = LSC, label = "LSC", color = "brown", vjust = -0.5, hjust = 1.0)
+```
