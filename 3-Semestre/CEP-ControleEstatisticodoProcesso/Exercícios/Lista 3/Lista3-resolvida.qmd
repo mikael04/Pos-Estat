@@ -1,5 +1,9 @@
 ---
 title: "Lista 3"
+author: "Mikael Marin Coletto"
+date: 13/10/2024
+date-format: long
+lang: pt
 format:
   html:
     toc: true
@@ -20,7 +24,6 @@ library(ggplot2)
 options(scipen = 99999)
 ```
 
-# Lista 3.
 ## a) Gráfico de controle para a média e amplitude
 
 ```{r}

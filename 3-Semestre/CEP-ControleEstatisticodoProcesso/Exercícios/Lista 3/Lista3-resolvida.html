@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Mikael Marin Coletto">
 
 <title>Lista 3</title>
 <style>
@@ -3221,12 +3222,10 @@ window.Quarto = {
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
   <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
+    <h2 id="toc-title">Índice</h2>
    
   <ul>
-  <li><a href="#lista-3." id="toc-lista-3." class="nav-link active" data-scroll-target="#lista-3.">Lista 3.</a>
-  <ul class="collapse">
-  <li><a href="#a-gráfico-de-controle-para-a-média-e-amplitude" id="toc-a-gráfico-de-controle-para-a-média-e-amplitude" class="nav-link" data-scroll-target="#a-gráfico-de-controle-para-a-média-e-amplitude">a) Gráfico de controle para a média e amplitude</a>
+  <li><a href="#a-gráfico-de-controle-para-a-média-e-amplitude" id="toc-a-gráfico-de-controle-para-a-média-e-amplitude" class="nav-link active" data-scroll-target="#a-gráfico-de-controle-para-a-média-e-amplitude">a) Gráfico de controle para a média e amplitude</a>
   <ul class="collapse">
   <li><a href="#cálculos-para-gráfico-de-controle-da-média-usando-amplitude" id="toc-cálculos-para-gráfico-de-controle-da-média-usando-amplitude" class="nav-link" data-scroll-target="#cálculos-para-gráfico-de-controle-da-média-usando-amplitude">Cálculos para gráfico de controle da média usando amplitude</a></li>
   <li><a href="#gráfico-de-controle-da-média-relacionado-à-amplitude" id="toc-gráfico-de-controle-da-média-relacionado-à-amplitude" class="nav-link" data-scroll-target="#gráfico-de-controle-da-média-relacionado-à-amplitude">Gráfico de controle da média relacionado à amplitude</a></li>
@@ -3258,7 +3257,6 @@ window.Quarto = {
   <li><a href="#cálculos-para-gráfico-de-controle-para-medidas-individuais" id="toc-cálculos-para-gráfico-de-controle-para-medidas-individuais" class="nav-link" data-scroll-target="#cálculos-para-gráfico-de-controle-para-medidas-individuais">Cálculos para gráfico de controle para medidas individuais</a></li>
   <li><a href="#gráfico-de-controle-para-medidas-individuais" id="toc-gráfico-de-controle-para-medidas-individuais" class="nav-link" data-scroll-target="#gráfico-de-controle-para-medidas-individuais">Gráfico de controle para medidas individuais</a></li>
   </ul></li>
-  </ul></li>
   </ul>
 </nav>
 </div>
@@ -3273,7 +3271,19 @@ window.Quarto = {
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mikael Marin Coletto </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Data de Publicação</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">10 de janeiro de 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -3283,13 +3293,11 @@ window.Quarto = {
 </header>
 
 
-<section id="lista-3." class="level1">
-<h1>Lista 3.</h1>
 <section id="a-gráfico-de-controle-para-a-média-e-amplitude" class="level2">
 <h2 class="anchored" data-anchor-id="a-gráfico-de-controle-para-a-média-e-amplitude">a) Gráfico de controle para a média e amplitude</h2>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Dados    </span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> openxlsx<span class="sc">::</span><span class="fu">read.xlsx</span>(<span class="st">&quot;Atividade 3.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;Planilha2&quot;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># dados &lt;- read.csv(&quot;dados_lista03.csv&quot;)</span></span>
@@ -3299,14 +3307,14 @@ window.Quarto = {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">media =</span> <span class="fu">mean</span>(<span class="fu">c_across</span>(x1<span class="sc">:</span>x5)),</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">amplitude =</span> <span class="fu">max</span>(<span class="fu">c_across</span>(x1<span class="sc">:</span>x5)) <span class="sc">-</span> <span class="fu">min</span>(<span class="fu">c_across</span>(x1<span class="sc">:</span>x5))) <span class="sc">|&gt;</span> </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="cálculos-para-gráfico-de-controle-da-média-usando-amplitude" class="level3">
 <h3 class="anchored" data-anchor-id="cálculos-para-gráfico-de-controle-da-média-usando-amplitude">Cálculos para gráfico de controle da média usando amplitude</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Média geral</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>media_geral <span class="ot">&lt;-</span> <span class="fu">mean</span>(dados<span class="sc">$</span>media)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Para 5 observações na amostra</span></span>
@@ -3315,7 +3323,7 @@ window.Quarto = {
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite inferior</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>LIC <span class="ot">&lt;-</span> media_geral <span class="sc">-</span> a2 <span class="sc">*</span> amplitude_geral</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite superior</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> a2 <span class="sc">*</span> amplitude_geral</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> a2 <span class="sc">*</span> amplitude_geral</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -3323,7 +3331,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="gráfico-de-controle-da-média-relacionado-à-amplitude">Gráfico de controle da média relacionado à amplitude</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! warning: F</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Amostra, <span class="at">y =</span> media)) <span class="sc">+</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
@@ -3339,7 +3347,7 @@ window.Quarto = {
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> media_geral, <span class="at">label =</span> <span class="st">&quot;Média&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LIC, <span class="at">label =</span> <span class="st">&quot;LIC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>) <span class="sc">+</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3355,7 +3363,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="cálculos-para-gráfico-de-controle-da-amplitude">Cálculos para gráfico de controle da amplitude</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Para 5 observações na amostra</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>d3 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>d4 <span class="ot">&lt;-</span><span class="fl">2.114</span></span>
@@ -3363,7 +3371,7 @@ window.Quarto = {
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite inferior</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>LIC <span class="ot">&lt;-</span> d3 <span class="sc">*</span> amplitude_geral</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite superior</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> d4 <span class="sc">*</span> amplitude_geral</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> d4 <span class="sc">*</span> amplitude_geral</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -3372,7 +3380,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="gráfico-de-controle-da-amplitude">Gráfico de controle da amplitude</h2>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Amostra, <span class="at">y =</span> amplitude)) <span class="sc">+</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
@@ -3387,7 +3395,7 @@ window.Quarto = {
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> amplitude_geral, <span class="at">label =</span> <span class="st">&quot;Amplitude geral&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LIC, <span class="at">label =</span> <span class="st">&quot;LIC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3405,7 +3413,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="cálculos-para-gráfico-de-controle-da-média-usando-desvio-padrão">Cálculos para gráfico de controle da média usando desvio padrão</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> dados <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">media =</span> <span class="fu">mean</span>(<span class="fu">c_across</span>(x1<span class="sc">:</span>x5)),</span>
@@ -3417,7 +3425,7 @@ window.Quarto = {
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite inferior</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>LIC <span class="ot">&lt;-</span> media_geral <span class="sc">-</span> a3 <span class="sc">*</span> desvio_padrao_geral</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite superior</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> a3 <span class="sc">*</span> desvio_padrao_geral</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> a3 <span class="sc">*</span> desvio_padrao_geral</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -3425,7 +3433,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="gráfico-de-controle-da-média-relacionado-ao-desvio-padrão">Gráfico de controle da média relacionado ao desvio padrão</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Amostra, <span class="at">y =</span> media)) <span class="sc">+</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
@@ -3440,7 +3448,7 @@ window.Quarto = {
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> media_geral, <span class="at">label =</span> <span class="st">&quot;Média&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LIC, <span class="at">label =</span> <span class="st">&quot;LIC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3456,7 +3464,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="cálculos-para-gráfico-de-controle-do-desvio-padrão">Cálculos para gráfico de controle do desvio padrão</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Para 4 observações na amostra</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>b3 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>b4 <span class="ot">&lt;-</span> <span class="fl">2.266</span> </span>
@@ -3464,7 +3472,7 @@ window.Quarto = {
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite inferior</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>LIC <span class="ot">&lt;-</span> b3 <span class="sc">*</span> desvio_padrao_geral</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite superior</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> b4 <span class="sc">*</span> desvio_padrao_geral</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> b4 <span class="sc">*</span> desvio_padrao_geral</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -3472,7 +3480,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="gráfico-de-controle-do-desvio-padrão">Gráfico de controle do desvio padrão</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Amostra, <span class="at">y =</span> desvio_padrao)) <span class="sc">+</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
@@ -3487,7 +3495,7 @@ window.Quarto = {
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> desvio_padrao_geral, <span class="at">label =</span> <span class="st">&quot;Desvio padrão geral&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LIC, <span class="at">label =</span> <span class="st">&quot;LIC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3507,7 +3515,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="calculando-as-zonas-de-controle-e-fazendo-os-gráficos-para-as-médias">Calculando as zonas de controle e fazendo os gráficos para as médias</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Calculando as zonas de controle</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>zona_a_inf <span class="ot">&lt;-</span> media_geral <span class="sc">-</span> <span class="dv">3</span> <span class="sc">*</span> desvio_padrao_geral</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>zona_a_sup <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> desvio_padrao_geral</span>
@@ -3546,7 +3554,7 @@ window.Quarto = {
 <span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> zona_b_sup, <span class="at">label =</span> <span class="st">&quot;B&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gold&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
 <span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> zona_b_inf, <span class="at">label =</span> <span class="st">&quot;B&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gold&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
 <span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> zona_c_sup, <span class="at">label =</span> <span class="st">&quot;C&quot;</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> zona_c_inf, <span class="at">label =</span> <span class="st">&quot;C&quot;</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="cn">Inf</span>, <span class="at">y =</span> zona_c_inf, <span class="at">label =</span> <span class="st">&quot;C&quot;</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3595,7 +3603,7 @@ window.Quarto = {
 <p>Cálculo do <span class="math inline">\(C_p\)</span> e <span class="math inline">\(C_{pk}\)</span></p>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Limite inferior e superior de especificação</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>LIE <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="sc">-</span> <span class="dv">20</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>LSE <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="sc">+</span> <span class="dv">20</span></span>
@@ -3605,7 +3613,7 @@ window.Quarto = {
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Cálculo do Cpk</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>Cpk <span class="ot">&lt;-</span> <span class="fu">min</span>((LSE <span class="sc">-</span> media_geral) <span class="sc">/</span> (<span class="dv">3</span> <span class="sc">*</span> desvio_padrao_geral), </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>           (media_geral <span class="sc">-</span> LIE) <span class="sc">/</span> (<span class="dv">3</span> <span class="sc">*</span> desvio_padrao_geral))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>           (media_geral <span class="sc">-</span> LIE) <span class="sc">/</span> (<span class="dv">3</span> <span class="sc">*</span> desvio_padrao_geral))</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Avaliando os resultados temos que o <span class="math inline">\(C_p\)</span> é 0.2824561, indicando que o processo é incapaz de atender a especificação e o <span class="math inline">\(C_{pk}\)</span> é 0.1388422, também indicando que o processo é incapaz de atender a especificação.</p>
@@ -3616,7 +3624,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="cálculos-para-gráfico-de-controle-para-medidas-individuais">Cálculos para gráfico de controle para medidas individuais</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Ajustando base de dados</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dados_individuais <span class="ot">&lt;-</span> dados <span class="sc">|&gt;</span> </span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>media, <span class="sc">-</span>desvio_padrao, <span class="sc">-</span> amplitude) <span class="sc">|&gt;</span> </span>
@@ -3635,7 +3643,7 @@ window.Quarto = {
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="do">## Limites de controle</span></span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>LIC <span class="ot">&lt;-</span> media_geral <span class="sc">-</span> <span class="dv">3</span> <span class="sc">*</span> (amplitude_media_geral <span class="sc">/</span> d2)</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> (amplitude_media_geral <span class="sc">/</span> d2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>LSC <span class="ot">&lt;-</span> media_geral <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> (amplitude_media_geral <span class="sc">/</span> d2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -3643,11 +3651,11 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="gráfico-de-controle-para-medidas-individuais">Gráfico de controle para medidas individuais</h3>
 <div class="cell">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Código</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados_individuais, <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(dados_individuais), <span class="at">y =</span> x)) <span class="sc">+</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(<span class="at">yintercept =</span> media_geral, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(<span class="at">yintercept =</span>  media_geral, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>) <span class="sc">+</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(LSC, LIC), <span class="at">linetype =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">color =</span> <span class="st">&quot;brown&quot;</span>) <span class="sc">+</span></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Gráfico de controle para medidas individuais&quot;</span>,</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">&quot;Usando a média associada amplitude móvel&quot;</span>,</span>
@@ -3658,7 +3666,7 @@ window.Quarto = {
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> media_geral, <span class="at">label =</span> <span class="st">&quot;Média&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LIC, <span class="at">label =</span> <span class="st">&quot;LIC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;brown&quot;</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;brown&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> LSC, <span class="at">label =</span> <span class="st">&quot;LSC&quot;</span>, <span class="at">color =</span> <span class="st">&quot;brown&quot;</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">1.0</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3668,7 +3676,6 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</section>
 </section>
 </section>
 
@@ -3717,12 +3724,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Copiada");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Copiada");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
