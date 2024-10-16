@@ -1,27 +1,27 @@
----
-title: "Trabalho"
-subtitle: "Dados de Queimadas"
-lang: pt-BR
-author: "Mikael Marin Coletto"
-date: "2024-10-01"
-format:
-  html:
-    toc: true
-    code-fold: true
-    theme: cerulean
-    transition: slide
-    background-transition: fade
-    embed-resources: true
-    # anchor-sections: true 
-    smooth-scroll: true
-    center: true
-  pdf:
-    toc: true
-    number-sections: true
-    colorlinks: true
----
-
-```{r setup, include=FALSE}
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
@@ -35,17 +35,17 @@ if(data_from == "pendrive"){
   data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
 }
 rewrite_data <- F
-```
-
-# Introdução
-
-Neste trabalho, vamos analisar os dados de queimadas no Brasil. Os dados foram obtidos do portal BDQueimadas do INPE (Instituto Nacional de Pesquisas Espaciais) e estão disponíveis em [https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/#exportar-dados](https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/#exportar-dados).       
-
-O intuito é analisar a quantidade de focos de queimadas por mês e ano, tentando identificar se houve um aumento no número de queimadas ao longo dos últimos anos.
-
-# Carregando os dados
-
-```{r, dados}
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 dados_2023_2024 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv"))
 
 df_queimadas_2023_2024 <- dados_2023_2024 |> 
@@ -80,12 +80,12 @@ df_mun <- df_queimadas_2014_2015_ag_mun_sat |>
   dplyr::filter(Municipio == "SÃO FÉLIX DO XINGU",
                 Satelite == "NPP-375")
 
-```
-
-## Análise inicial
-
-### Verificando a quantidade de focos de queimadas por mês e ano de 2014/10 à 2015/9
-```{r, analise-inicial}
+#
+#
+#
+#
+#
+#
 ## Verificando a quantidade de focos de queimadas por mês e ano
 format(lubridate::ymd_hms(df_queimadas_2014_2015[1,1]), "%Y-%m")
 
@@ -115,9 +115,9 @@ queimadas_ano_mes |>
        y = "Quantidade de focos") +
   theme_minimal()
 ```
-### Verificando estado com mais focos de incêncio em 2014/10 à 2015/9
-
-```{r, estado-mais-focos-2014-2014}
+#
+#
+#
 df_estado <- df_queimadas_2014_2015 |> 
   dplyr::group_by(Estado) |> 
   dplyr::summarise(n = n()) |> 
@@ -130,11 +130,11 @@ df_estado |>
        x = "Estado",
        y = "Quantidade de focos") +
   theme_minimal()
-```
-
-### Verificando estado com mais focos de incêncio em 2023/10 à 2024/9
-
-```{r, estado-mais-focos-2023-2024}
+#
+#
+#
+#
+#
 df_estado_2023_2024 <- df_queimadas_2023_2024 |> 
   dplyr::group_by(Estado) |> 
   dplyr::summarise(n = n()) |> 
@@ -147,19 +147,19 @@ df_estado_2023_2024 |>
        x = "Estado",
        y = "Quantidade de focos") +
   theme_minimal()
-```
-
-## Preparando dados
-
-Para esta avaliação, usaremos os dados apenas de um estado, pelos dados analisados anteriormente, os estados com maior número de focos de incêndio são o Pará e Mato Grosso, pelos dados coletados.
-Portanto, faremos uma primeira análise com dados apenas do Pará.
-
-```{r, preparando-dados}
+#
+#
+#
+#
+#
+#
+#
+#
 if(rewrite_data){
   # Usando dados apenas de um município
   ## Município selecionado
   estado_sel <- "MATO GROSSO"
-  satelite_sel <- "NPP- 375"
+  satelite_sel <- "NPP-375"
   ## Lendo todos os arquivos da pasta dados
   files <- list.files(paste0(data_path), full.names = T)
   ## Lendo os arquivos e selecionando apenas dados do estado e Satelite selecionados
@@ -191,9 +191,9 @@ df_queimadas_estado_anomes <- df_queimadas_estado |>
   estado_sel <- "MATO GROSSO"
   satelite_sel <- "NPP-375"
 }
-```
-
-```{r, visualizacoes}
+#
+#
+#
 ## Fazendo gráfico de linhas da série temporal
 df_queimadas_estado_anomes |>
   mutate(Ano_mes = paste0(Ano_mes, "-01")) %>%       # Create "YYYY-MM-01"
@@ -206,18 +206,18 @@ df_queimadas_estado_anomes |>
   theme_minimal() +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 
-```
-
-```{r, autocorrelacao}
+#
+#
+#
 ## Autocorrelação dos dados de focos de queimadas no estado selecionado
 forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autocorrelação para volume de queimadas no mês", lag.max = 15)
 
 ## Autocorrelação parcial dos dados de focos de queimadas no estado selecionado
 forecast::Acf(df_queimadas_estado_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 15)
-```
-
-
-```{r, modelo-arima}
+#
+#
+#
+#
 ## Dividindo os dados em treino e teste
 df_queimadas_estado_anomes <- df_queimadas_estado_anomes |> 
   dplyr::mutate(Ano_mes = as.Date(paste0(Ano_mes, "-01")))
@@ -236,61 +236,13 @@ ts_data <- ts(df_queimadas_estado_anomes_treino$n, start = c(lubridate::year(min
 fit_arima <- arima(ts_data, order = c(1, 0, 1))
 fit_sarima <- arima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 1, 0), period = 12))
 
-## Coeficientes do modelo
-lmtest::coeftest(fit_sarima)
-# (1-pnorm(abs(fit_sarima$coef)/sqrt(diag(fit_sarima$var.coef))))*2
-
 ## Modelo ARIMA
-# modelo_arima <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = list(order = c(2, 1, 0), period = 12))
-# forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1))
-```
+modelo_arima <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1))
+# forecast::ARIMA(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1))
+modelo_arima
 
-```{r, analisando resíduos}
-#| warning: false
-
-## Analisando modelo
-fitted_values <- fitted(fit_sarima)
-
-# forecast_values <- forecast::forecast(fit_sarima, h = 12)
-
-# plot(forecast_values, main = "ARIMA Model Forecast", xlab = "Time", ylab = "Values")
-
-# Plot the original time series
-# plot(ts_data, col = "blue", lwd = 2, main = "Original Data and ARIMA Fitted Values", ylab = "Values")
-
-dates <- df_queimadas_estado_anomes_treino$Ano_mes
-# 1:length(ts_data)
-
-ggplot() +
-  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
-  geom_line(aes(x = dates, y = fitted_values, color = "ARIMA(1,0,0)(2,1,0)[12]"), lwd = 1) +
-  labs(title = "Dados originais e modelo ajustado",
-       subtitle = "Número de focos de incêndio",
-       x = "",
-       y = "",
-       color = "Legend") +
-  scale_color_manual(values = c("Dados originais" = "black", "ARIMA(1,0,0)(2,1,0)[12]" = "red")) +
-  theme_minimal()
-
-```
-
-## Analisando resíduos
-
-```{r, analisando-residuos}
-residuals <- residuals(fit_sarima)
-# 
-ggplot() +
-  geom_line(aes(x = time(residuals), y = residuals)) +
-  labs(title = "Resíduos no tempo", x = "Time", y = "Resíduos") +
-  theme_minimal()
-
-forecast::Acf(residuals, type = "correlation", main = "ACF of Residuals")
-forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
-
-### Resíduos padronizados
-# residuals_standardized <- residuals / sd(residuals)
-# ggplot() +
-#   geom_line(aes(x = time(residuals_standardized), y = residuals_standardized)) +
-#   labs(title = "Standardized Residuals vs. Time", x = "Time", y = "Standardized Residuals") +
-#   theme_minimal()
-```
+auto.arima(ts_data)
+#
+#
+#
+#

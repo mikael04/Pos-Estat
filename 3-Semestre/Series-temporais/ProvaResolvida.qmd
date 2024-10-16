@@ -1,0 +1,141 @@
+---
+title: "Prova Séries Temporais"
+author: "Mikael Marin Coletto"
+date: 16/10/2024
+date-format: long
+lang: pt
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+# Resolução da prova de Séries Temporais I
+
+## Questão 1
+
+Em sua opinião qual a diferença fundamental de séries temporais e modelos de regressão?
+
+R: A diferença fundamental entre séries temporais e modelos de regressão é séries temporais trabalham com modelos que consideram a dependência temporal dos dados, trabalhando em cima de sua relação de autocorrelação e autocorrelação parcial, enquanto que modelos de regressão pressupõe independência entre as observações.
+
+## Questão 2
+
+O que é sazonalidade e ciclo. Diferencie estas duas componentes de uma série temporal?
+
+R: Sazonalidade indica algum tipo de correlação dentro de um período determinado (até um ano), já ciclo ou periodicidade indicam o mesmo tipo de correlação mas sem um período fixo pré-determinado.
+
+## Questão 3
+
+Diferencie um modelo simples de um modelo sazonal.
+
+R: O modelo sazonal trabalha com uma variação que irá se repetir em um período determinado, além de seus componentes de autoregressão, diferença e médias móveis, possui também componentes de mesmo tipo mas relacionado à sazonalidade do modelo. São modelos conhecidos como SARIMA de forma geral (p, d, q)(P, D, Q)s.
+
+## Questão 4
+
+O que é a metodologia Box & Jenkins?
+
+R: A metodologia de Box & Jenkins nos dá um ciclo iterativo no qual podemos construir o nosso modelo de séries temporais. Começamos na identificação onde verificamos estacionariedade e identificamos os parâmetros, utilizando as funções de autocorrelação (FAC) e autocorrelação parcial (FACP). Partimos para a estimação onde são calculados os estimadores e fazemos os cálculos das estatísticas dos estimadores e dos resíduos minimizando a diferença entre os valores previstos e os valores reais. Efetuamos a validação do modelo, verificando a qualidade do modelo e avaliando os resíduos, buscando um ruído branco (média zero, variância constante, não autocorrelação e distribuição normal). E por fim Podemos trabalhar na previsão usando o modelo criado, avaliando novamente sua capacidade de estabelecer previsões. Todos os passos são iterativos, portanto ao não se cumprir um dos passos corretamente, é possível retornar ao início e refazer o ciclo.
+
+## Questão 5
+
+Explique o que é um modelo ARIMA (1, 1, 2).
+
+R: O modelo ARIMA (1, 1, 2) é um modelo que possui um componente autoregressivo de ordem 1, de diferença de ordem 1, e de médias móveis de ordem 2.
+
+## Questão 6
+
+Como podemos verificar se um modelo encontrado pela metodologia B&J é melhor do que outro? Que tipos de critérios podemos utilizar?
+
+R: O modelo encontrado pode ser avaliado por alguns critérios, primeiro ele precisa atender os pressupostos, tendo seus coeficientes entre valores -1 e 1, e indicando se estes parâmetros (ar1, ar2, ma1, ma2, sar1, sar2, sam1, sam2, etc.) são significativos para explicar a nossa série temporal. Depois, existem os critérios de avbaliação de modelos, os mais usados são o AIC (Akaike Information Criterion) e o BIC (Bayesian Information Criterion).
+
+## Questão 7
+
+Para que serve um correlograma e um correlograma parcial?
+
+R: O correlograma é o gráfico que mostra as funções de autocorrelação e funções de autocorrelação parcial. Serve para uma primeira inspeção nos dados e já nos dá uma ideia inicial da distribuição dos dados e possivelmente dos tipos de componentes da qual a série temporal que vamos modelar possui.
+
+## Questão 8
+
+Como fica graficamente o correlograma e o correlograma parcial, quando se tem um modelo AR e um MA?
+  
+R: Quando temos um modelo puramente autoregressivo (AR), o nosso correlograma irá ter um primeiro valor mais alto e um decaimento exponencial, podendo alternar ou não o sinal, já o correlograma parcial irá ter um corte rápido no valor significativo.
+Já o modelo puramente de médias móveis tem o comportamento exatamente oposto. Possui no correlograma um corte rápido no valor significativo, e no correlograma parcial uma queda exponencial podendo ou não alternar o seu sinal.
+
+## Questão 9
+
+Escreva o modelo AR(1) genérico;
+
+R: O modelo AR(1) genérico é dado por:
+
+$$
+\tilde{Z}_t = \phi_1 \tilde{Z}_{t-1} + e_t
+$$
+
+## Questão 10
+
+Escreva o modelo MA(1) genérico;
+
+R: O modelo MA(1) genérico é dado por:
+
+$$
+\tilde{Z}_t = e_t + \theta_1 e_{t-1}
+$$
+
+## Questão 11
+
+O que são e para que servem as condições de estacionariedade e inversibilidade no AR e no MA?   
+
+R: As condições de estacionariedade e inversibilidade são condições necessárias para que o modelo seja bem ajustado e possa ser utilizado para previsões. A estacionariedade garante que a série temporal não tenha tendência e que a média e a variância sejam constantes ao longo do tempo. A inversibilidade garante que o modelo possa ser invertido, ou seja, que possamos prever os valores futuros a partir dos valores passados.
+
+## Questão 12
+
+As transformações em utilizadas em ST são úteis para que finalidade?
+
+R: As transformações são úteis para tornar a série temporal estacionária, ou seja, para remover a tendência e a sazonalidade da série. Usando a diferença vamos remover tendências e componentes sazonais, garantindo a estacionariedade da série para podermos trabalhar com modelos ARIMA.
+
+## Questão 13
+
+Se você fosse realizar uma análise de ST, o que você observaria em primeiro lugar?
+
+R: Em primeiro lugar, observaria se a série é estacionária, observando possíveis tendências ou eventos de sazonalidade, ou seja, se a média e a variância são constantes ao longo do tempo. Caso a série não seja estacionária, faria as transformações necessárias para torná-la estacionária.
+
+## Questão 14
+
+Realize a primeira diferença e a segunda diferença até o décimo lag.
+
+R: A primeira diferença é dada por:
+
+$$
+\Delta Z_t = Z_t - Z_{t-1}
+$$
+
+A segunda diferença é dada por:
+
+$$
+\Delta^2 Z_t = \Delta Z_t - \Delta Z_{t-1}
+$$
+
+E assim por diante.
+
+## Questão 15
+
+Do banco de dados fornecido calcule as funções de autocorrelações e autocorrelações parciais, e trace os respectivos gráficos até o terceiro lag.
+
+```{r}
+dados <- readxl::read_xls("Dados para modelo ARMA.xls") |> 
+  dplyr::select(t, zt2 = `Zt...2`)
+
+## Função de autocorrelação
+forecast::Acf(dados$zt2, lag.max = 15)
+
+## Função de autocorrelação parcial
+forecast::Pacf(dados$zt2, lag.max = 15)
+
+```

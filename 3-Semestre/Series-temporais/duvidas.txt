@@ -1,0 +1,1 @@
+Para dizer que um modelo é estacionário, temos que verificar se os parâmetros são (em módulo) menor ou igual a 1. Se for maior que 1, o modelo não é estacionário
