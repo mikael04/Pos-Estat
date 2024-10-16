@@ -129,7 +129,7 @@ E assim por diante.
 Do banco de dados fornecido calcule as funções de autocorrelações e autocorrelações parciais, e trace os respectivos gráficos até o terceiro lag.
 
 ```{r}
-dados <- readxl::read_xls("Dados para modelo ARMA.xls") |> 
+dados <- readxl::read_xls("Material/Dados para modelo ARMA.xls") |> 
   dplyr::select(t, zt2 = `Zt...2`)
 
 ## Função de autocorrelação
