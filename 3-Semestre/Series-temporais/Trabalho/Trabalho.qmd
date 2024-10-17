@@ -193,6 +193,10 @@ df_queimadas_estado_anomes <- df_queimadas_estado |>
 }
 ```
 
+# Série temporal
+
+## Visualizando a série
+
 ```{r, visualizacoes}
 ## Fazendo gráfico de linhas da série temporal
 df_queimadas_estado_anomes |>
@@ -208,6 +212,8 @@ df_queimadas_estado_anomes |>
 
 ```
 
+## Correlogramas
+
 ```{r, autocorrelacao}
 ## Autocorrelação dos dados de focos de queimadas no estado selecionado
 forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autocorrelação para volume de queimadas no mês", lag.max = 15)
@@ -215,7 +221,7 @@ forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autoco
 ## Autocorrelação parcial dos dados de focos de queimadas no estado selecionado
 forecast::Acf(df_queimadas_estado_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 15)
 ```
-
+## Modelo ARIMA
 
 ```{r, modelo-arima}
 ## Dividindo os dados em treino e teste
