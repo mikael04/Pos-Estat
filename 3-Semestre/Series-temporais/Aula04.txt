@@ -36,3 +36,42 @@ Fazer primeiro o teste de diferença, teste de raízes unitárias
 
 
 Testar as diferenças, se não for estacionário, testar a sazonalidade, se não for sazonal, testar a média móvel
+
+AIC -> Amostra pequena
+BIC -> Amostra grande
+
+Primeira diferença -> Zt - Zt-1 -> Deixa a série mais estável
+Segunda diferença -> Zt - (2Zt-1 + Zt-2) -> Deixa a série mais estável ainda
+
+Quando diferencia a série, tu perde a propriedade de longo prazo, e num modelo ARIMA usualmente se usa uma diferença, portanto ele é chamado de modelo de memória curta.
+
+Decai pra 0 até lag 12 é estacionária.
+
+
+Modelo ARFIMA -> Modelo fracionário
+
+Tem memória mais longa, tenta modelar com uma diferença parcial (entre -0,5 e 0,5).
+
+Se decai lentamente para 0 ela dá sinais de ser fracionária. Testar a diferença (se é 1 ou entre -0,5 e 0,5) para ver se o modelo é ARIMA (dif 1 ou inteira) ou ARFIMA (dif -0,5 à 0,5).
+
+Modelo ARMAX -> Modelo com variável exógena
+
+A variável exógena é uma variável que não é modelada pelo modelo, mas que influencia a variável dependente e tem comportamento temporal (também é uma série temporal
+
+Se a variável exógena tiver um comportamento além do momento atual (t2), como t2(1), t2(2), se tratam de modelos.
+
+
+Testes de estacionariedade (teste de raízes unitárias)
+
+Se o teste for não conclusivo, pode ser fracionário.
+
+séries estacionárias -> séries vac
+séries não estacionárias -> séries vec
+
+Série original -> série em nível
+
+E faz os testes de hipóteses para ver se a série é estacionária ou não.
+
+Verificar se a série original tem intercepto ou tendência (olhando para a série em nível, gráfico)
+H0 -> T1 é I(1), ou seja, não estacionária
+H1 -> T1 é I(0), ou seja, estacionária

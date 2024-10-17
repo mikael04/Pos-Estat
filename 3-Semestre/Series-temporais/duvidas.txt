@@ -1,1 +1,9 @@
-Para dizer que um modelo é estacionário, temos que verificar se os parâmetros são (em módulo) menor ou igual a 1. Se for maior que 1, o modelo não é estacionário
+Para dizer que um modelo é estacionário, temos que verificar se os parâmetros são (em módulo) menor ou igual a 1. Se for maior que 1, o modelo não é estacionário.
+
+- estacionariedade e inversibilidade -> AR é reversível porque é um modelo finito.
+
+- primeira diferença e a segunda diferença até o décimo lag
+
+
+AR é reversível porque é um modelo finito. Vai de um modelo AR para um modelo MA.
+

@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 options(scipen = 99999)
-data_from <- "local"
+data_from <- "pendrive"
 # data_from <- "pendrive"
 if(data_from == "local"){
   data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
@@ -239,11 +239,17 @@ ts_data <- ts(df_queimadas_estado_anomes_treino$n, start = c(lubridate::year(min
 
 # auto.arima(ts_data, seasonal = TRUE)
 # ts_data <- na.omit(ts_data)
-fit_arima <- arima(ts_data, order = c(1, 0, 1))
-fit_sarima <- arima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 1, 0), period = 12))
+fit_arima <- forecast::Arima(ts_data, order = c(1, 0, 0))
+fit_arima
+## Coeficientes do modelo
+lmtest::coeftest(fit_arima)
 
+
+fit_sarima <-forecast::Arima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 1, 0), period = 12))
+fit_sarima
 ## Coeficientes do modelo
 lmtest::coeftest(fit_sarima)
+
 # (1-pnorm(abs(fit_sarima$coef)/sqrt(diag(fit_sarima$var.coef))))*2
 
 ## Modelo ARIMA
@@ -257,30 +263,23 @@ lmtest::coeftest(fit_sarima)
 ## Analisando modelo
 fitted_values <- fitted(fit_sarima)
 
-# forecast_values <- forecast::forecast(fit_sarima, h = 12)
-
-# plot(forecast_values, main = "ARIMA Model Forecast", xlab = "Time", ylab = "Values")
-
-# Plot the original time series
-# plot(ts_data, col = "blue", lwd = 2, main = "Original Data and ARIMA Fitted Values", ylab = "Values")
-
 dates <- df_queimadas_estado_anomes_treino$Ano_mes
 # 1:length(ts_data)
 
 ggplot() +
   geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
-  geom_line(aes(x = dates, y = fitted_values, color = "ARIMA(1,0,0)(2,1,0)[12]"), lwd = 1) +
+  geom_line(aes(x = dates, y = fitted_values, color = "SARIMA(1,0,0)(2,1,0)[12]"), lwd = 0.5) +
   labs(title = "Dados originais e modelo ajustado",
        subtitle = "Número de focos de incêndio",
        x = "",
        y = "",
        color = "Legend") +
-  scale_color_manual(values = c("Dados originais" = "black", "ARIMA(1,0,0)(2,1,0)[12]" = "red")) +
+  scale_color_manual(values = c("Dados originais" = "black", "SARIMA(1,0,0)(2,1,0)[12]" = "red")) +
   theme_minimal()
 
 ```
 
-## Analisando resíduos
+### Analisando resíduos
 
 ```{r, analisando-residuos}
 residuals <- residuals(fit_sarima)
@@ -290,7 +289,7 @@ ggplot() +
   labs(title = "Resíduos no tempo", x = "Time", y = "Resíduos") +
   theme_minimal()
 
-forecast::Acf(residuals, type = "correlation", main = "ACF of Residuals")
+forecast::Acf(residuals, type = "correlation", main = "AC of Residuals")
 forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
 
 ### Resíduos padronizados
@@ -299,4 +298,71 @@ forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
 #   geom_line(aes(x = time(residuals_standardized), y = residuals_standardized)) +
 #   labs(title = "Standardized Residuals vs. Time", x = "Time", y = "Standardized Residuals") +
 #   theme_minimal()
+```
+
+## Modelo ARFIMA
+
+```{r, modelo-arfima}
+library(arfima)
+## Modelo ARFIMA
+# fit_arfima <- fracdiff::fracdiff(ts_data, nar = 1, nma = 1, ar = 2)
+fit_arfima <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+fit_arfima_2 <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+arfima::bestModes(fit_arfima, 5)
+
+## Coeficientes do modelo
+lmtest::coeftest(fit_arfima)
+
+## Analisando modelo
+fitted_values_arfima <- fitted(fit_arfima)
+
+ggplot() +
+  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
+  geom_line(aes(x = dates, y = fitted_values_arfima, color = "ARFIMA(1,1)"), lwd = 1) +
+  labs(title = "Dados originais e modelo ajustado",
+       subtitle = "Número de focos de incêndio",
+       x = "",
+       y = "",
+       color = "Legend") +
+  scale_color_manual(values = c("Dados originais" = "black", "ARFIMA(1,1)" = "red")) +
+  theme_minimal()
+
+```
+
+## Modelo ARMAX
+
+```{r, modelo-armax}
+## Modelo ARMAX
+# fit_armax <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1), xreg = )
+
+## Coeficientes do modelo
+lmtest::coeftest(fit_armax)
+
+## Analisando modelo
+fitted_values_armax <- fitted(fit_armax)
+
+ggplot() +
+  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
+  geom_line(aes(x = dates, y = fitted_values_armax, color = "ARMAX(1,0,1)(12,0,1)"), lwd = 1) +
+  labs(title = "Dados originais e modelo ajustado",
+       subtitle = "Número de focos de incêndio",
+       x = "",
+       y = "",
+       color = "Legend") +
+  scale_color_manual(values = c("Dados originais" = "black", "ARMAX(1,0,1)(12,0,1)" = "red")) +
+  theme_minimal()
+```
+
+## Teste de raiz unitária
+
+```{r, teste-raiz-unitaria}
+## Teste de Dickey-Fuller aumentado
+aug_dic_ful_test <- tseries::adf.test(ts_data, alternative = "stationary")
+print(aug_dic_ful_test)
+## Teste Kwiatkowski-Phillips-Schmidt-Shin
+kpss_test <- tseries::kpss.test(ts_data)
+print(kpss_test)
+## Teste phillips-perron
+phillips_perron_test <- tseries::pp.test(ts_data)
+print(phillips_perron_test)
 ```
