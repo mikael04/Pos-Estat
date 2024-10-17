@@ -75,3 +75,15 @@ E faz os testes de hipóteses para ver se a série é estacionária ou não.
 Verificar se a série original tem intercepto ou tendência (olhando para a série em nível, gráfico)
 H0 -> T1 é I(1), ou seja, não estacionária
 H1 -> T1 é I(0), ou seja, estacionária
+
+O teste não captur quebra estrutural
+
+E o teste pode não ser conclusivo.
+
+O ideal é usar mais de um teste para verificar estacionariedade
+Ao rodar o teste precisamos verificar se possui intercepto e/ou tendência.
+
+KPSS -> não considera ruído como ruído branco e usa H0 como estacionário ao invés de não estacionário como na maioria dos outros
+
+
+É preciso testar se é estacionário para uma diferença, depois para duas diferenças, depois para três.
