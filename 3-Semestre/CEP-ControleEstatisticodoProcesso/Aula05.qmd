@@ -1,0 +1,113 @@
+---
+title: "Aula 05"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: sky
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+```
+
+# Aula 05
+
+## Lendo dados
+
+```{r}
+dados_01 <- openxlsx::read.xlsx("exemplo cusum e EWMA.xlsx", sheet = "CUSUM")
+head(dados_01)
+
+```
+
+## Cálculos
+
+```{r}
+## Valor alvo u0 = 10
+mu_0 <- 10
+n <- 1
+sigma <- 1
+k <- 1/2
+
+dados_01_calc <- dados_01 |>
+  dplyr::mutate(S_H = 0)
+  
+# Loop to calculate S_H(i) iteratively
+for (i in 2:nrow(dados_01_calc)) {
+  dados_01_calc$S_H[i] <- max(0, dados_01_calc$xi[i] - (mu_0 + k) + dados_01_calc$S_H[i - 1], na.rm = T)
+}
+
+dados_01_calc <- dados_01_calc |>
+  dplyr::mutate(S_L = 0)
+
+# i <- 1
+# max(0, (mu_0 - k) - dados_01_calc$xi[i])
+# Loop to calculate S_L(i) iteratively
+for (i in 1:nrow(dados_01_calc)) {
+  # i <- 2
+  if(i == 1){
+    dados_01_calc$S_L[i] <- max(0, mu_0 - k - dados_01_calc$xi[i])
+  }
+  dados_01_calc$S_L[i] <- max(0, mu_0 - k - dados_01_calc$xi[i] + dados_01_calc$S_L[i - 1])
+}
+
+## Limite superior e inferior
+dados_01_calc <- dados_01_calc |>
+  dplyr::mutate(LIC = -5, LSC = 5)
+```
+
+## Gráfico
+
+```{r}
+
+dados_01_calc |>
+  ggplot2::ggplot() +
+  ggplot2::geom_line(ggplot2::aes(x = 1:nrow(dados_01_calc), y = S_H), color = "red") +
+  ggplot2::geom_line(ggplot2::aes(x = 1:nrow(dados_01_calc), y = S_L), color = "blue") +
+  ggplot2::geom_line(ggplot2::aes(x = 1:nrow(dados_01_calc), y = LSC), color = "black") +
+  ggplot2::geom_line(ggplot2::aes(x = 1:nrow(dados_01_calc), y = LIC), color = "black") +
+  ggplot2::labs(title = "CUSUM", x = "i", y = "S_H, S_L, xi") +
+  ggplot2::theme_minimal()
+```
+
+## Gráficos de controle de regressão
+
+```{r}
+### Exercício 3, olhar script do Henrique
+dados_02 <- openxlsx::read.xlsx("exemplo cusum e EWMA.xlsx", sheet = "GCR") |> 
+  janitor::clean_names()
+
+colnames(dados_02)
+
+# Fit the linear regression model
+model <- lm(pureza_y_percent ~ nivel_de_hidrocarbonetos_x_percent, data = dados_02)
+
+# Summary of the model (optional)
+summary(model)
+
+# Create the regression plot
+regression_plot <- ggplot(dados_02, aes(x = nivel_de_hidrocarbonetos_x_percent, y = pureza_y_percent)) +
+  geom_point(color = "darkblue", size = 2) +  # Plot the data points
+  geom_smooth(method = "lm", se = TRUE, color = "red", fill = "lightpink") +  # Add regression line with confidence interval
+  labs(
+    title = "Regression of Pureza Y% on Nível de Hidrocarbonetos X%",
+    x = "Nível de Hidrocarbonetos X% (Independent Variable)",
+    y = "Pureza Y% (Dependent Variable)"
+  ) +
+  theme_minimal()
+
+# Display the regression plot
+print(regression_plot)
+
+```

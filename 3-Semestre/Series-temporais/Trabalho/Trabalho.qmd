@@ -27,6 +27,7 @@ library(dplyr)
 library(ggplot2)
 options(scipen = 99999)
 data_from <- "pendrive"
+descritiva <- F
 # data_from <- "pendrive"
 if(data_from == "local"){
   data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
@@ -46,107 +47,115 @@ O intuito é analisar a quantidade de focos de queimadas por mês e ano, tentand
 # Carregando os dados
 
 ```{r, dados}
-dados_2023_2024 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv"))
+if(descritiva){
+  dados_2023_2024 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2023-10-01_2024-10-01_32.767240.csv"))
+  
+  df_queimadas_2023_2024 <- dados_2023_2024 |> 
+    dplyr::arrange(Estado, Municipio, DataHora)
+  
+  ## Verificando quantas informações temos cada município
+  df_queimadas_2023_2024_ag_mun_sat <- df_queimadas_2023_2024 |> 
+    dplyr::group_by(Municipio, Satelite) |> 
+    dplyr::mutate(n = n()) |> 
+    dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
+    dplyr::select(Estado, Municipio, Satelite, n) |> 
+    dplyr::ungroup()
+  
+  df_top_22 <- df_queimadas_2023_2024_ag_mun_sat |> 
+    # head(22)
+    dplyr::slice(1:22)
+  
+  dados_2014_2015 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2014-10-01_2015-10-01_41.322529.csv"))
+  
+  df_queimadas_2014_2015 <- dados_2014_2015 |> 
+    dplyr::arrange(Estado, Municipio, DataHora)
+  
+  ## Verificando quantas informações temos cada município
+  df_queimadas_2014_2015_ag_mun_sat <- df_queimadas_2014_2015 |> 
+    dplyr::group_by(Municipio, Satelite) |> 
+    dplyr::mutate(n = n()) |> 
+    dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
+    dplyr::select(Estado, Municipio, Satelite, n)
+  
+  ## Observando um município
+  df_mun <- df_queimadas_2014_2015_ag_mun_sat |> 
+    dplyr::filter(Municipio == "SÃO FÉLIX DO XINGU",
+                  Satelite == "NPP-375")
 
-df_queimadas_2023_2024 <- dados_2023_2024 |> 
-  dplyr::arrange(Estado, Municipio, DataHora)
-
-## Verificando quantas informações temos cada município
-df_queimadas_2023_2024_ag_mun_sat <- df_queimadas_2023_2024 |> 
-  dplyr::group_by(Municipio, Satelite) |> 
-  dplyr::mutate(n = n()) |> 
-  dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
-  dplyr::select(Estado, Municipio, Satelite, n) |> 
-  dplyr::ungroup()
-
-df_top_22 <- df_queimadas_2023_2024_ag_mun_sat |> 
-  # head(22)
-  dplyr::slice(1:22)
-
-dados_2014_2015 <- data.table::fread(paste0(data_path, "focos_qmd_inpe_2014-10-01_2015-10-01_41.322529.csv"))
-
-df_queimadas_2014_2015 <- dados_2014_2015 |> 
-  dplyr::arrange(Estado, Municipio, DataHora)
-
-## Verificando quantas informações temos cada município
-df_queimadas_2014_2015_ag_mun_sat <- df_queimadas_2014_2015 |> 
-  dplyr::group_by(Municipio, Satelite) |> 
-  dplyr::mutate(n = n()) |> 
-  dplyr::distinct(Municipio, Satelite, .keep_all = T) |>
-  dplyr::select(Estado, Municipio, Satelite, n)
-
-## Observando um município
-df_mun <- df_queimadas_2014_2015_ag_mun_sat |> 
-  dplyr::filter(Municipio == "SÃO FÉLIX DO XINGU",
-                Satelite == "NPP-375")
-
+}
 ```
 
 ## Análise inicial
 
 ### Verificando a quantidade de focos de queimadas por mês e ano de 2014/10 à 2015/9
 ```{r, analise-inicial}
-## Verificando a quantidade de focos de queimadas por mês e ano
-format(lubridate::ymd_hms(df_queimadas_2014_2015[1,1]), "%Y-%m")
-
-df_queimadas_2014_2015_sample <- df_queimadas_2014_2015 |> 
-  dplyr::sample_n(1000) |> 
-  dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
-  dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
-  dplyr::group_by(Ano_mes) |> 
-  dplyr::summarise(n = n()) |> 
-  dplyr::ungroup() |> 
-  dplyr::mutate(Ano_mes = as.factor(Ano_mes))
-
-queimadas_ano_mes <- df_queimadas_2014_2015|> 
-  dplyr::sample_n(1000) |> 
-  dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
-  dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
-  dplyr::filter(Ano_mes != "2015-10") |> 
-  dplyr::group_by(Ano_mes) |> 
-  dplyr::summarise(n = n()) |> 
-  dplyr::ungroup()
-
-queimadas_ano_mes |> 
-  ggplot(aes(x = Ano_mes, y = n)) +
-  geom_col(position = "dodge", fill = "#407D97") +
-  labs(title = "Focos de queimadas por mês e ano",
-       x = "Ano/Mês",
-       y = "Quantidade de focos") +
-  theme_minimal()
+if(descritiva){
+  ## Verificando a quantidade de focos de queimadas por mês e ano
+  format(lubridate::ymd_hms(df_queimadas_2014_2015[1,1]), "%Y-%m")
+  
+  df_queimadas_2014_2015_sample <- df_queimadas_2014_2015 |> 
+    dplyr::sample_n(1000) |> 
+    dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
+    dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+    dplyr::group_by(Ano_mes) |> 
+    dplyr::summarise(n = n()) |> 
+    dplyr::ungroup() |> 
+    dplyr::mutate(Ano_mes = as.factor(Ano_mes))
+  
+  queimadas_ano_mes <- df_queimadas_2014_2015|> 
+    dplyr::sample_n(1000) |> 
+    dplyr::mutate(DataHora_ = lubridate::ymd_hms(DataHora)) |>
+    dplyr::mutate(Ano_mes = format(DataHora_, "%Y-%m")) |>
+    dplyr::filter(Ano_mes != "2015-10") |> 
+    dplyr::group_by(Ano_mes) |> 
+    dplyr::summarise(n = n()) |> 
+    dplyr::ungroup()
+  
+  queimadas_ano_mes |> 
+    ggplot(aes(x = Ano_mes, y = n)) +
+    geom_col(position = "dodge", fill = "#407D97") +
+    labs(title = "Focos de queimadas por mês e ano",
+         x = "Ano/Mês",
+         y = "Quantidade de focos") +
+    theme_minimal()
+}
 ```
 ### Verificando estado com mais focos de incêncio em 2014/10 à 2015/9
 
 ```{r, estado-mais-focos-2014-2014}
-df_estado <- df_queimadas_2014_2015 |> 
-  dplyr::group_by(Estado) |> 
-  dplyr::summarise(n = n()) |> 
-  dplyr::arrange(desc(n))
-
-df_estado |>
-  ggplot(aes(x = n, y = reorder(Estado, n))) +
-  geom_col(fill = "#407D97") +
-  labs(title = "Focos de queimadas por estado",
-       x = "Estado",
-       y = "Quantidade de focos") +
-  theme_minimal()
+if(descritiva){
+  df_estado <- df_queimadas_2014_2015 |> 
+    dplyr::group_by(Estado) |> 
+    dplyr::summarise(n = n()) |> 
+    dplyr::arrange(desc(n))
+  
+  df_estado |>
+    ggplot(aes(x = n, y = reorder(Estado, n))) +
+    geom_col(fill = "#407D97") +
+    labs(title = "Focos de queimadas por estado",
+         x = "Estado",
+         y = "Quantidade de focos") +
+    theme_minimal()
+}
 ```
 
 ### Verificando estado com mais focos de incêncio em 2023/10 à 2024/9
 
 ```{r, estado-mais-focos-2023-2024}
-df_estado_2023_2024 <- df_queimadas_2023_2024 |> 
-  dplyr::group_by(Estado) |> 
-  dplyr::summarise(n = n()) |> 
-  dplyr::arrange(desc(n))
-
-df_estado_2023_2024 |>
-  ggplot(aes(x = n, y = reorder(Estado, n))) +
-  geom_col(fill = "#407D97") +
-  labs(title = "Focos de queimadas por estado",
-       x = "Estado",
-       y = "Quantidade de focos") +
-  theme_minimal()
+if(descritiva){
+  df_estado_2023_2024 <- df_queimadas_2023_2024 |> 
+    dplyr::group_by(Estado) |> 
+    dplyr::summarise(n = n()) |> 
+    dplyr::arrange(desc(n))
+  
+  df_estado_2023_2024 |>
+    ggplot(aes(x = n, y = reorder(Estado, n))) +
+    geom_col(fill = "#407D97") +
+    labs(title = "Focos de queimadas por estado",
+         x = "Estado",
+         y = "Quantidade de focos") +
+    theme_minimal()
+}
 ```
 
 ## Preparando dados
@@ -307,11 +316,14 @@ library(arfima)
 ## Modelo ARFIMA
 # fit_arfima <- fracdiff::fracdiff(ts_data, nar = 1, nma = 1, ar = 2)
 fit_arfima <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
-fit_arfima_2 <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
-arfima::bestModes(fit_arfima, 5)
+# fit_arfima_2 <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+fit_arfima_forecast <- forecast::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+
+forecast::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+# arfima::bestModes(fit_arfima, 5)
 
 ## Coeficientes do modelo
-lmtest::coeftest(fit_arfima)
+fit_arfima
 
 ## Analisando modelo
 fitted_values_arfima <- fitted(fit_arfima)
@@ -333,24 +345,24 @@ ggplot() +
 
 ```{r, modelo-armax}
 ## Modelo ARMAX
-# fit_armax <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1), xreg = )
-
-## Coeficientes do modelo
-lmtest::coeftest(fit_armax)
-
-## Analisando modelo
-fitted_values_armax <- fitted(fit_armax)
-
-ggplot() +
-  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
-  geom_line(aes(x = dates, y = fitted_values_armax, color = "ARMAX(1,0,1)(12,0,1)"), lwd = 1) +
-  labs(title = "Dados originais e modelo ajustado",
-       subtitle = "Número de focos de incêndio",
-       x = "",
-       y = "",
-       color = "Legend") +
-  scale_color_manual(values = c("Dados originais" = "black", "ARMAX(1,0,1)(12,0,1)" = "red")) +
-  theme_minimal()
+# # fit_armax <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1), xreg = )
+# 
+# ## Coeficientes do modelo
+# lmtest::coeftest(fit_armax)
+# 
+# ## Analisando modelo
+# fitted_values_armax <- fitted(fit_armax)
+# 
+# ggplot() +
+#   geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
+#   geom_line(aes(x = dates, y = fitted_values_armax, color = "ARMAX(1,0,1)(12,0,1)"), lwd = 1) +
+#   labs(title = "Dados originais e modelo ajustado",
+#        subtitle = "Número de focos de incêndio",
+#        x = "",
+#        y = "",
+#        color = "Legend") +
+#   scale_color_manual(values = c("Dados originais" = "black", "ARMAX(1,0,1)(12,0,1)" = "red")) +
+  # theme_minimal()
 ```
 
 ## Teste de raiz unitária

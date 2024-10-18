@@ -1,0 +1,14 @@
+Gráfico CUSUM
+
+Busca entender melhor pequenas variações que o gráfico de stewart não consegue captar. O gráfico CUSUM é uma ferramenta de controle estatístico de processo que permite detectar pequenas mudanças no processo.
+
+Valor K é um valor arbitrário, mas se usa em geral 0,5. E o valor de H = 4 ou 5.
+
+Gráfico de Controle da Média Móvel Exponencialmente Ponderada
+
+Lambda entre 0 e 1
+Senão tem um valor alvo conhecido, podemos usar a média do processo (x barra)
+
+Gráfico de controle de regressão
+- Pressupostos da regressão
+Em função do modelo de regressão se acha os limites do gráfico.
