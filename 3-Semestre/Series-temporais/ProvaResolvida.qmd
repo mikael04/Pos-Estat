@@ -15,6 +15,7 @@ format:
     # anchor-sections: true 
     smooth-scroll: true
     center: true
+  docx: default
 ---
 
 # Resolução da prova de Séries Temporais I
