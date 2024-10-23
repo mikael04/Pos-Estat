@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 options(scipen = 99999)
-data_from <- "pendrive"
+data_from <- "local"
 descritiva <- F
 # data_from <- "pendrive"
 if(data_from == "local"){
@@ -220,16 +220,40 @@ df_queimadas_estado_anomes |>
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 
 ```
+A primeira observação da série nos mostra que existe uma sazonalidade nos dados.
+
+```{r, visualizacoes}
+## Fazendo gráfico de linhas da série temporal apenas de um ano
+df_queimadas_estado_anomes |>
+  dplyr::filter(Ano_mes >= "2023-01-01" & Ano_mes <= "2023-12-01") |>
+  ggplot(aes(x = Ano_mes, y = n, group = 1)) +
+  geom_line() +
+  labs(title = paste0 ("Focos de queimadas por mês em 2023 ", "no ", estado_sel),
+       x = "",
+       y = "Quantidade de focos no mês") +
+  theme_minimal() +
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")
+
+```
+Olhando apenas em um ano, neste caso em 2023, podemos observar que o número de focos de queimadas aumenta no segundo semestre do ano. Sabemos que a época de secas no estado é de maio a setembro, o que pode explicar o aumento no número de focos de queimadas, já entre outubro e março temos o período de chuvas, onde vemos a queda do número de focos de incêndio até quase zero.
+
 
 ## Correlogramas
 
+Agora vamos observar os correlogramas da nossa série temporal, usando o lag máximo de 36 para observar o período de alguns anos.
+
 ```{r, autocorrelacao}
 ## Autocorrelação dos dados de focos de queimadas no estado selecionado
-forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autocorrelação para volume de queimadas no mês", lag.max = 15)
+forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autocorrelação para volume de queimadas no mês", lag.max = 36)
 
 ## Autocorrelação parcial dos dados de focos de queimadas no estado selecionado
-forecast::Acf(df_queimadas_estado_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 15)
+forecast::Acf(df_queimadas_estado_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 36)
 ```
+A análise do gráfico de autocorrelação nos dá indícios de algumas características da nossa série temporal.
+A primeira que já haviamos observado no gráfico de linhas, é a sazonalidade.
+Como também não verificamos uma queda até o valor 0 da autocorrelação, há indícios de que a série não seja  puramente autoregressiva.
+Apesar de observarmos um corte mais abrupto, há outros picos de autocorrelação que também nos mostram não ser um modelo puramente de médias móveis.
+
 ## Modelo ARIMA
 
 ```{r, modelo-arima}
