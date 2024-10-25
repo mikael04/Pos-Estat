@@ -1,6 +1,6 @@
 ---
 title: "Apresentação de artigo"
-subtitle: "Contribuição do gráfico de controle cusum na assistência e segurança de pacientes"
+subtitle: "Uso de diagramas de controle na vigilância epidemiológica das infecções hospitalares"
 lang: pt-BR
 author: "Mikael Marin Coletto"
 format:
@@ -40,7 +40,7 @@ rewrite_data <- F
 ## Informações do artigo
 
 - Título do artigo: Uso de diagramas de controle na vigilância epidemiológica das infecções hospitalares
-- Autores: Aglai Arantes, Eduardo da Silva Carvalho*, Eduardo Alexandrino Servolo Medeiros, Calil Kairalla Farhat e Orlando César Mantesa
+- Autores: Aglai Arantes, Eduardo da Silva Carvalho, Eduardo Alexandrino Servolo Medeiros, Calil Kairalla Farhat e Orlando César Mantesa
 - Acesso em: 	https://www.scielo.br/j/rsp/a/Z5C5Hy73rxLWqxkxJ6Xwprq/#
 - Revista: Saúde de Pública 2003;37(6):768-74
 
@@ -64,17 +64,21 @@ rewrite_data <- F
 - Monitorar a tendência de ocorrência e identificar surtos de infecções hospitalares.
 
 ## Metodologia
+::::  {.columns .small-font-size}
 
 - Estudo de coorte prospectivo de aproximadamente 3 anos (jan/1998 à dez/2000), em Unidade de Terapia Intesiva Pediátrica.
 - Vigilância epidemiológica segundo critérios NNIS/CDC e MS.
 - Cálculo mensal das taxas de infecção hospitalar por paciente-dia e lugares específicos.
 - Foram determinadas taxas gerais de infecções hospitalares por mil pacientes/dia e taxas para locais específicos associados a mil procedimentos/dia.
 - Gráfico *u* selecionado com base na distribuição de Poisson.
+::::
 
 ::: {.notes}
+- Estudo de coorte prospectivo, ou seja, acompanhamento de um grupo de pessoas ao longo do tempo.
 - Hospital com 105 leitos destinados a internação de crianças com idade de 29 dias à 13 anos.
 - NNIS -> National Nosocomial Infections Surveillance System.
 - CDC -> Centers for Disease Control and Prevention.
+- Gráfico U para monitorar a variabilidade em processos de contagem (controle número médio de defeitos).
 :::
 
 ## Etapas (pt. 1)
@@ -186,6 +190,7 @@ rewrite_data <- F
 - Uso pode aprimorar a detecção e investigação de surtos hospitalares
 - Limitação: necessários pelo menos 25 meses para assegurar estabilidade
 
+
 ## Ref. biblio. do artigo
 
 :::: {.columns .biblio-font-size}
@@ -281,7 +286,8 @@ ggplot(hospital_infections, aes(x = month_year_res, y = infections/patient_days)
   ggplot2::labs(
     title = "Gráfico de controle de infecções hospitalares",
     x = "Mês/Ano",
-    y = "Taxa de infecção por paciente dia"
+    y = "Taxa de infecção por paciente dia por mil",
+    color = "Legenda"
   ) +
   ggplot2::theme_minimal() +
   ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -290,3 +296,8 @@ ggplot(hospital_infections, aes(x = month_year_res, y = infections/patient_days)
   ggplot2::scale_y_continuous(breaks = seq(0.01, 0.1, by = 0.01))
 
 ```
+
+::: {.notes}
+ - Gráfico CUSUM (soma acumulada) são usados para monitorar mudanças pequenas e graduais em um processo, acumulando desvios da média para detectar tendências ou deslocamentos ao longo do tempo
+
+:::
