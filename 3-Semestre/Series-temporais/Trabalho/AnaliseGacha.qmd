@@ -86,15 +86,24 @@ tabela <- data.frame(
 tabela |> 
   gt::gt() |>
   gt::fmt_number(
-    columns = vars(min_s_extra, max_s_extra, min_c_extra, max_c_extra, min_total, max_total, n),
+    columns = c(min_s_extra, max_s_extra, min_c_extra, max_c_extra, min_total, max_total, n),
     decimals = 0
   )
 ```
 
-### Verificando estado com mais focos de incêncio em 2023/10 à 2024/9
+### Observando a série temporal
 
-```{r, estado-mais-focos-2023-2024}
+```{r, serie-temporal}
 
+dados |> 
+  ggplot(aes(x = Dia, y = `Ganho total`)) +
+  geom_line() +
+  labs(
+    title = "Ganho total ao longo dos dias",
+    x = "Dia",
+    y = "Ganho total"
+  ) + 
+  ggplot2::theme_minimal()
 ```
 
 ## Preparando dados

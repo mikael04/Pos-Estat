@@ -11,7 +11,7 @@ coeficiente de covariancia computado usando "outer product of gradiants"
 Cuidar essas estatísticas -> Quanto menor esses valores melhor
 AC
 BC
-Han
+H
 
 Correlograma dos resíduos -> Se não for branco (ou seja, estar dentro do intervalo d confiança, que é 2x o desvio padrão do rk), tem que fazer ajustes no modelo
 

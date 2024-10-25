@@ -1,0 +1,292 @@
+---
+title: "Apresentação de artigo"
+subtitle: "Contribuição do gráfico de controle cusum na assistência e segurança de pacientes"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+format:
+  revealjs:
+    theme: sky
+    code-fold: true
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+    css: custom.css
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
+}
+rewrite_data <- F
+```
+  
+## Informações do artigo
+
+- Título do artigo: Uso de diagramas de controle na vigilância epidemiológica das infecções hospitalares
+- Autores: Aglai Arantes, Eduardo da Silva Carvalho*, Eduardo Alexandrino Servolo Medeiros, Calil Kairalla Farhat e Orlando César Mantesa
+- Acesso em: 	https://www.scielo.br/j/rsp/a/Z5C5Hy73rxLWqxkxJ6Xwprq/#
+- Revista: Saúde de Pública 2003;37(6):768-74
+
+## Introdução
+
+- Importância da vigilância epidemiológica em hospitais.
+- Necessidade de monitorar a ocorrencia de infecções hospitalares para identificar surtos e implementar medidas de controle.
+- Objetivo: Avaliar a eficácia do uso de diagramas de controle na vigilância epidemiológica das infecções hospitalares.
+
+::: {.notes}
+- Falar sobre o custo humano e financeiro das doenças hospitalares.
+- Variação da taxa endêmica de infecções hospitalares.
+- 20% das Infecções hospitalares correspondem as infecções relacionadas à Assistência à Saúde (IRAS), ou seja, poderiam ser evitadas.
+- Importância da detecção precoce de surtos para evitar a disseminação de infecções.
+- Falar como os diagramas de controle podem ser úteis para detectar surtos e auxiliar no controle de doenças.
+- Comentar sobre o uso de ferramentas de controle estatístico do processo ao invés de repetidos testes de hipótese.           
+:::
+
+## Objetivo
+
+- Monitorar a tendência de ocorrência e identificar surtos de infecções hospitalares.
+
+## Metodologia
+
+- Estudo de coorte prospectivo de aproximadamente 3 anos (jan/1998 à dez/2000), em Unidade de Terapia Intesiva Pediátrica.
+- Vigilância epidemiológica segundo critérios NNIS/CDC e MS.
+- Cálculo mensal das taxas de infecção hospitalar por paciente-dia e lugares específicos.
+- Foram determinadas taxas gerais de infecções hospitalares por mil pacientes/dia e taxas para locais específicos associados a mil procedimentos/dia.
+- Gráfico *u* selecionado com base na distribuição de Poisson.
+
+::: {.notes}
+- Hospital com 105 leitos destinados a internação de crianças com idade de 29 dias à 13 anos.
+- NNIS -> National Nosocomial Infections Surveillance System.
+- CDC -> Centers for Disease Control and Prevention.
+:::
+
+## Etapas (pt. 1)
+::::  {.columns .small-font-size}
+
+1 - Cálculo da taxa média de incidência de infecções (X = nº total de infecções/nº paciente dia total).
+
+2 - Cálculo da média de paciente dia mensal (nº paciente dia/nº total de meses).
+
+3 - Cálculo do desvio-padrão (σ = √X/n).
+
+4 - Cálculo das linhas do diagrama:
+
+  - Linha Central (LC) -> Taxa média de incidência.
+  
+  - Linha de Alerta Superior (LAS) -> LC + 2σ.
+  
+  - Linha de Controle Superior (LCS) -> LC + 3σ.
+  
+  - Linha de Controle Inferior (LCI) -> LC - 3σ.
+  
+::::
+::: {.notes}
+- Interessante notar que eles usaram a simplificação por desvio padrão
+- Também não calcularam a linha de alerta inferior.
+- Fizeram o cálculo da taxa média geral, depois o cálculo da média de paciente dia mensal e por fim o cálculo do desvio padrão.
+- Usaram a simplificação para o cálculo das linhas de controle, mas fizeram o desvio padrão mensal acompanhando a variação da média mensal.
+:::
+
+## Etapas (pt. 2)
+
+::::  {.columns .small-font-size}
+
+5 - Cálculo das taxas mensais de incidência e plotagem no gráfico.
+
+6 - Avaliação dos critérios de decisão:
+
+  - Uma taxa acima da LCS ou abaixo da LCI.
+  
+  - 2-3 taxas consecutivas entre 2σ e 3σ.
+  
+  - 9 taxas consecutivas do mesmo lado da linha central.
+  
+  - 6 taxas consecutivas com aumentos ou decréscimos.
+  
+  - 14 taxas alternando acima e abaixo da linha central.
+  
+  - 15 taxas consecutivas abaixo da linha central.
+::::
+
+::: {.notes}
+- Usaram 0 para a linha de limite de controle inferior.
+- Definiram como periodo epidêmico a taxa de infecções acima da LCS.
+- Foi feito um recálculo removendo os meses epidêmicos.
+:::
+
+# Gráficos
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![Gráfico de primeiro cálculo das taxas e limites](imgs/graf_1_artigo_taxa_limites_1998a2000.png)
+:::
+
+::: {.column width="50%"}
+![Gráfico removendo pontos endêmicos do cálculo das taxas e limites](imgs/graf_1_artigo_taxa_limites_1998a2000_semPeriodEpi.png)
+:::
+
+::::
+
+
+::: {.notes}
+- A taxa média diminui e os limites também diminuem, porém não aparecem novos períodos epidêmicos.
+- Avaliando pelas linhas de controle, temos apenas um caso de epidemia em julho de 2020.
+- Usando os critérios também não temos outro ponto além do já citado acima da linha de controle.
+
+:::
+
+## Resultados
+
+::::  {.columns .small-font-size}
+
+- 460 pacientes internados, 50 deles tiveram 60 episódios de infecções hospitalares.
+- Média mensal de 83 pacientes.
+- Incidência média mensal de 20 por mil pacientes dia, passando para 18 após a remoção do período epidêmico.
+- Taxa de incidência de infecção hospitalar foi de 63 por mil pacientes dia em julho de 2020, ultrapassando a LCS.
+- Densidade de utilização de dispositivos invasivos acima do percentil 90 segundo o NNIS.
+- Taxas de infecção específicas entre P50-P90 segundo o NNIS.
+
+:::::
+
+## Resultados (Surto)
+
+- Surto de infecção hospitalar em julho de 2020, num surto de infecção urinária.
+- Taxa no mês de 63 por mil pacientes dia.
+- 5 pacientes com infecção urinária, 4 com bacteremia e 1 com pneumonia.
+
+## Vantagens do uso de diagramas de controle
+
+- Identificação de variações anormais/surtos.
+- Discriminação entre variações naturais e eventos incomuns.
+- Dispensa o uso de cálculos e testes de hipóteses adicionais.
+- Possibilita o monitoramento contínuo e detecção precoce.
+
+## Conclusão
+
+- Diagramas de controle são ferramentas úteis na vigilância de IH
+- Permitiram identificar e distinguir surtos das variações normais
+- Uso pode aprimorar a detecção e investigação de surtos hospitalares
+- Limitação: necessários pelo menos 25 meses para assegurar estabilidade
+
+## Ref. biblio. do artigo
+
+:::: {.columns .biblio-font-size}
+
+::: {.column width="50%"}
+- Benneyan JC. Statistical quality control methods in infection control and hospital epidemiology, part I: introduction and basic theory. Infect Control Hosp Epidemiol 1993;19:194-214.
+- Benneyan JC. Statistical quality control methods in infection control and hospital epidemiology, part II: Chart uses, statistical properties, and research issues. Infect Control Hosp Epidemiol 1993;19:265-83.
+- Center for Disease Control and Prevention. Guidelines for investigating clusters of health events. MMWR 1990;39:1-22.
+- Center for Disease Control and Prevention. Semiannual report. Aggregated data from the National Nosocomial Infection Surveillance (NNIS) System. Available from: URL: Http://www.cdc.gov/ncidod/hip/surveill/nnis.htm [2000]
+- Emori TG, Edwards JR, Culver DH, Sartor C, Stroud LA, Gaunt EE, Horan TC, Gaynes RP. Accuracy of reporting nosocomial infections in intensive-care-unit patient to the National Nosocomial Infections Surveillance System: a pilot study. Infect Control Hosp Epidemiol 1998;19:308-16.
+- Garner JS, Jarvis WR, Emori TG, Horan TC, Hughes JM. CDC definitions for nosocomial infections, 1988. Am J Infect Control 1988;16:128-40.
+- Gaynes RP, Culver DH, Emori TG, Horan TC, Benarjee SN, Edwards JR, et al. The National Nosocomial Infections Surveillance System: plans for the 1990s and beyond. Am J Med 1991;91(Suppl 3B):116-20.
+:::
+
+::: {.column width="50%"}
+- Haley RW, Tenney JH, Lindsey JO, Garner JS, Bennett JV. How frequent are outbreaks of nosocomial infection in community hospital? Infect Control Hosp Epidemiol 1985;6:233-6.
+- Haley RW, Gaynes RP, Aber RC, Bennett JV. Surveillance of nosocomial infections. In Bennett JV, Brachmann PS. Hospital Infections. 3ʳᵈ ed. Boston: Little Brown; 1992 p. 79 -109.
+- Horan TC, Emori TG. Definitions of key terms used in the NNIS system. Am J Infect Control 1997;25:112-6.
+- Jacquez GM, Waller LA, Grimson R, Wartenberg D. The analysis of disase clusters, part I: state of the art. Infect Control Hosp Epidemiol 1996;17:310-27.
+- Jacquez GM, Grimson R, Waller LA, Watenberg D. The analisys of disease clusters, part II: introduction to techniques. Infect Control Hosp Epidemiol 1996;17:385-97.
+- Ministério da Saúde. Portaria n° 2616 de 12 de maio de 1998. Diário Oficial da União, Brasília (DF): 13 de maio; 1998.
+- Sellick JA. The use of statistical process control charts in hospital epidemiology. Infect Control Hosp Epidemiol 1993;14:649-56.   
+:::
+
+::::
+
+## Gráficos
+
+```{r}
+# Colunas
+month_year <- c(
+  "Janeiro/1998", "Fevereiro/1998", "Marco/1998", "Abril/1998", "Maio/1998", "Junho/1998",
+  "Julho/1998", "Agosto/1998", "Setembro/1998", "Outubro/1998", "Novembro/1998", "Dezembro/1998",
+  "Janeiro/1999", "Fevereiro/1999", "Marco/1999", "Abril/1999", "Maio/1999", "Junho/1999",
+  "Julho/1999", "Agosto/1999", "Setembro/1999", "Outubro/1999", "Novembro/1999", "Dezembro/1999",
+  "Janeiro/2000", "Fevereiro/2000", "Marco/2000", "Abril/2000", "Maio/2000", "Junho/2000",
+  "Julho/2000", "Agosto/2000", "Setembro/2000", "Outubro/2000", "Novembro/2000", "Dezembro/2000"
+)
+month_year_res <- c(
+  "Jan/1998", "Fev/1998", "Mar/1998", "Abr/1998", "Mai/1998", "Jun/1998",
+  "Jul/1998", "Ago/1998", "Set/1998", "Out/1998", "Nov/1998", "Dez/1998",
+  "Jan/1999", "Fev/1999", "Mar/1999", "Abr/1999", "Mai/1999", "Jun/1999",
+  "Jul/1999", "Ago/1999", "Set/1999", "Out/1999", "Nov/1999", "Dez/1999",
+  "Jan/2000", "Fev/2000", "Mar/2000", "Abr/2000", "Mai/2000", "Jun/2000",
+  "Jul/2000", "Ago/2000", "Set/2000", "Out/2000", "Nov/2000", "Dez/2000"
+)
+
+infections <- c(
+  4, 2, 0, 2, 0, 2, 4, 2, 1, 1, 0, 1,
+  2, 1, 1, 1, 0, 0, 1, 1, 0, 2, 0, 2,
+  2, 2, 3, 2, 3, 1, 7, 0, 3, 2, 3, 2
+)
+
+patient_days <- c(
+  103, 100, 79, 101, 63, 106, 119, 94, 35, 60, 40, 77,
+  92, 69, 79, 76, 84, 83, 69, 44, 74, 55, 75, 78,
+  69, 80, 106, 100, 85, 92, 110, 73, 101, 111, 105, 108
+)
+
+# Criando o dataframe
+hospital_infections <- data.frame(
+  month_year = month_year,
+  month_year_res = month_year_res,
+  infections = infections,
+  patient_days = patient_days
+)
+
+total_patients <- sum(hospital_infections$patient_days)
+mean_inc <- mean(hospital_infections$infections/hospital_infections$patient_days)
+
+
+hospital_infections <- hospital_infections |> 
+  dplyr::mutate(
+    mean_patients = patient_days/total_patients,
+    sd_infections = sqrt(mean_inc/patient_days),
+    upper_control_limit = mean_inc + 3*sd_infections,
+    lower_control_limit = ifelse(mean_inc - 3*sd_infections < 0, 0, mean_inc - 3*sd_infections),
+    upper_alert_limit = mean_inc + 2*sd_infections,
+  )
+
+# Gráfico
+
+ggplot(hospital_infections, aes(x = month_year_res, y = infections/patient_days)) +
+  ggplot2::geom_line(group = 1, color = "black") +
+  ggplot2::geom_point() +
+  ggplot2::geom_hline(yintercept = mean_inc, linetype = "dashed", color = "black") +
+  # geom_hline(yintercept = hospital_infections$upper_control_limit, linetype = "dashed", color = "blue") +
+  # geom_hline(yintercept = hospital_infections$lower_control_limit, linetype = "dashed", color = "blue") +
+  # geom_hline(yintercept = hospital_infections$upper_alert_limit, linetype = "dashed", color = "green") +
+  ggplot2::geom_line(aes(y = upper_control_limit), group = 1, linetype = "dashed", color = "red") +
+  ggplot2::geom_line(aes(y = lower_control_limit), group = 1, linetype = "dashed", color = "red") +
+  ggplot2::geom_line(aes(y = upper_alert_limit), group = 1, linetype = "dashed", color = "orange") +
+  ggplot2::labs(
+    title = "Gráfico de controle de infecções hospitalares",
+    x = "Mês/Ano",
+    y = "Taxa de infecção por paciente dia"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggplot2::theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggplot2::scale_y_continuous(breaks = seq(0.01, 0.1, by = 0.01))
+
+```
