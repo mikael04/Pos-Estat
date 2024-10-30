@@ -1,0 +1,405 @@
+---
+title: "Prova 2 resolvida"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+format:
+  html:
+    theme: sky
+    code-fold: true
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+    css: custom.css
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Prova 2/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Prova 2/"
+}
+rewrite_data <- F
+```
+
+# Questão 1
+
+Diga se a série a ser estudada é  estacionária utilizando os métodos desenvolvidos em sala de aula, caso a série seja não estacionária qual o procedimento a ser adotado;
+
+```{r}
+#| warning: false
+## Lendo dados
+df_temperatura <- readxl::read_xls(paste0(data_path, "Temperatura dos moldes.xls"))
+
+## Transformando em série temporal
+ts_temperatura <- ts(df_temperatura$T1, frequency = 1)
+
+## Plotando série
+ggplot() +
+  geom_line(aes(x = time(ts_temperatura), y = ts_temperatura)) +
+  labs(title = "Série temporal da temperatura do molde T1",
+       x = "Tempo",
+       y = "Temperatura") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+```
+
+### Fazendo teste de estacionariedade
+
+```{r}
+library(tseries)
+stat_test <- adf.test(ts_temperatura)
+# kpss.test(ts_temperatura)
+```
+
+O teste de Dickey-Fuller aumentado (ADF) é um teste de raiz unitária para uma amostra de uma série temporal. A hipótese nula do teste é que a série temporal possui uma raiz unitária, o que indica que a série não é estacionária. A hipótese alternativa (rejeitando a hipótese nula) é que a série temporal é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(stat_test$p.value, 3)`, ou seja, **rejeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal é estacionária**.
+
+## Questão 2 e 3
+
+Determine a função geradora da série temporal e o provável modelo;
+
+```{r}
+## ACF e PACF
+par(mfrow = c(1, 2))
+# acf(ts_temperatura, main = "ACF")
+# pacf(ts_temperatura, main = "PACF")
+## Autocorrelação dos dados T1
+forecast::Acf(ts_temperatura, type = "correlation", main = "Autocorrelação para T1", lag.max = 36)
+
+## Autocorrelação parcial dos dados T1
+forecast::Acf(ts_temperatura, type = "partial", main = "Autocorrelação parcial para T1", lag.max = 36)
+```
+
+Observando a função de autocorrelação (ACF) podemos observar um pico no primeiro lag, e uma pequena queda, porém se mantém relativamente alta e com todos os pontos acima da nossa linha de significância, também não observamos um decaimento até 0 nem mesmo no lag 25 observado, ou seja, precisaremos testar sazonalidade ou diferença.
+
+Já olhando a função de autocorrelação parcial (PACF) observamos um pico no primeiro lag e uma queda mais brusca, onde os demais pontos estão quase todos dentro do limite da linha de significância, indicando um modelo de autoregressão AR(1).
+
+Combinando as duas análises, iremos testar um modelo ARIMA(1, 1, 0).
+
+### Fazendo a primeira diferença
+
+```{r}
+## Diferenciando a série
+ts_temperatura_diff <- diff(ts_temperatura)
+
+## Plotando série diferenciada
+ggplot() +
+  geom_line(aes(x = time(ts_temperatura_diff), y = ts_temperatura_diff)) +
+  labs(title = "Série temporal da temperatura do molde T1 diferenciada",
+       x = "Tempo",
+       y = "Temperatura") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+```
+
+E agora faremos o teste de estacionariedade na série diferenciada.
+
+```{r}
+stat_test_diff <- adf.test(ts_temperatura_diff)
+# kpss.test(ts_temperatura_diff)
+```
+
+Rodando o teste nos dados da temperatura com uma diferença, temos um resultado de p-valor `r round(stat_test$p.value, 3)`, ou seja, **rejeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal é estacionária**. Vamos seguir analisando as funções de autocorrelação e autocorrelação parcial.
+
+```{r}
+## ACF e PACF
+par(mfrow = c(1, 2))
+# acf(ts_temperatura_diff, main = "ACF")
+# pacf(ts_temperatura_diff, main = "PACF")
+## Autocorrelação dos dados T1 com uma diferença
+forecast::Acf(ts_temperatura_diff, type = "correlation", main = "Autocorrelação para T1", lag.max = 36)
+
+## Autocorrelação parcial dos dados T1 com uma diferença
+forecast::Acf(ts_temperatura_diff, type = "partial", main = "Autocorrelação parcial para T1", lag.max = 36)
+```
+
+O resultado parece ter melhorado, removendo os lags significativos no correlograma de autocorrelação, porém nosso gráfico de autocorrelação parcial parece ter aumentado o número de picos. Vamos tentar uma segunda diferença.
+
+### Fazendo a segunda diferença
+
+```{r}
+## Diferenciando a série
+ts_temperatura_diff2 <- diff(ts_temperatura_diff)
+
+## Plotando série diferenciada
+ggplot() +
+  geom_line(aes(x = time(ts_temperatura_diff2), y = ts_temperatura_diff2)) +
+  labs(title = "Série temporal da temperatura do molde T1 diferenciada 2 vezes",
+       x = "Tempo",
+       y = "Temperatura") +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+```
+
+E agora faremos o teste de estacionariedade na série diferenciada duas vezes.
+
+```{r}
+stat_test_diff2 <- adf.test(ts_temperatura_diff2)
+# kpss.test(ts_temperatura_diff2)
+```
+
+Rodando o teste nos dados da temperatura com duas diferenças, temos um resultado de p-valor `r round(stat_test$p.value, 3)`, ou seja, **rejeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal é estacionária**. Vamos seguir analisando as funções de autocorrelação e autocorrelação parcial.
+
+```{r}
+## ACF e PACF
+par(mfrow = c(1, 2))
+
+## Autocorrelação dos dados T1 com duas diferenças
+forecast::Acf(ts_temperatura_diff2, type = "correlation", main = "Autocorrelação para T1", lag.max = 36)
+
+## Autocorrelação parcial dos dados T1 com duas diferenças
+forecast::Acf(ts_temperatura_diff2, type = "partial", main = "Autocorrelação parcial para T1", lag.max = 36)
+```
+
+A segunda diferença não parece ter ajudado muito, portanto vamos trabalhar modelos com apenas a primeira diferença e verificarmos os resultados preliminares.
+
+### O primeiro modelo
+
+Os testes anteriores indicaram uma diferença, e a primeira diferença parece ter tornado a série um pouco mais estável. Além disso, pelo comportamento do gráfico de autocorrelação e autocorrelação parcial parecem haver indícios de um modelo com componente regressivo, o nossso primeiro teste então será um modelo ARIMA de ordem 1, 1, 0. 
+
+#### Modelo 1: ARIMA(1, 1, 0)
+
+```{r}
+model_arima_1 <- forecast::Arima(ts_temperatura, order = c(1, 1, 0))
+
+## Coeficientes do modelo
+coef_model_arima_1 <- lmtest::coeftest(model_arima_1)
+```
+
+Analisando o modelo ARIMA(1, 1, 0) temos um coeficiente para o componente autoregressivo de `r round(coef_model_arima_1[1], 3)`, um valor dentro do considerado válido e um p-valor de `r round(coef_model_arima_1[4], 3)`, indicando que parece sim existir um componente autoregressivo de ordem 1 e que a nossa diferença parece ter contribuído. Vamos analisar a seguir os gráficos de autocorrelação e autocorrelação parcial dos resíduos. O 
+
+```{r}
+## ACF e PACF dos resíduos
+par(mfrow = c(1, 2))
+
+## Autocorrelação dos resíduos
+forecast::Acf(model_arima_1$residuals, type = "correlation", main = "Autocorrelação dos resíduos", lag.max = 36)
+
+## Autocorrelação parcial dos resíduos
+forecast::Acf(model_arima_1$residuals, type = "partial", main = "Autocorrelação parcial dos resíduos", lag.max = 36)
+```
+Após a análise dos resíduos, verificamos que o modelo ARIMA(1, 1, 0) não foi capaz de capturar toda a estrutura da série, pois ainda há autocorrelações significativas nos resíduos. Vamos tentar um modelo ARIMA(1, 1, 1).
+
+#### Modelo 2: ARIMA(1, 1, 1)
+
+```{r}
+model_arima_2 <- forecast::Arima(ts_temperatura, order = c(1, 1, 1))
+
+## Coeficientes do modelo
+coef_model_arima_2 <- lmtest::coeftest(model_arima_2)
+coef_model_arima_2
+```
+
+Aqui novamente parecemos ter um modelo adequado, investigando os estimadores estão ambos entre valores -1 e 1, e o p-valor de ambos foi bastante baixo, respectivamente para o componente autoregressivo e para o componente de médias móveis tivemos o estimador de `r coef_model_arima_2[1,1]` e `r coef_model_arima_2[2,1]` e para o valor p tivemos `r coef_model_arima_2[1,4]` e `r coef_model_arima_2[2,4]`, indicando que o modelo ARIMA(1, 1, 1) é adequado. Vamos analisar os resíduos.
+
+```{r}
+## ACF e PACF dos resíduos
+par(mfrow = c(1, 2))
+
+## Autocorrelação dos resíduos
+forecast::Acf(model_arima_2$residuals, type = "correlation", main = "Autocorrelação dos resíduos", lag.max = 36)
+
+## Autocorrelação parcial dos resíduos
+forecast::Acf(model_arima_2$residuals, type = "partial", main = "Autocorrelação parcial dos resíduos", lag.max = 36)
+```
+Agora sim já temos os resíduos mais controlados e dentro da nossa linha de significância, indicando que o modelo ARIMA(1, 1, 1) já pode ser usado como um primeiro modelo para estimar essa série.
+
+Agora em sequência iremos trabalhar com modelos que tenham mais componentes autoregressivos e mais componentes de médias móveis e ver como se comporta a nossa estatística de desempenho do modelo (AIC e BIC).
+
+Como comparação, temos AIC e BIC para o modelo ARIMA (1, 1, 1):
+
+```{r}
+## AIC e BIC do modelo ARIMA(1, 1, 1)
+aic_bic_arima_2 <- c(AIC(model_arima_2), BIC(model_arima_2))
+```
+
+AIC = `r aic_bic_arima_2[1]` e BIC = `r aic_bic_arima_2[2]`.
+
+#### Modelo 3: ARIMA (2, 1, 1)
+
+```{r}
+model_arima_3 <- forecast::Arima(ts_temperatura, order = c(2, 1, 1))
+
+## Coeficientes do modelo
+coef_model_arima_3 <- lmtest::coeftest(model_arima_3)
+# coef_model_arima_3
+```
+
+Ao avaliarmos o p-valor do segundo componente de autoregressão temos um p-valor de 0.415, ou seja, não significativo para o modelo, portanto não prosseguiremos com as seguintes análises e com este modelo.
+
+#### Modelo 4: ARIMA (1, 1, 2)
+
+```{r}
+model_arima_4 <- forecast::Arima(ts_temperatura, order = c(1, 1, 2))
+
+## Coeficientes do modelo
+coef_model_arima_4 <- lmtest::coeftest(model_arima_4)
+# coef_model_arima_4
+```
+
+A adição do segundo componente de médias móveis também prejudicou os demais componentes do modelo, portanto também não prosseguiremos com as análises para este caso.
+
+#### Modelo 5: ARIMA (0, 1, 2)
+
+```{r}
+model_arima_5 <- forecast::Arima(ts_temperatura, order = c(0, 1, 2))
+
+## Coeficientes do modelo
+coef_model_arima_5 <- lmtest::coeftest(model_arima_5)
+coef_model_arima_5
+
+## AIC e BIC do modelo ARIMA(0, 1, 2)
+aic_bic_arima_5 <- c(AIC(model_arima_5), BIC(model_arima_5))
+# aic_bic_arima_5
+```
+
+Outro modelo testado que também teve bons resultados foi o modelo ARIMA(0, 1, 2), com estimativas do coeficiente de `r coef_model_arima_5[1,1]` e `r coef_model_arima_5[2,1]` e para o valor p tivemos `r coef_model_arima_5[1,4]` e `r coef_model_arima_5[2,4]` para o componente de médias móveis 1 e 0.000 para o componente de médias móveis 2, indicando que ambos são significativos para o modelo. AIC = `r aic_bic_arima_5[1]` e BIC = `r aic_bic_arima_5[2]`. Vamos então analisar seus resíduos.
+
+
+```{r}
+## ACF e PACF dos resíduos
+par(mfrow = c(1, 2))
+
+## Autocorrelação dos resíduos
+forecast::Acf(model_arima_5$residuals, type = "correlation", main = "Autocorrelação dos resíduos", lag.max = 36)
+
+## Autocorrelação parcial dos resíduos
+forecast::Acf(model_arima_5$residuals, type = "partial", main = "Autocorrelação parcial dos resíduos", lag.max = 36)
+```
+
+Os resíduos também se comportaram bem, tendo poucos pontos fora dos limites de significância, indicando que o modelo ARIMA(0, 1, 2) é adequado para a série temporal da temperatura do molde T1.
+
+#### Escolhendo o modelo
+
+Os modelos que tivemos melhores resultados foram o ARIMA (1, 1, 1) e o ARIMA (0, 1, 2), ambos com componentes significativos e com AIC e BIC menores que os demais modelos testados. Portanto, para a série temporal da temperatura do molde T1, os modelos ARIMA (1, 1, 1) e ARIMA (0, 1, 2) são os mais indicados.
+Olhando pelas métricas de avaliação do quanto o modelo está sendo explicado os valores são bem próximos, porém como temos um AIC e BIC melhores no primeiro modelo, optaremos pelo ARIMA (1, 1, 1).
+
+
+### Questão 4
+
+Já analisamos os resíduos de ambos os modelos, e ambos parecem adequados para a série temporal da temperatura do molde T1.
+
+### Questão 5
+
+Como já temos dois modelos que se comportaram bem nos testes de significância dos parâmetros e estão dentro do esperado, podemos avaliar graficamente as previsões dos modelos, e poderíamos também avaliar, caso trabalhássemos na área, o que faria mais sentido conforme o problema apresentado.
+
+```{r}
+## Valores previstos dos modelos
+fitted_values_2 <- fitted(model_arima_2)
+fitted_values_5 <- fitted(model_arima_5)
+
+## Transformando tudo em um dataframe
+df <- data.frame(
+  time = time(ts_temperatura),
+  actual = as.numeric(ts_temperatura),
+  model2 = as.numeric(fitted_values_2),
+  model5 = as.numeric(fitted_values_5)
+)
+
+# Ajustando dataframe
+df_long <- df %>%
+  tidyr::pivot_longer(
+    cols = c(actual, model2, model5),
+    names_to = "series",
+    values_to = "value"
+  )
+
+## Plotando modelos mais série temporal
+ggplot(df_long, aes(x = time, y = value, color = series)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Plotando modelos e a série temporal",
+       x = "Time",
+       y = "Temperature",
+       color = "Series") +
+  scale_color_manual(values = c("actual" = "black", 
+                               "model2" = "blue", 
+                               "model5" = "red"),
+                    labels = c("Actual Data", 
+                             "ARIMA Model 2", 
+                             "ARIMA Model 5"))
+```
+
+### Questão 6
+
+Para realizar a previsão 3 passos a frente, usaremos o modelo ARIMA (1, 1, 1) que foi o escolhido para a série temporal da temperatura do molde T1.
+
+```{r}
+## Previsão a frente
+previsao <- forecast::forecast(model_arima_2, h = 3)
+
+## Plotando previsão
+# plot(forecast_values)
+
+# Criar um gráfico da previsão
+# Primeiro criar um dataframe com os dados originais e previstos
+dados_originais <- length(ts_temperatura)
+tempo_futuro <- seq(from = dados_originais + 1, length.out = 3)
+
+df_previsao <- data.frame(
+  time = c(time(ts_temperatura), time(ts_temperatura)[dados_originais] + seq(1:3)/frequency(ts_temperatura)),
+  valor = c(as.numeric(ts_temperatura), as.numeric(previsao$mean)),
+  tipo = c(rep("Observado", dados_originais), rep("Previsto", 3))
+)
+
+# Adicionar intervalos de confiança
+df_ic <- data.frame(
+  time = time(ts_temperatura)[dados_originais] + seq(1:3)/frequency(ts_temperatura),
+  lower80 = as.numeric(previsao$lower[,"80%"]),
+  upper80 = as.numeric(previsao$upper[,"80%"]),
+  lower95 = as.numeric(previsao$lower[,"95%"]),
+  upper95 = as.numeric(previsao$upper[,"95%"])
+)
+
+
+ggplot() +
+  # Dados originais e previsão pontual
+  geom_line(data = df_previsao, 
+            aes(x = time, y = valor, color = tipo, linetype = tipo)) +
+  # Intervalo de confiança de 95%
+  geom_ribbon(data = df_ic,
+             aes(x = time, ymin = lower95, ymax = upper95),
+             fill = "grey70", alpha = 0.2) +
+  # Intervalo de confiança de 80%
+  geom_ribbon(data = df_ic,
+             aes(x = time, ymin = lower80, ymax = upper80),
+             fill = "grey50", alpha = 0.2) +
+  # Personalização do gráfico
+  theme_minimal() +
+  labs(title = "Previsão ARIMA - 3 Passos à Frente",
+       x = "Tempo",
+       y = "Temperatura",
+       color = "Série",
+       linetype = "Série") +
+  scale_color_manual(values = c("Observado" = "black", "Previsto" = "red")) +
+  scale_linetype_manual(values = c("Observado" = "solid", "Previsto" = "dashed")) +
+  theme(legend.position = "bottom")
+
+```
+
+No gráfico podemos ver:
+
+- Os dados originais em preto;
+- A previsão pontual em vermelho;
+- O intervalo de confiança de 95% em cinza claro;
+- O intervalo de confiança de 80% em cinza escuro.

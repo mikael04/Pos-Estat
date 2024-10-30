@@ -208,9 +208,11 @@ df_queimadas_estado_anomes <- df_queimadas_estado |>
 
 ```{r, visualizacoes}
 ## Fazendo gráfico de linhas da série temporal
-df_queimadas_estado_anomes |>
-  mutate(Ano_mes = paste0(Ano_mes, "-01")) %>%       # Create "YYYY-MM-01"
-  mutate(Ano_mes = lubridate::ymd(Ano_mes))   |> 
+df_queimadas_estado_anomes <- df_queimadas_estado_anomes |>
+  mutate(Ano_mes = paste0(Ano_mes, "-01")) |> 
+  mutate(Ano_mes = lubridate::ymd(Ano_mes))
+
+df_queimadas_estado_anomes |> 
   ggplot(aes(x = Ano_mes, y = n, group = 1)) +
   geom_line() +
   labs(title = paste0 ("Focos de queimadas por mês e ano ", "no ", estado_sel),
@@ -226,6 +228,7 @@ A primeira observação da série nos mostra que existe uma sazonalidade nos dad
 ## Fazendo gráfico de linhas da série temporal apenas de um ano
 df_queimadas_estado_anomes |>
   dplyr::filter(Ano_mes >= "2023-01-01" & Ano_mes <= "2023-12-01") |>
+  dplyr::mutate(Ano_mes = as.Date(Ano_mes)) |> 
   ggplot(aes(x = Ano_mes, y = n, group = 1)) +
   geom_line() +
   labs(title = paste0 ("Focos de queimadas por mês em 2023 ", "no ", estado_sel),
@@ -311,7 +314,6 @@ ggplot() +
   theme_minimal()
 
 ```
-
 ### Analisando resíduos
 
 ```{r, analisando-residuos}
