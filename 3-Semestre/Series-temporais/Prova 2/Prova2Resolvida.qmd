@@ -95,6 +95,7 @@ Combinando as duas análises, iremos testar um modelo ARIMA(1, 1, 0).
 ### Fazendo a primeira diferença
 
 ```{r}
+#| warning: false
 ## Diferenciando a série
 ts_temperatura_diff <- diff(ts_temperatura)
 
@@ -110,7 +111,7 @@ ggplot() +
 
 ```
 
-E agora faremos o teste de estacionariedade na série diferenciada.
+E agora faremos o teste de estacionariedade (Augmented Dickey–Fuller Test) na série diferenciada.
 
 ```{r}
 stat_test_diff <- adf.test(ts_temperatura_diff)
@@ -136,6 +137,7 @@ O resultado parece ter melhorado, removendo os lags significativos no correlogra
 ### Fazendo a segunda diferença
 
 ```{r}
+#| warning: false
 ## Diferenciando a série
 ts_temperatura_diff2 <- diff(ts_temperatura_diff)
 
@@ -151,9 +153,10 @@ ggplot() +
 
 ```
 
-E agora faremos o teste de estacionariedade na série diferenciada duas vezes.
+E agora faremos o teste de estacionariedade (Augmented Dickey–Fuller Test) na série diferenciada duas vezes.
 
 ```{r}
+#| warning: false
 stat_test_diff2 <- adf.test(ts_temperatura_diff2)
 # kpss.test(ts_temperatura_diff2)
 ```
