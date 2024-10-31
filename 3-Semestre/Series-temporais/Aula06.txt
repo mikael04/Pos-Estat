@@ -1,0 +1,36 @@
+Quando
+
+Não estacionária, poruqe está subindo. -> Testar estacionariedade
+Picos -> Variabilidade e sazonalidade.
+ACF -> Verificar estacionariedade se decai até o lag 0.
+
+
+Estacionariedade precisa cair lag 12 até 0.
+Limites do intervalo de confiança tracejado do ACF ACPF.
+
+A dependência do instante 1 vai enfraquecento, por isso o gráfico da autocorrelação vai diminuindo com o tempo
+
+PRIMEIRO INSPEÇÃO da ACF -> Indica estacionariedade
+
+
+Os testes deram resultados distintos (ADF e KPSS), então podemos ter uma série que na verdade é fracionária.
+
+Um indicativo de série fracionária são -> ADF e KPSS dão resultados distintos. E quando a ACF decai muito lentamente.
+
+A série que decai lentamente pode não ser modelo ARIMA.
+
+Passo 1 -> Fazer gráfico de ACF e PACF para inspeção visual.
+Passo 2 -> Rodar testes de estacionariedade (ADF e KPSS).
+Passo 3 -> Se os testes derem resultados distintos, possivelmente indica não-estacionariedade ou série fracionária.
+
+
+Os testes ADF, PP, Ng supõe que os resíduos são ruído branco, já o teste KPSS não, portanto ele é mais "confiável" em caso de discordância, porque talvez os resíduos não atendam.
+
+Quando fez uma diferença, remove a constante.
+
+Fracionário precisa estar c/ coeficiente entre -0.5 e 0.5.
+
+
+Estudar testes de raízes unitárias.
+Reconhecer quando é fracionário ou não.
+Saber o fluxograma do Box & Jenkins.

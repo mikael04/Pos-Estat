@@ -22,7 +22,7 @@ Quebra estrutural, diferença não capta o movimento, quando tem uma "quebra" de
 
 
 Não decai rápido pra 0 no graf FAC -> indica que precisa de uma diferençá, não é estacionário
-Indício de modelo fracionário
+Indício de modelo fracionário, também temos uma diferençaentre os testes ADF e KPSS.
 
 
 Akaike info criterism
