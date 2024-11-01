@@ -3,17 +3,7 @@ title: "Prova 2 resolvida"
 lang: pt-BR
 author: "Mikael Marin Coletto"
 format:
-  html:
-    theme: sky
-    code-fold: true
-    transition: slide
-    background-transition: fade
-    embed-resources: true
-    # anchor-sections: true 
-    smooth-scroll: true
-    center: true
-    css: custom.css
-  pdf:
+  docx: default:
     toc: true
     number-sections: true
     colorlinks: true
@@ -38,7 +28,7 @@ rewrite_data <- F
 
 # Questão 1
 
-Diga se a série a ser estudada é  estacionária utilizando os métodos desenvolvidos em sala de aula, caso a série seja não estacionária qual o procedimento a ser adotado;
+**Diga se a série a ser estudada é  estacionária utilizando os métodos desenvolvidos em sala de aula, caso a série seja não estacionária qual o procedimento a ser adotado;**
 
 ```{r}
 #| warning: false
@@ -81,23 +71,25 @@ Na PACF vemos um pico no primeiro lag e uma queda mais brusca, indicando umnovam
 ## Teste de estacionariedade
 
 ```{r}
+#| warning: false
 library(tseries)
 ## Teste de estacionariedade
 ### ADF (Augmented Dickey-Fulled) -> H0 diz que é tem uma raíz unitário, ou seja, tem uma diferençá
 stat_test_adf <- adf.test(ts_temperatura)
-stat_test_adf
+# stat_test_adf
 ### KSPSS (Kwiatkowski-Phillip-Schmidt-Shin-> H0 diz que a série não é estacionária
 stat_test_kpss <- kpss.test(ts_temperatura)
-stat_test_kpss
+# stat_test_kpss
 ```
 
 O teste de Dickey-Fuller aumentado (ADF) é um teste de raiz unitária para uma amostra de uma série temporal. A hipótese nula do teste é que a série temporal possui uma raiz unitária, o que indica que a série não é estacionária. A hipótese alternativa (rejeitando a hipótese nula) é que a série temporal é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(stat_test_adf$p.value, 3)`, ou seja, **rejeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal é estacionária**.
 
-Já o teste de Kwiatkowski-Phillips-Schmidt-Shin (KPSS) é outro teste que verifica raizes unitárias em tendência, e tem sua hipótese nula que a série é não estacionária, e a hipótese alternativa que a série é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(stat_test$p.value, 3)`, ou seja, **reijeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal não é estacionária**.
+Já o teste de Kwiatkowski-Phillips-Schmidt-Shin (KPSS) é outro teste que verifica raizes unitárias em tendência, e tem sua hipótese nula que a série é não estacionária, e a hipótese alternativa que a série é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(stat_test_kpss$p.value, 3)`, ou seja, **reijeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal não é estacionária**.
 
 # Questão 2 e 3
 
-Determine a função geradora da série temporal e o provável modelo;
+**2) Determine a função geradora da série temporal e o provável modelo;**
+**3) Estime no mínimo dois modelos concorrentes que você consideraria importante para os seus estudos futuros com os respectivos parâmetros;**
 
 ```{r}
 ## ACF e PACF
@@ -139,13 +131,14 @@ ggplot() +
 E agora faremos o teste de estacionariedade (Augmented Dickey–Fuller Test) na série diferenciada.
 
 ```{r}
+#| warning: false
 stat_test_diff_adf <- adf.test(ts_temperatura_diff)
-stat_test_diff
+# stat_test_diff
 stat_test_diff_kpss <- kpss.test(ts_temperatura_diff)
-stat_test_diff_kpss
+# stat_test_diff_kpss
 ```
 
-Rodando o teste ADF nos dados da temperatura com a primeira diferença, temos um resultado de p-valor `r round(stat_test$p.value, 3)` para o teste ADF e `r round(stat_test_diff_kpss$p.value, 3)` para o teste KPSS, ambos os testes agora indicam que a série após a primeira diferença se tornou estacionária.
+Rodando o teste ADF nos dados da temperatura com a primeira diferença, temos um resultado de p-valor `r round(stat_test_diff_adf$p.value, 3)` para o teste ADF e `r round(stat_test_diff_kpss$p.value, 3)` para o teste KPSS, ambos os testes agora indicam que a série após a primeira diferença se tornou estacionária.
 
 ## Os modelos
 
@@ -263,37 +256,23 @@ forecast::Acf(model_arima_5$residuals, type = "partial", main = "Autocorrelaçã
 
 Os resíduos também se comportaram bem, tendo poucos pontos fora dos limites de significância, indicando que o modelo ARIMA(0, 1, 2) é adequado para a série temporal da temperatura do molde T1.
 
-### Modelo 6: ARFIMA
-
-```{r}
-# Verificando a diferença
-model_arfima <- fracdiff::fracdiff(ts_temperatura)
-
-# Estimando o coeficiente da diferença
-summary(model_arfima)
-```
-```{r}
-# Estimando o modelo ARFIMA
-model_arfima <- arima(ts_temperatura, order = c(0, model_arfima$d, 2))
-
-# Coeficientes do modelo
-coef_model_arfima <- lmtest::coeftest(model_arfima)
-coef_model_arfima
-```
-
 ### Escolhendo o modelo
 
-Os modelos que tivemos melhores resultados foram o ARIMA (1, 1, 1) e o ARIMA (0, 1, 2), ambos com componentes significativos e com AIC e BIC menores que os demais modelos testados. Portanto, para a série temporal da temperatura do molde T1, os modelos ARIMA (1, 1, 1) e ARIMA (0, 1, 2) são os mais indicados.
+Os modelos que tivemos melhores resultados foram o modelo 2 (ARIMA 1, 1, 1) e o modelo 4 (ARIMA 0, 1, 2), ambos com componentes significativos e com AIC e BIC menores que os demais modelos testados. Portanto, para a série temporal da temperatura do molde T1, os modelos ARIMA (1, 1, 1) e ARIMA (0, 1, 2) são os mais indicados.
 Olhando pelas métricas de avaliação do quanto o modelo está sendo explicado os valores são bem próximos, porém como temos um AIC e BIC melhores no primeiro modelo, optaremos pelo ARIMA (1, 1, 1).
 
-
 ### Questão 4
+
+**Estime os resíduos dos modelos concorrentes e verifique se eles possuem característica de ruído branco;**
 
 Já analisamos os resíduos de ambos os modelos, e ambos parecem adequados para a série temporal da temperatura do molde T1.
 
 ### Questão 5
 
-Como já temos dois modelos que se comportaram bem nos testes de significância dos parâmetros e estão dentro do esperado, podemos avaliar graficamente as previsões dos modelos, e poderíamos também avaliar, caso trabalhássemos na área, o que faria mais sentido conforme o problema apresentado.
+**Com o intuito de validar o modelo encontrado para futuras previsões quais os critérios que você utilizaria? Calcule-os;**
+
+Como já temos dois modelos que se comportaram bem nos testes de significância dos parâmetros e estão dentro do esperado, podemos avaliar graficamente as previsões dos modelos nos dados atuais e observar qual parece se adequar melhor.
+Outra questão que também poderíamos avaliar, caso trabalhássemos na área, seria utilizar o que faria mais sentido de acordo com as nossas hipóteses anteriores ou experiências anteriores, ou ainda buscando outros estudos na literatura que pudessem corroborar com a escolha do modelo.
 
 ```{r}
 ## Valores previstos dos modelos
@@ -333,6 +312,8 @@ ggplot(df_long, aes(x = time, y = value, color = series)) +
 ```
 
 ### Questão 6
+
+**Realize previsões 3 passos à frente do melhor modelo encontrado.**
 
 Para realizar a previsão 3 passos a frente, usaremos o modelo ARIMA (1, 1, 1) que foi o escolhido para a série temporal da temperatura do molde T1.
 
