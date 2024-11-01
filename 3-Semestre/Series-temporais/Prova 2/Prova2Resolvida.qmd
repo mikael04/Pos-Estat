@@ -266,26 +266,19 @@ Os resíduos também se comportaram bem, tendo poucos pontos fora dos limites de
 ### Modelo 6: ARFIMA
 
 ```{r}
-# Fit the model using fracdiff
+# Verificando a diferença
 model_arfima <- fracdiff::fracdiff(ts_temperatura)
 
-# Get summary
+# Estimando o coeficiente da diferença
 summary(model_arfima)
 ```
-
 ```{r}
-## Observando a ACF e PACF do modelo com a diferença fracionária
-par(mfrow = c(1, 2))
+# Estimando o modelo ARFIMA
+model_arfima <- arima(ts_temperatura, order = c(0, model_arfima$d, 2))
 
-## Autocorrelação dos resíduos
-forecast::Acf(model_arfima$residuals, type = "correlation", main = "Autocorrelação dos resíduos", lag.max = 36)
-
-## Autocorrelação parcial dos resíduos
-forecast::Acf(model_arfima$residuals, type = "partial", main = "Autocorrelação parcial dos resíduos", lag.max = 36)
-```
-
-```{r}
-ts_temperatura_frac_diff <- fracdiff::fracdiff(ts_temperatura, nar = 1, nma = 1)
+# Coeficientes do modelo
+coef_model_arfima <- lmtest::coeftest(model_arfima)
+coef_model_arfima
 ```
 
 ### Escolhendo o modelo
