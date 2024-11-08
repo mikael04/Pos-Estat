@@ -1,0 +1,223 @@
+---
+title: "Aula 02"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-10-08"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
+}
+rewrite_data <- F
+```
+
+## Teste de Kolmogorov-Smirnov
+
+Teste usado para variáveis contínuas, que verifica se a amostra tem aderência a alguma distribuição (normal, binomial, poisson, uniforme, etc.), normalmente usado para testar normalidade.
+Precisamos de uma amostra e de uma distribuição teórica para comparar.
+Também é preciso de que a média populacional e o desvio padrão populacional sejam conhecidos (para testar a normal).
+H0 -> Segue distribuição normal (média u, desvio padrão sigma).
+H1 -> Não segue distribuição normal.
+
+Exemplo de aula:
+
+```{r}
+x <- c(198, 254, 262, 272, 275, 278, 285, 287, 287, 292)
+u <- 290
+sigma <- 56
+
+z = (x-u)/sigma
+
+## 1.64 é o valor crítico para 5% de significância
+pnorm(-1.64)
+
+# Padroniza os dados e faz a acumulada
+f_x <- pnorm(z)
+
+s_x <- c(seq(0.1, 1, 0.1))
+
+f_x_less_s_x <- abs(f_x - s_x)
+
+df <- data.frame(x, z, s_x, f_x, f_x_less_s_x)
+
+d_calc <- max(f_x_less_s_x)
+
+## N = 10, 5% de significância
+d_tab <- 0.41
+
+d_calc > d_tab
+
+## Como d_calc > d_tab, rejeitamos a hipótese nula, ou seja,
+## existem evidências de que a amostra não pertence a uma população que segue uma distribuição normal
+## N ~ (290, 56)
+
+## Se fizermos diretamente pela função de Kolmogorov-Smirnov
+ks.test(x, "pnorm", mean = 290, sd = 56)
+```
+
+## Teste de Lilliefors
+
+Teste usado para variáveis contínuas, que verifica se a amostra segue uma distribuição normal.
+Estimamos a média e variância com base na amostra.
+H0 -> Segue distribuição normal.
+H1 -> Não segue distribuição normal.
+
+Agora usaremos a formula para chegarmos na média e variância da amostra e calcularmos o teste de Lilliefors.
+
+```{r}
+
+x <- c(29, 33, 35, 36, 36)
+n <- length(x)
+x_barra <- mean(x)
+s <- sd(x)
+
+z = (x-x_barra)/s
+
+## 1.64 é o valor crítico para 5% de significância
+pnorm(-1.64)
+
+# Padroniza os dados e faz a acumulada
+f_x <- pnorm(z)
+
+s_x <- c(seq(0.2, 1, 0.2))
+
+f_x_less_s_x <- abs(f_x - s_x)
+
+df <- data.frame(x, z, s_x, f_x, f_x_less_s_x)
+
+d_calc <- max(f_x_less_s_x)
+
+## N = 5, 5% de significância
+d_tab <- 0.337
+
+d_calc > d_tab
+
+## Como d_calc < d_tab, não rejeitamos a hipótese nula, ou seja,
+## existem evidências de que a amostra pertence a uma população que segue uma distribuição normal
+
+## Se fizermos diretamente pela função de Lilliefors
+nortest::lillie.test(x)
+
+```
+
+## Teste de Aleatoriedade ou Iterações (Runs test)
+
+Precisa dos dados dicotomizados (2 categorias) para fazer o teste.
+Dispor as observações na ordem de ocorrência. Estuda-se a mudança na observações (iterações ou aleatoriedade).
+Iteração -> Sucessão de símbolos idênticos. Ex: AABBBA -> AA: Primeira iteração, BBB: Segunda iteração, A: Terceira iteração.
+
+H0 -> Ordem é aleatória
+H1 -> Ordem não é aleatória.
+
+n = tamanho da amostra
+n1 = número de observações da primeira categoria
+n2 = número de observações da segunda categoria
+
+Exemplo:
+
+AAAAABBAAABAABBBBBBBBAA
+ AAAAA   BB     AAA     B      AA   BBBBBBBB     AA
+ 1a it  2a it  3a it  4a it  5a it    6a it    7a it
+
+r é o número de iterações (no caso do exemplo, 7)
+
+H0: F_I < r < F_II -> Não rejeita H0, tenho aleatoriedade
+H1: r <= F_I ou r => F_II -> Rejeita H0, não tenho aleatoriedade
+
+n1 = 6
+n2 = 7
+
+Pela tabela:
+F_I = 7
+F_II = 18
+
+Como r = 7, e é igual a F_I, rejeitamos H0, ou seja, não temos aleatoriedade na amostra.
+
+### Exemplo
+
+```{r}
+ter<-c("a","a","a","a","a","b","b","a","a","a","b","a","a","b","b","b",
+"b","b","b","b","b","a","a")
+ter
+RunsTest(ter)
+
+moeda <- c("K", "K", "C", "C", "K", "C", "K", "K", "C", "K", "C", "C", "K", "K", "K", "C", "K", "K", "C", "K", "K", "C", "C", "K", "C", "K", "K", "C", "K", "C", "C", "K", "K", "C", "K", "K", "K", "C", "C", "K")
+
+n = length(moeda)
+n1 <- sum("K" == moeda)
+n2 <- sum("C" == moeda)
+r <- 25
+
+
+# Method 2: More explicit way to understand what's happening
+changes <- 1
+for(i in 2:length(moeda)) {
+  if(moeda[i] != moeda[i-1]) {
+    changes <- changes + 1
+  }
+}
+
+numerator <- 2 * n1 * n2 / (n1 + n2) + 1
+denominator <- sqrt((2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / ((n1 + n2)^2 * (n1 + n2 - 1)))
+z <- (r-numerator)/denominator
+
+# p-valor de 1,46 = 0,07. P valor = 0,07 + 0,07 (teste bilateral) = 0,14, Não rejeita h0, ou seja, é aleatória
+```
+
+Outro exemplo:
+
+```{r}
+#install.packages("DescTools")
+library(DescTools)
+ter<-c("a","a","a","a","a","b","b","a","a","a","b","a","a","b","b","b",
+"b","b","b","b","b","a","a")
+ter
+RunsTest(ter)
+## Rejeita h0, ou seja, não temos uma amostra aleatória
+
+####caso de dados numéricos: Pacote randtests
+#install.packages("randtests")
+library(randtests)
+
+x<-c(108,103,109,107,125,142,147,122,116,153,144,162,143,126,145,129,134,137,143,150,
+148,152,126,106,112,139,132,122,138,148,155,146,158)
+
+runs.test(x)
+## Não rejeita h0, ou seja, temos uma amostra aleatória
+
+ter1<-c("K","K","C","C","K","C","K","K","C","K","C","C","K","K","K",
+"C","K","K","C","K","K","C","C","K","C","K",
+"K","C","K","C","C","K","K","C","K","K","K","C","C","K")
+length(ter1)
+RunsTest(ter1,correct=F)
+
+## Aqui não rejeitamos h0, ou seja, a nossa amostra é aleatória
+
+
+```

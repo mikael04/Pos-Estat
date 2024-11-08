@@ -1,0 +1,11 @@
+1 - Primeiro passo estacionariedade em todas;
+2 - Depois rodar teste causalidade de granger;
+Não granjar causa (não tem relação de causalidade)
+Se aceita a hipótese nula, uma não causa a outra
+3 - X;
+4 - Determinar o número de defasagens (ordem do modelo) - Lags, Rodar os Lags e definir (usando algum dos testes) o número de lags. De preferência o menor número para diminuir o número de parâmetros do modelo.
+Qui-quadrado mede uqão mais exógena é a variável, tem maior grau de explicação e depende menos do modelo que explicou ela;
+Ordenar de acordo com o teste de bloco de exógenidade;
+X - Avaliar após as inovações (de um desvios padrões) o resultado nas variáveis em uma variável em relação as outras; Avaliar quanto tempo a variável leva para estabilizar;
+
+Série não estacionária, série de longo prazo, série VEC e não VAR;

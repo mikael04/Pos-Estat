@@ -1,0 +1,40 @@
+Testes para uma amostra
+
+Teste binomial -> Testar para variáveis discretas.
+
+Teste qui-quadrado para verificar se a amostra tem alguma distribuição (binomial). Testar para variáveis contínuas.
+
+Teste de aderência quiquadrado, testar se os dados observados podem ser colocamos numa distribuição teórica (normal, binomial, poisson, etc.).
+
+Teste de kolmogorov-sirnov -> Testando normalidade, testando se não há diferença entre as frequencias acumuladas (h0) ou se há diferença entre as frequências acumuladas (h1).
+
+1 - Especificar F(x) -> Determinar qual distribuição estamos testando.
+
+Testa aderência usando a acumulada, e testa na distância máxima (D = max{|F(x) - S(x)}|), se o D_calc > D_tabela, rejeita-se a hipótese nula.
+
+Para testar a normalidade precisa dos dados populacionais.
+
+Teste de Lilliefors
+
+Teste usado para variáveis contínuas, que verifica se a amostra segue uma distribuição normal.
+Estimamos a média e variância com base na amostra.
+H0 -> Segue distribuição normal.
+H1 -> Não segue distribuição normal.
+
+Teste de Aleatoriedade ou de Iterações
+
+Preciso dos dados dicotomizados (2 categorias) para fazer o teste.
+
+H0 -> Ordem é aleatória
+H1 -> Ordem não é aleatória.
+
+Acho n1 e n2, o número de observações da categoria 1, e da categoria 2, respectivamente.
+Faço a conta do r, que é o número de iterações (ou seja, o número de vezes que a sequência muda de 0 para 1 ou de uma sequencia da primeira categoria, para uma sequencia da segunda, ex: AAABBABB, primeira it = AAA, segunda it = BB, terceira it = A, quarta it = BB).
+E verifico pela tabela se o r é maior que F_I e menor que F_II.
+
+
+H0: F_I < r < F_II -> Não rejeita H0, tenho aleatoriedade
+H1: r <= F_I ou r => F_II -> Rejeita H0, não tenho aleatoriedade
+
+
+Se temos valores numéricos, achamos a mediana da amostra, codificamos os valores em 0 e 1, removemos a mediana e fazemos as contagens para o teste de aleatoriedade.
