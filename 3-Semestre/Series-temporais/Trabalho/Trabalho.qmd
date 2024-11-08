@@ -222,7 +222,7 @@ df_queimadas_estado_anomes |>
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 
 ```
-A primeira observação da série nos mostra que existe uma sazonalidade nos dados.
+A primeira observação da série nos mostra que parece existir uma sazonalidade nos dados.
 
 ```{r, visualizacoes}
 ## Fazendo gráfico de linhas da série temporal apenas de um ano
@@ -252,12 +252,96 @@ forecast::Acf(df_queimadas_estado_anomes$n, type = "correlation", main = "Autoco
 ## Autocorrelação parcial dos dados de focos de queimadas no estado selecionado
 forecast::Acf(df_queimadas_estado_anomes$n, type = "partial", main = "Autocorrelação parcial para volume de queimadas no mês", lag.max = 36)
 ```
-A análise do gráfico de autocorrelação nos dá indícios de algumas características da nossa série temporal.
-A primeira que já haviamos observado no gráfico de linhas, é a sazonalidade.
-Como também não verificamos uma queda até o valor 0 da autocorrelação, há indícios de que a série não seja  puramente autoregressiva.
-Apesar de observarmos um corte mais abrupto, há outros picos de autocorrelação que também nos mostram não ser um modelo puramente de médias móveis.
 
-## Modelo ARIMA
+A análise do gráfico de autocorrelação nos dá indícios de algumas características da nossa série temporal.
+No gráfico de autocorrelação não observamos uma queda até o valor 0 do lag 12, pelo contrário, vemos picos no lag 11 e 12, é um indício de que a série possui sazonalidade.
+Já no gráfico deautocorrelação parcial, observamos quedas porém ainda existem outros picos fora do intervalo de confiança.
+
+## Teste de raiz unitária
+
+```{r, teste-raiz-unitaria}
+
+## Transformando os dados em série temporal
+ts_data <- ts(df_queimadas_estado_anomes$n, start = c(lubridate::year(min(df_queimadas_estado_anomes$Ano_mes)), lubridate::month(min(df_queimadas_estado_anomes$Ano_mes))), frequency = 12)
+
+
+## Teste de Dickey-Fuller aumentado
+aug_dic_ful_test <- tseries::adf.test(ts_data, alternative = "stationary")
+print(aug_dic_ful_test)
+## Teste Kwiatkowski-Phillips-Schmidt-Shin
+kpss_test <- tseries::kpss.test(ts_data)
+print(kpss_test)
+# ## Teste phillips-perron
+# phillips_perron_test <- tseries::pp.test(ts_data)
+# print(phillips_perron_test)
+```
+
+O teste de Dickey-Fuller aumentado (ADF) é um teste de raiz unitária para uma amostra de uma série temporal. A hipótese nula do teste é que a série temporal possui uma raiz unitária, o que indica que a série não é estacionária. A hipótese alternativa (rejeitando a hipótese nula) é que a série temporal é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(aug_dic_ful_test$p.value, 3)`, ou seja, **rejeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal é estacionária**.
+
+Já o teste de Kwiatkowski-Phillips-Schmidt-Shin (KPSS) é outro teste que verifica raizes unitárias em tendência, e tem sua hipótese nula que a série é não estacionária, e a hipótese alternativa que a série é estacionária. Rodando o teste nos dados da temperatura do molde T1, temos um resultado de p-valor `r round(kpss_test$p.value, 3)`, ou seja, **reijeitamos a hipótese nula e aceitamos a hipótese alternativa** de que **a série temporal não é estacionária**.
+
+Como temos uma discordância entre os testes, isso pode nos indicar uma raíz unitária fracionária, ou que a nossa série precisa de diferença para ser estabilizada. Vamos tentar dar uma diferença primeiro e verificar o comportamento da série.
+
+## Diferenciação
+
+```{r, diferenciacao}
+decompose(ts_data) |> autoplot()
+
+analisando_sazonalidade <- function(ts_data){
+  # 1. Decomposition using both additive and multiplicative models
+  if(any(ts_data <= 0)) {
+    decomp <- decompose(ts_data, type="additive")
+  } else {
+    decomp <- decompose(ts_data, type="multiplicative")
+  }
+  
+  # 2. Calculate seasonal strength
+  seasonal_strength <- max(0, 1 - var(decomp$random, na.rm=TRUE) / 
+                            var(decomp$seasonal + decomp$random, na.rm=TRUE))
+  
+  # 3. Perform Kruskal-Wallis test for seasonality
+  # First, create factors for seasons/periods
+  period <- frequency(ts_data)
+  seasonal_factors <- factor(cycle(ts_data))
+  kw_test <- kruskal.test(as.numeric(ts_data) ~ seasonal_factors)
+  
+  # 4. Calculate Friedman test for seasonality
+  # Reshape data into a matrix with seasons in columns
+  n_periods <- length(ts_data) %/% period
+  ts_matrix <- matrix(head(as.numeric(ts_data), n_periods * period), 
+                     ncol=period, byrow=TRUE)
+  friedman_test <- friedman.test(ts_matrix)
+  
+  # 5. Create results list
+  results <- list(
+    decomposition = decomp,
+    seasonal_strength = seasonal_strength,
+    kruskal_wallis_test = kw_test,
+    friedman_test = friedman_test
+  )
+  
+  # 6. Print summary
+  cat("\nAnálise de sazonalidade:\n")
+  cat("--------------------------------\n")
+  cat("Força da Sazonalidade:", seasonal_strength, "\n")
+  cat("(Valores próximos de 1 indicam sazonalidade)\n\n")
+  
+  cat("Kruskal-Wallis Test:\n")
+  cat("H0: Não há efeitos de sazonalidade\n")
+  cat("p-value:", kw_test$p.value, "\n\n")
+  
+  cat("Friedman Test:\n")
+  cat("H0: Não há efeitos de sazonalidade\n")
+  cat("p-value:", friedman_test$p.value, "\n")
+  cat("--------------------------------\n")
+}
+
+analisando_sazonalidade(ts_data)
+```
+
+Pelos testes rodados, todos indicam que existe sazonalidade e que há uma forte sazonalidade, portanto partiremos para modelos SARIMA diretamente.
+
+## Modelo SARIMA
 
 ```{r, modelo-arima}
 ## Dividindo os dados em treino e teste
@@ -271,39 +355,88 @@ df_queimadas_estado_anomes_teste <- df_queimadas_estado_anomes |>
   dplyr::filter(Ano_mes >= "2024-01-01")
 
 ## Transformando os dados em série temporal
-ts_data <- ts(df_queimadas_estado_anomes_treino$n, start = c(lubridate::year(min(df_queimadas_estado_anomes_treino$Ano_mes)), lubridate::month(min(df_queimadas_estado_anomes_treino$Ano_mes))), frequency = 12)
+ts_data_model <- ts(df_queimadas_estado_anomes_treino$n, start = c(lubridate::year(min(df_queimadas_estado_anomes_treino$Ano_mes)), lubridate::month(min(df_queimadas_estado_anomes_treino$Ano_mes))), frequency = 12)
 
 # auto.arima(ts_data, seasonal = TRUE)
-# ts_data <- na.omit(ts_data)
-fit_arima <- forecast::Arima(ts_data, order = c(1, 0, 0))
-fit_arima
+# ts_data_model <- na.omit(ts_data_model)
+fit_arima <- forecast::Arima(ts_data_model, order = c(1, 0, 0))
+fit_arima$aic
 ## Coeficientes do modelo
-lmtest::coeftest(fit_arima)
+coeficientes_arima <- lmtest::coeftest(fit_arima)
 
+# Function to analyze and fit SARIMA model
+analyze_and_fit_sarima <- function(ts_data_model, forecast_periods = 12) {
+  library(forecast)
+  library(stats)
+  
+  # 1. Analyze the series
+  # Check if differencing is needed
+  ndiffs_result <- ndiffs(ts_data_model)  # for non-seasonal differencing
+  nsdiffs_result <- nsdiffs(ts_data_model, m = 12)  # for seasonal differencing
+  
+  # 2. Auto ARIMA to get initial parameters
+  # This helps us get a baseline model
+  auto_fit <- auto.arima(ts_data_model, 
+                        seasonal = TRUE,
+                        stepwise = TRUE,
+                        approximation = FALSE,
+                        trace = TRUE)  # shows model selection process
+  
+  # Print model information
+  cat("\nModel Analysis Results:\n")
+  cat("--------------------------------\n")
+  cat("Recommended differences (non-seasonal):", ndiffs_result, "\n")
+  cat("Recommended differences (seasonal):", nsdiffs_result, "\n")
+  cat("\nAuto ARIMA suggested parameters:\n")
+  cat("ARIMA", auto_fit$arma, "\n")
+  cat("with seasonal period", auto_fit$seasonal$period, "\n\n")
+  
+  # 3. Manual SARIMA specification
+  # Example: SARIMA(1,1,1)(1,1,1)[12]
+  # Modify these parameters based on your analysis
+  sarima_model <- Arima(ts_data_model,
+                       order = c(1,1,1),  # non-seasonal part (p,d,q)
+                       seasonal = list(order = c(1,1,1),  # seasonal part (P,D,Q)
+                                    period = 12))         # monthly data
+  
+  # 4. Model diagnostics
+  checkresiduals(sarima_model)
+  
+  # 5. Generate forecasts
+  forecasts <- forecast(sarima_model, h = forecast_periods)
+  
+  # 6. Return results
+  return(list(
+    auto_model = auto_fit,
+    manual_model = sarima_model,
+    forecasts = forecasts,
+    residuals_test = Box.test(sarima_model$residuals, type = "Ljung-Box")
+  ))
+}
 
-fit_sarima <-forecast::Arima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 1, 0), period = 12))
-fit_sarima
-## Coeficientes do modelo
-lmtest::coeftest(fit_sarima)
+# Example usage:
+results <- analyze_and_fit_sarima(ts_data_model)
 
-# (1-pnorm(abs(fit_sarima$coef)/sqrt(diag(fit_sarima$var.coef))))*2
-
-## Modelo ARIMA
-# modelo_arima <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = list(order = c(2, 1, 0), period = 12))
-# forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1))
 ```
+
+O modelo SARIMA 
 
 ```{r, analisando resíduos}
 #| warning: false
 
+sarima_model <- Arima(ts_data_model,
+                       order = c(1,1,1),  # non-seasonal part (p,d,q)
+                       seasonal = list(order = c(1,1,1),  # seasonal part (P,D,Q)
+                                    period = 12))         # monthly data
+
 ## Analisando modelo
-fitted_values <- fitted(fit_sarima)
+fitted_values <- fitted(sarima_model)
 
 dates <- df_queimadas_estado_anomes_treino$Ano_mes
-# 1:length(ts_data)
+# 1:length(ts_data_model)
 
 ggplot() +
-  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
+  geom_line(aes(x = dates, y = ts_data_model, color = "Dados originais"), lwd = 1) +
   geom_line(aes(x = dates, y = fitted_values, color = "SARIMA(1,0,0)(2,1,0)[12]"), lwd = 0.5) +
   labs(title = "Dados originais e modelo ajustado",
        subtitle = "Número de focos de incêndio",
@@ -317,12 +450,15 @@ ggplot() +
 ### Analisando resíduos
 
 ```{r, analisando-residuos}
-residuals <- residuals(fit_sarima)
+residuals <- residuals(sarima_model)
+
 # 
 ggplot() +
   geom_line(aes(x = time(residuals), y = residuals)) +
   labs(title = "Resíduos no tempo", x = "Time", y = "Resíduos") +
   theme_minimal()
+
+par(mfrow = c(1, 2))
 
 forecast::Acf(residuals, type = "correlation", main = "AC of Residuals")
 forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
@@ -335,17 +471,30 @@ forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
 #   theme_minimal()
 ```
 
+```{r}
+## Testando normalidade nos resíduos
+shapiro.test(residuals)
+
+```
+
 ## Modelo ARFIMA
 
 ```{r, modelo-arfima}
 library(arfima)
-## Modelo ARFIMA
-# fit_arfima <- fracdiff::fracdiff(ts_data, nar = 1, nma = 1, ar = 2)
-fit_arfima <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
-# fit_arfima_2 <- arfima::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
-fit_arfima_forecast <- forecast::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+# Modelo ARFIMA
+fit_arfima <- fracdiff::fracdiff(ts_data_model)
+d <- fit_arfima$d
+fit_arfima <- arima(ts_data_model, order = c(1, d, 0))
 
-forecast::arfima(ts_data, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+
+## Coeficientes do modelo
+lmtest::coeftest(fit_arfima)
+
+# fit_arfima <- arfima::arfima(ts_data_model, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+# fit_arfima_2 <- arfima::arfima(ts_data_model, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+# fit_arfima_forecast <- forecast::arfima(ts_data_model, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
+
+# forecast::arfima(ts_data_model, order = c(1, 0, 0), seasonal = list(order = c(2, 0, 1), period = 12))
 # arfima::bestModes(fit_arfima, 5)
 
 ## Coeficientes do modelo
@@ -354,16 +503,16 @@ fit_arfima
 ## Analisando modelo
 fitted_values_arfima <- fitted(fit_arfima)
 
-ggplot() +
-  geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
-  geom_line(aes(x = dates, y = fitted_values_arfima, color = "ARFIMA(1,1)"), lwd = 1) +
-  labs(title = "Dados originais e modelo ajustado",
-       subtitle = "Número de focos de incêndio",
-       x = "",
-       y = "",
-       color = "Legend") +
-  scale_color_manual(values = c("Dados originais" = "black", "ARFIMA(1,1)" = "red")) +
-  theme_minimal()
+# ggplot() +
+#   geom_line(aes(x = dates, y = ts_data_model, color = "Dados originais"), lwd = 1) +
+#   geom_line(aes(x = dates, y = fitted_values_arfima, color = "ARFIMA(1,1)"), lwd = 1) +
+#   labs(title = "Dados originais e modelo ajustado",
+#        subtitle = "Número de focos de incêndio",
+#        x = "",
+#        y = "",
+#        color = "Legend") +
+#   scale_color_manual(values = c("Dados originais" = "black", "ARFIMA(1,1)" = "red")) +
+#   theme_minimal()
 
 ```
 
@@ -371,7 +520,7 @@ ggplot() +
 
 ```{r, modelo-armax}
 ## Modelo ARMAX
-# # fit_armax <- forecast::Arima(ts_data, order = c(1, 0, 1), seasonal = c(12, 0, 1), xreg = )
+# # fit_armax <- forecast::Arima(ts_data_model, order = c(1, 0, 1), seasonal = c(12, 0, 1), xreg = )
 # 
 # ## Coeficientes do modelo
 # lmtest::coeftest(fit_armax)
@@ -380,7 +529,7 @@ ggplot() +
 # fitted_values_armax <- fitted(fit_armax)
 # 
 # ggplot() +
-#   geom_line(aes(x = dates, y = ts_data, color = "Dados originais"), lwd = 1) +
+#   geom_line(aes(x = dates, y = ts_data_model, color = "Dados originais"), lwd = 1) +
 #   geom_line(aes(x = dates, y = fitted_values_armax, color = "ARMAX(1,0,1)(12,0,1)"), lwd = 1) +
 #   labs(title = "Dados originais e modelo ajustado",
 #        subtitle = "Número de focos de incêndio",
@@ -391,16 +540,3 @@ ggplot() +
   # theme_minimal()
 ```
 
-## Teste de raiz unitária
-
-```{r, teste-raiz-unitaria}
-## Teste de Dickey-Fuller aumentado
-aug_dic_ful_test <- tseries::adf.test(ts_data, alternative = "stationary")
-print(aug_dic_ful_test)
-## Teste Kwiatkowski-Phillips-Schmidt-Shin
-kpss_test <- tseries::kpss.test(ts_data)
-print(kpss_test)
-## Teste phillips-perron
-phillips_perron_test <- tseries::pp.test(ts_data)
-print(phillips_perron_test)
-```
