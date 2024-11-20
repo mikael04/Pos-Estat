@@ -475,6 +475,12 @@ forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
 ## Testando normalidade nos resíduos
 shapiro.test(residuals)
 
+nortest::ad.test(residuals)
+
+nortest::lillie.test(residuals)
+
+ks.test(residuals, "pnorm")
+
 ```
 
 ## Modelo ARFIMA
