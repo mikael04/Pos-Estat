@@ -1,0 +1,75 @@
+---
+title: "Aula 01"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-10-01"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
+}
+rewrite_data <- F
+```
+
+## Introdução aos métodos não-paramétricos
+
+- Níveis de mensuração das variáveis
+  1 - Nominais - não existe relação (ex: não podemos falar maior menor, etc.)
+  2 - Ordinais - existe relação de ordem, hierarquia (ex: bom, regularm ruim, etc.)
+
+Ex de testes de hipótese:
+
+#### Teste paramétrico
+
+$$H_0: \mu = 0$$
+$$H_1: \mu \neq 0$$
+
+#### Teste não-paramétrico
+
+$$H_0: Dist. \, Poisson$$
+$$H_1: Ñ \quad Dist. \, Poisson$$
+
+Atribuições de postos:
+
+- Atribui-se o posto 1 a N, do menor ao maior valor. Por exemplo: 
+
+```{r}
+x <- c(25, 12, 2, 3, 100, 1000)
+rank(x)
+```
+
+Nesse caso perdemos a relação de diferença (distância) entre os valores, já que ficamos apenas no ranking (ordem).
+
+## Teste Binomial
+
+Usado em populações dicoitômicas (sim/não, sucesso/fracasso, etc.). Por exemplo, em um teste de medicamento, onde o sucesso é a cura e o fracasso é a não-cura. O teste avaliará a proporção, onde denominamos **p** a proporção de sucesso e **q** a proporção de fracasso onde **q=1-p**.
+
+
+
+

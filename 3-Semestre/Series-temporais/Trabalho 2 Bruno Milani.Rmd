@@ -1,0 +1,322 @@
+---
+title: "Trabalho 2 Bruno Milani"
+author: "Bruno Milani"
+date: "2024-10-30"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Questão 1
+
+Diga se a série a ser estudada é  estacionária utilizando os métodos desenvolvidos em sala de aula, caso a série seja não estacionária qual o procedimento a ser adotado;
+
+```{r, warning = FALSE, message = FALSE}
+# Abrir pacotes
+library(tseries)
+library(urca)
+library(readxl)
+library(forecast)
+library(fracdiff)
+
+# Ler o arquivo do Excel
+caminho_arquivo <- "C:/BRUNO/ESTATÍSTICA/Previsão Aplicada/Trabalho 2/T1.xlsx"
+T1 <- read_excel(caminho_arquivo)
+
+# Teste de Dickey-Fuller Aumentado (ADF)
+adf_test <- adf.test(T1$T1, alternative = "stationary")
+print("Teste de Dickey-Fuller Aumentado (ADF):")
+print(adf_test)
+
+# Teste KPSS
+kpss_test <- kpss.test(T1$T1)
+print("Teste KPSS:")
+print(kpss_test)
+
+# Teste Phillips-Perron (PP)
+pp_test <- pp.test(T1$T1)
+print("Teste de Phillips-Perron (PP):")
+print(pp_test)
+
+plot(T1$T1, type = "l", main = "Temperatura T1 ao Longo do Tempo", xlab = "Tempo", ylab = "Temperatura")
+```
+Os testes ADF e Phillip Perron aplicados às séries originais rejeitaram a hipótese nula, o que indica que podem ser consideradas estacionárias. No entanto, o teste KPSS também rejeitou a hipótese nula, o que neste caso indica não estacionariedade. A inspeção visual da série aparenta ter tendência, o que também é indício de não estacionariedade; Optei por analisar a série com diferenciação e sem.
+
+## Questão 2
+Determine a função geradora da série temporal e o provável modelo;
+
+```{r, warning = FALSE, message = FALSE}
+# Explorando os dados
+acf(T1$T1, main = "Função de Autocorrelação (ACF)")
+pacf(T1$T1, main = "Função de Autocorrelação Parcial (PACF)")
+```
+O correlograma apresenta as barras acima do intervalo de confiança, o que indica autocorrelação. Aparentemente não há cortes abruptos, que indicariam um componente MA, mas há oscilações que se repetem, com picos em intervalos regulares, o que indica sazonalidade. Os intervalos aparentam estar a cada 6 ou 7 observações, o que justifica a tentativa de incorporar um componente sazonal com uma destas ordens.
+
+No correlograma parcial, além da extrapolação dos intervalos de confiança, verifica-se o corte abrupto após a primeira observação, o que indica que a ordem AR é 1, mas não aparenta haver um decay exponencial que indicaria um componente MA.
+
+## Questão 3
+Estime no mínimo dois modelos concorrentes que você consideraria importante para os seus estudos futuros com os respectivos parâmetros;
+
+```{r, warning = FALSE, message = FALSE}
+##Estimação dos Modelos
+# Estimação do Modelo 1
+modelo_arima1 <- arima(T1$T1, order = c(1, 0, 1))
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima1$coef
+erros_padrao <- sqrt(diag(modelo_arima1$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo 2
+modelo_arima2 <- arima(T1$T1, order = c(2, 0, 1))
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima2$coef
+erros_padrao <- sqrt(diag(modelo_arima2$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo
+modelo_arima3 <- arima(T1$T1, order = c(3, 0, 1))
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima3$coef
+erros_padrao <- sqrt(diag(modelo_arima3$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo
+modelo_arima4 <- arima(T1$T1, order = c(2, 0, 2))
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima4$coef
+erros_padrao <- sqrt(diag(modelo_arima4$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo
+modelo_arima5 <- arima(T1$T1, order = c(1, 1, 1), include.mean = FALSE)
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima5$coef
+erros_padrao <- sqrt(diag(modelo_arima5$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo
+modelo_arima6 <- arima(T1$T1, order = c(2, 1, 1), include.mean = FALSE)
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima6$coef
+erros_padrao <- sqrt(diag(modelo_arima6$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+# Estimação do Modelo
+modelo_arima7 <- arima(T1$T1, order = c(1, 1, 2), include.mean = FALSE)
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arima7$coef
+erros_padrao <- sqrt(diag(modelo_arima7$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+#Estimar o modelo SARIMA
+modelo_sarima <- arima(T1$T1, order = c(1, 1, 1), 
+                       seasonal = list(order = c(1, 0, 1), period = 6), 
+                       include.mean = FALSE)
+
+# Extrair e organizar coeficientes estimados
+coeficientes <- modelo_sarima$coef
+erros_padrao <- sqrt(diag(modelo_sarima$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+### ARFIMA (1,d,1) ###
+# 1. Estimar o parâmetro fracionário 'd' para a série endógena r_ifix
+modelo_fracdiff <- fracdiff(T1$T1)
+
+d <- modelo_fracdiff$d  # Grau de diferenciação fracionária
+d
+
+modelo_arfima <- arima(T1$T1, order = c(1, d, 1), include.mean = FALSE)
+
+# Extrair e apresentar coeficientes estimados
+coeficientes <- modelo_arfima$coef
+erros_padrao <- sqrt(diag(modelo_arfima$var.coef))
+valores_z <- coeficientes / erros_padrao
+p_valores <- 2 * pnorm(-abs(valores_z))
+resultado <- data.frame(
+  Coeficientes = coeficientes,
+  Erro_Padrao = erros_padrao,
+  Z_valores = valores_z,
+  P_valores = p_valores
+)
+print(resultado)
+
+```
+A estimação dos nove modelos expostos acima gera coeficientes significativos para ARIMA (1,0,1), ARIMA (2,0,1), ARIMA (1,1,1), SARIMA (2,1,1)(1,0,1)[6] e ARFIMA(1, 0.44, 1).
+
+## Questão 4
+
+Estime os resíduos dos modelos concorrentes e verifique se eles possuem característica de ruído branco;
+
+```{r, warning = FALSE, message = FALSE}
+#Extrair e testar os resíduos do modelo
+residuos1 <- residuals(modelo_arima1)
+adf_test_residuos <- adf.test(residuos1, alternative = "stationary")
+print(adf_test_residuos)
+
+residuos2 <- residuals(modelo_arima2)
+adf_test_residuos2 <- adf.test(residuos2, alternative = "stationary")
+print(adf_test_residuos2)
+
+residuos3 <- residuals(modelo_arima3)
+adf_test_residuos3 <- adf.test(residuos3, alternative = "stationary")
+print(adf_test_residuos3)
+
+residuos4 <- residuals(modelo_arima4)
+adf_test_residuos4 <- adf.test(residuos4, alternative = "stationary")
+print(adf_test_residuos4)
+
+residuos5 <- residuals(modelo_arima5)
+adf_test_residuos5 <- adf.test(residuos5, alternative = "stationary")
+print(adf_test_residuos5)
+
+residuos6 <- residuals(modelo_arima6)
+adf_test_residuos6 <- adf.test(residuos6, alternative = "stationary")
+print(adf_test_residuos6)
+
+residuos7 <- residuals(modelo_arima7)
+adf_test_residuos7 <- adf.test(residuos7, alternative = "stationary")
+print(adf_test_residuos7)
+
+residuos8 <- residuals(modelo_sarima)
+adf_test_residuos8 <- adf.test(residuos8, alternative = "stationary")
+print(adf_test_residuos8)
+
+residuos9 <- residuals(modelo_arfima)
+adf_test_residuos9 <- adf.test(residuos9, alternative = "stationary")
+print(adf_test_residuos9)
+
+# Ajusta o layout para uma janela de gráficos com 3 linhas e 3 colunas
+par(mfrow = c(3, 3))
+
+# Gráfico dos resíduos do Modelo 1 ao Modelo 9
+plot(residuos1, type = "l", main = "Resíduos do Modelo ARIMA 1", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos2, type = "l", main = "Resíduos do Modelo ARIMA 2", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos3, type = "l", main = "Resíduos do Modelo ARIMA 3", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos4, type = "l", main = "Resíduos do Modelo ARIMA 4", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos5, type = "l", main = "Resíduos do Modelo ARIMA 5", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos6, type = "l", main = "Resíduos do Modelo ARIMA 6", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos7, type = "l", main = "Resíduos do Modelo ARIMA 7", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos8, type = "l", main = "Resíduos do Modelo ARIMA 8", xlab = "Tempo", ylab = "Resíduos")
+plot(residuos9, type = "l", main = "Resíduos do Modelo ARIMA 9", xlab = "Tempo", ylab = "Resíduos")
+```
+Após a extração dos resíduos dos modelos e aplicação do teste ADF para cada um deles, percebe-se que a hipótese nula foi rejeitada em todos os casos. Assim, pode-se entender que os resíduos são estacionários.
+
+## Questão 5
+
+Com o intuito de validar o modelo encontrado para futuras previsões quais os critérios que você utilizaria? Calcule-os;
+
+```{r, warning = FALSE, message = FALSE}
+# Função para calcular o residual bias
+calcular_residual_bias <- function(modelo, dados) {
+  # Obter os valores previstos
+  previsoes <- fitted(modelo)
+  # Calcular o residual bias
+  rb <- mean(dados - previsoes)
+  return(rb)
+}
+# Criação de um data frame para armazenar os resultados
+resultados_aic_bic <- data.frame(
+  Modelo = c("modelo_arima1", "modelo_arima2", "modelo_arima3", "modelo_arima4", "modelo_arima5", "modelo_arima6", "modelo_arima7", "modelo_sarima", "modelo_arfima"),
+  AIC = c(AIC(modelo_arima1), AIC(modelo_arima2), AIC(modelo_arima3), AIC(modelo_arima4), AIC(modelo_arima5), AIC(modelo_arima6), AIC(modelo_arima7), AIC(modelo_sarima), AIC(modelo_arfima)),
+  BIC = c(BIC(modelo_arima1), BIC(modelo_arima2), BIC(modelo_arima3), BIC(modelo_arima4), BIC(modelo_arima5), BIC(modelo_arima6), BIC(modelo_arima7), BIC(modelo_sarima), BIC(modelo_arfima))
+)
+
+# Exibir a tabela
+print(resultados_aic_bic)
+```
+Para avaliar a validade do modelo, dois critérios foram utilizados: Critério de Informação de Akaike (AIC) e o Critério de Informação Bayesiana (BIC), os quais estão expostos na tabela. Quanto menores, melhor é o modelo. O AIC aponta o modelo Sarima como sendo o melhor, enquanto BIC aponta Arima (1,1,1). 
+
+## Questão 6
+
+Realize previsões 3 passos à frente do melhor modelo encontrado.
+
+```{r, warning = FALSE, message = FALSE}
+# Previsão de 3 passos à frente
+n_passos <- 3
+previsao <- forecast(modelo_sarima, h = n_passos)
+
+# Visualizar as previsões
+print(previsao)
+valores_previstos <- previsao$mean
+print("Valores Previstos:")
+print(valores_previstos)
+
+# Plotar as previsões
+plot(previsao, main = "Previsões do Modelo SARIMA", xlab = "Tempo", ylab = "Valores Previsto")
+
+```
