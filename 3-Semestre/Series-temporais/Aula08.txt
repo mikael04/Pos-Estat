@@ -1,0 +1,12 @@
+0 - Inspeção visual;
+
+1 - Fazer os testes de raízes unitárias:
+  - ADF, KPSS e ;
+
+2 - Teste de causalidade de Granger;
+  - O quanto uma variável pode melhorar o modelo; A variável melhora a previsão, portanto ela causou um impacto;
+
+* Ele é vetorial porque todas as variáveis são estimadas ao mesmo tempo;
+* No VAR todas as defasagens são iguais entre as variáveis independentes;
+
+Ordenar da mais exógena para a menos exógena. A que menos depende do efeito das outras.

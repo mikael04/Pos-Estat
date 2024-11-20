@@ -9,3 +9,11 @@ Ordenar de acordo com o teste de bloco de exógenidade;
 X - Avaliar após as inovações (de um desvios padrões) o resultado nas variáveis em uma variável em relação as outras; Avaliar quanto tempo a variável leva para estabilizar;
 
 Série não estacionária, série de longo prazo, série VEC e não VAR;
+
+
+Ler artigos taylon, renan, mayara.
+
+
+VEC
+-> Todas variáveis tem o mesmo número de defasagens;
+- Mesmo se a variável é não significativa, ela permanece no modelo;

@@ -1,0 +1,173 @@
+---
+title: "Trabalho"
+subtitle: "Dados de Queimadas"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-10-01"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(urca)
+library(vars)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/home/userlm/Projetos/Pos-Estat/3-Semestre/Series-temporais/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
+}
+rewrite_data <- F
+```
+
+## Lendo dados e primeira inspeção visual
+
+```{r}
+## Exemplo claude
+# Create example data (you can replace this with your own data)
+set.seed(123)
+t <- 100
+y1 <- arima.sim(n = t, model = list(ar = 0.5))
+y2 <- arima.sim(n = t, model = list(ar = 0.4))
+data <- cbind(y1, y2)
+data <- ts(data, frequency = 4)  # Convert to time series object
+
+
+# Step 1: Test for stationarity
+adf_y1 <- ur.df(y1, type = "drift")
+adf_y2 <- ur.df(y2, type = "drift")
+
+# Step 2: Select optimal lag length
+# lag_selection <- VARselect(data, lag.max = 10, type = "constadf_y2")
+# optimal_lag <- lag_selection$selection["AIC(n)"]
+```
+
+```{r}
+dados <- readxl::read_excel(paste0(data_path, "Banco de Dados - Setor Eletroeletrônico Brasileiro.xls")) |>
+  dplyr::rename(mes_ano = 1)
+
+## Transformando a coluna em formato de data
+dados <- dados |> 
+  dplyr::mutate(
+    mes_ano_t = lubridate::parse_date_time(paste("01", mes_ano, sep="."), "d.b.Y", locale="pt_BR.UTF-8"))
+
+dados_ts <- dados |> dplyr::select(-mes_ano, -mes_ano_t) |> 
+  ts()
+
+par(mfrow = c(2, 3))
+## Admissões
+ggplot2::ggplot(dados, aes(x = mes_ano_t, y = AD)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "AD") +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(
+    title = "Série temporal das Admissões (AD)",
+    x = "Tempo",
+    y = "Admissão"
+  )
+
+## Demissões
+ggplot2::ggplot(dados, aes(x = mes_ano_t, y = AD)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "DE") +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(
+    title = "Série temporal das Demissões (DE)",
+    x = "Tempo",
+    y = "Demissões"
+  )
+
+## PIB
+ggplot2::ggplot(dados, aes(x = mes_ano_t, y = AD)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "PIB") +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(
+    title = "Série temporal do PIB (PIB)",
+    x = "Tempo",
+    y = "PIB"
+  )
+
+## Exportações
+ggplot2::ggplot(dados, aes(x = mes_ano_t, y = ET)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "PIB") +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(
+    title = "Série temporal do Exportações (ET)",
+    x = "Tempo",
+    y = "Exportações"
+  )
+
+## Moeda Cambio Dólar
+ggplot2::ggplot(dados, aes(x = mes_ano_t, y = MCD)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "PIB") +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(
+    title = "Série temporal do Moeda câmbio dólar (MCD)",
+    x = "Tempo",
+    y = "Moeda câmbio dólar"
+  )
+  
+
+
+par(mfrow = c(2, 3))
+pacf(dados$AD, lag.max = 24)
+pacf(dados$DE, lag.max = 24)
+pacf(dados$PIB, lag.max = 24)
+pacf(dados$ET, lag.max = 24)
+pacf(dados$MCD, lag.max = 24)
+pacf(dados$IPCA, lag.max = 24)
+
+par(mfrow = c(2, 3))
+acf(dados$AD, lag.max = 24)
+acf(dados$DE, lag.max = 24)
+acf(dados$PIB, lag.max = 24)
+acf(dados$ET, lag.max = 24)
+acf(dados$MCD, lag.max = 24)
+acf(dados$IPCA, lag.max = 24)
+```
+
+## Análise de raízes unitárias
+
+```{r}
+## Teste de raízes unitárias
+## Teste de Dickey-Fuller aumentado
+aug_dic_ful_test <- tseries::adf.test(dados$IPCA, alternative = "stationary")
+print(aug_dic_ful_test)
+## Teste Kwiatkowski-Phillips-Schmidt-Shin
+kpss_test <- tseries::kpss.test(dados$IPCA)
+print(kpss_test)
+## Teste phillips-perron
+phillips_perron_test <- tseries::pp.test(dados$IPCA)
+print(phillips_perron_test)
+
+## Tabelando resultados
+tabela_testes <- data.frame(
+  Teste = c("ADF", "KPSS", "Phillips-Perron"),
+  Estatistica = c(aug_dic_ful_test$statistic, kpss_test$statistic, phillips_perron_test$statistic),
+  P_valor = c(aug_dic_ful_test$p.value, kpss_test$p.value, phillips_perron_test$p.value),
+  Estacionariedade = c(aug_dic_ful_test$stationary, kpss_test$stationary, phillips_perron_test$stationary)
+)
+```
