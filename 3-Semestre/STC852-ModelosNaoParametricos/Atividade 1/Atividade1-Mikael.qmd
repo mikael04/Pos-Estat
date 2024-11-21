@@ -1,6 +1,5 @@
 ---
 title: "Atividade 1"
-lang: pt-BR
 author: "Mikael Marin Coletto"
 date: "2024-11-20"
 format:
@@ -133,6 +132,8 @@ Portanto, concluímos que, com base no teste qui-quadrado, não há evidências 
 
 ![Tabela 2](imgs/tabela_2.png)
 
+
+
 Verificar a aleatoriedade dos escores.
 
 H0: Os escores são aleatórios
@@ -189,3 +190,26 @@ if(teste$p.value < 0.05){
 ```
 
 Portanto, concluímos que, com base no teste de Kolmogorov-Smirnov, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm, ou seja, podemos dizer que as peças seguem os parâmetros indicados pelo fabricante.
+
+# Questão 5
+
+Refaça pelo teste de Lilliefors, o exemplo feito em sala de aula sobre o peso das carnes nas refeições do restaurante. (Testar Normalidade) α=5%.
+
+R:
+
+H0: A distribuição dos pesos das carnes segue uma distribuição normal.
+H1: A distribuição dos pesos das carnes não segue uma distribuição normal.
+
+```{r, teste-lilliefors}
+# Dados observados
+amostra <- c(198, 254, 262, 272, 275, 278, 285, 287, 287, 292)  # pesos observados
+
+# Teste de Lilliefors
+teste <- nortest::lillie.test(amostra)
+
+# Resultados
+print(teste)
+
+```
+
+Portanto, concluímos que, com base no teste de Lilliefors, não há evidências para rejeitar a afirmação de que a distribuição dos pesos das carnes segue uma distribuição normal, ou seja, podemos dizer que os pesos .

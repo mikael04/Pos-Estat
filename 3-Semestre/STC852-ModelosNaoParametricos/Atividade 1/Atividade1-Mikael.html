@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.57">
@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mikael Marin Coletto">
+<meta name="dcterms.date" content="2024-11-20">
 
 <title>Atividade 1</title>
 <style>
@@ -19,6 +20,40 @@ ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
+}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -3048,8 +3083,18 @@ vertical-align: -.125em;
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  
-<div class="quarto-alternate-formats"><h2>Outros formatos</h2><ul><li><a href="Atividade1-Mikael.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#questão-1" id="toc-questão-1" class="nav-link active" data-scroll-target="#questão-1">Questão 1</a></li>
+  <li><a href="#questão-2" id="toc-questão-2" class="nav-link" data-scroll-target="#questão-2">Questão 2</a></li>
+  <li><a href="#questão-3" id="toc-questão-3" class="nav-link" data-scroll-target="#questão-3">Questão 3</a></li>
+  <li><a href="#questão-4" id="toc-questão-4" class="nav-link" data-scroll-target="#questão-4">Questão 4</a></li>
+  <li><a href="#questão-5" id="toc-questão-5" class="nav-link" data-scroll-target="#questão-5">Questão 5</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="Atividade1-Mikael.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -3062,16 +3107,16 @@ vertical-align: -.125em;
 <div class="quarto-title-meta">
 
     <div>
-    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
              <p>Mikael Marin Coletto </p>
           </div>
   </div>
     
     <div>
-    <div class="quarto-title-meta-heading">Data de Publicação</div>
+    <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">20 de novembro de 2024</p>
+      <p class="date">November 20, 2024</p>
     </div>
   </div>
   
@@ -3083,7 +3128,260 @@ vertical-align: -.125em;
 </header>
 
 
+<section id="questão-1" class="level1">
+<h1>Questão 1</h1>
+<p>Um instituto de pesquisa afirma que um determinado produto possui 50% de aceitação por parte dos consumidores. Em uma amostra de 180 consumidores, observaram-se 100 pessoas declarando rejeição e 80 declarando aceitação para com o produto. Teste a afirmação dada pelo instituto, adotando-se α=5%. (Dá pra fazer tanto por qui-quadrado, quanto binomial. Escolha um.)</p>
+<p>R: Como possuímos uma amostra grande (mais de 30) usaremos uma aproximação pela normal. Também usaremos como hipótese nula que a proporção de aceitação é de 50% e como hipótese alternativa que a proporção de aceitação é diferente de 50%.</p>
+<p>H0: p = 0.5 H1: p != 0.5</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">180</span> <span class="co"># Tamanho da amostra</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>aceitacao <span class="ot">=</span> <span class="dv">80</span> <span class="co"># Número de pessoas que aceitaram</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="dv">100</span> <span class="co"># Número de pessoas que rejeitaram</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> aceitacao<span class="sc">/</span>n</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>q <span class="ot">=</span> <span class="dv">1</span> <span class="sc">-</span> p</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="dv">80</span> <span class="co"># Menor frequência</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>zcalc <span class="ot">=</span> ((x<span class="sc">-</span>n<span class="sc">*</span>p)<span class="sc">/</span>(<span class="fu">sqrt</span>(n<span class="sc">*</span>p<span class="sc">*</span>q)))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># zcalc</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># p_value &lt;- pnorm(zcalc)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">binom.test</span>(<span class="dv">80</span>,<span class="dv">180</span>,<span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Exact binomial test
 
+data:  80 and 180
+number of successes = 80, number of trials = 180, p-value = 0.1565
+alternative hypothesis: true probability of success is not equal to 0.5
+95 percent confidence interval:
+ 0.3705325 0.5202165
+sample estimates:
+probability of success 
+             0.4444444 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">####Encontrando no R probabilidades utilizando a normal</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>p_value <span class="ot">&lt;-</span> <span class="fu">pnorm</span>(zcalc)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#teste &lt;- binom.test(aceitacao, n, p=0.5, alternative=&quot;less&quot;)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(p_value <span class="sc">&lt;</span> <span class="fl">0.05</span>){</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Rejeitamos H0, ou seja, há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</span>) <span class="do">## Proporção diferente de 50%</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Não rejeitamos H0, ou seja, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</span>) <span class="do">## Proporção igual à 50%</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;Não rejeitamos H0, ou seja, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados observados</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>observado <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">100</span>)  <span class="co"># aceitação, rejeição</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">180</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Teste qui-quadrado</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>esperado <span class="ot">&lt;-</span> <span class="fu">c</span>(n<span class="sc">/</span><span class="dv">2</span>, n<span class="sc">/</span><span class="dv">2</span>)  <span class="co"># frequência esperada sob H0</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>esperado_prop <span class="ot">&lt;-</span> esperado<span class="sc">/</span>n  <span class="co"># ajuste para a soma ser igual a observada</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>teste <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(observado, <span class="at">p =</span> esperado_prop)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(teste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Chi-squared test for given probabilities
+
+data:  observado
+X-squared = 2.2222, df = 1, p-value = 0.136</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternativa usando prop.test</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(<span class="dv">80</span>, <span class="dv">180</span>, <span class="at">p=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    1-sample proportions test with continuity correction
+
+data:  80 out of 180, null probability 0.5
+X-squared = 2.0056, df = 1, p-value = 0.1567
+alternative hypothesis: true p is not equal to 0.5
+95 percent confidence interval:
+ 0.3710924 0.5202061
+sample estimates:
+        p 
+0.4444444 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(teste<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Rejeitamos H0, ou seja, há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</span>) <span class="do">## Proporção diferente de 50%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Não rejeitamos H0, ou seja, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</span>) <span class="do">## Proporção igual à 50%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;Não rejeitamos H0, ou seja, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%&quot;</code></pre>
+</div>
+</div>
+<p>Portanto, concluímos que, com base nos testes qui-quadrado e binomial aproximado pela normal, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%. A indicação da pesquisa foi comprovada.</p>
+</section>
+<section id="questão-2" class="level1">
+<h1>Questão 2</h1>
+<p>Deseja-se testar a hipótese de que os resultados das faces de um dado tem uniformidade de ocorrência. Para tanto, joga-se o mesmo o numero de vezes mostrado abaixo, anotando-se os resultados:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img"></p>
+<figcaption>Tabela 1</figcaption>
+</figure>
+</div>
+<p>Execute um teste qui-quadrado. Utilize α=5%.</p>
+<p>H0: p1 = p2 = p3 = p4 = p5 = p6 (As faces do dado tem uniformidade de ocorrência) H1: Pelo menos uma das probabilidades é diferente (As faces do dado não tem uniformidade de ocorrência)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados observados</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>observado <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">180</span>, <span class="dv">207</span>, <span class="dv">191</span>, <span class="dv">203</span>, <span class="dv">210</span>, <span class="dv">209</span>)  <span class="co"># frequências observadas</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">sum</span>(observado)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>qtd_freq <span class="ot">&lt;-</span> <span class="fu">length</span>(observado)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>esperado <span class="ot">&lt;-</span> <span class="fu">rep</span>(n<span class="sc">/</span>qtd_freq, qtd_freq)  <span class="co"># frequência esperada sob H0</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>esperado_prop <span class="ot">&lt;-</span> esperado<span class="sc">/</span>n  <span class="co"># proporção esperada sob H0</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Teste qui-quadrado</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>teste <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(observado, <span class="at">p =</span> esperado_prop)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(teste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Chi-squared test for given probabilities
+
+data:  observado
+X-squared = 3.6, df = 5, p-value = 0.6083</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(teste<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>){</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência&quot;</code></pre>
+</div>
+</div>
+<p>Portanto, concluímos que, com base no teste qui-quadrado, não há evidências para rejeitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência. Ou seja, podemos dizer que as probabilidades de ocorrência de cada face do dado são iguais.</p>
+</section>
+<section id="questão-3" class="level1">
+<h1>Questão 3</h1>
+<p>24 crianças foram avaliadas com relação a um índice de agressividade e em seguida converteram-se os dados em sinais positivos (+) e negativos (-), dependendo se o índice estava acima ou abaixo da mediana do grupo. Deseja-se verificar a aleatoriedade dos escores de agressividade com relação à ordem em que foram obtidos.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img"></p>
+<figcaption>Tabela 2</figcaption>
+</figure>
+</div>
+<p>Verificar a aleatoriedade dos escores.</p>
+<p>H0: Os escores são aleatórios H1: Os escores não são aleatórios</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados observados</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">posicao =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">24</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sinal =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;b&quot;</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>teste <span class="ot">&lt;-</span> DescTools<span class="sc">::</span><span class="fu">RunsTest</span>(dados<span class="sc">$</span>sinal)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(teste<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>){</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que os escores são aleatórios&quot;</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os escores são aleatórios&quot;</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os escores são aleatórios&quot;</code></pre>
+</div>
+</div>
+<p>Portanto, concluímos que, com base no teste de aleatoriedade dos escores, não há evidências para rejeitar a afirmação de que os escores são aleatórios. Ou seja, podemos dizer que os escores de agressividades são aleatórios.</p>
+</section>
+<section id="questão-4" class="level1">
+<h1>Questão 4</h1>
+<p>Um fabricante de autopeças garante que o diâmetro de eixos produzidos por sua fábrica segue uma distribuição normal com média 100 mm e desvio padrão 2 mm. Teste a afirmação considerando a amostra de 6 peças obtidas e o teste de Kolmogorov Smirnov ao nível de 5% de significância:</p>
+<p>R: Testar Distribuição normal, média 100mm e desvio padrão 2mm. Usando o teste de kolmogorov e nível de significância de 5%.</p>
+<p>H0: A distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm. H1: A distribuição dos diâmetros não segue uma distribuição normal com média 100 mm e desvio padrão 2 mm.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados observados</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">93.45</span>, <span class="fl">96.74</span>, <span class="fl">97.93</span>, <span class="fl">100.73</span>, <span class="fl">103.60</span>, <span class="fl">105.20</span>)  <span class="co"># diâmetros observados</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Teste de Kolmogorov-Smirnov</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>teste <span class="ot">&lt;-</span> <span class="fu">ks.test</span>(amostra, <span class="st">&quot;pnorm&quot;</span>, <span class="at">mean=</span><span class="dv">100</span>, <span class="at">sd=</span><span class="dv">2</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(teste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Exact one-sample Kolmogorov-Smirnov test
+
+data:  amostra
+D = 0.34967, p-value = 0.3679
+alternative hypothesis: two-sided</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(teste<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>){</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">&quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm&quot;</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] &quot;Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm&quot;</code></pre>
+</div>
+</div>
+<p>Portanto, concluímos que, com base no teste de Kolmogorov-Smirnov, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm, ou seja, podemos dizer que as peças seguem os parâmetros indicados pelo fabricante.</p>
+</section>
+<section id="questão-5" class="level1">
+<h1>Questão 5</h1>
+<p>Refaça pelo teste de Lilliefors, o exemplo feito em sala de aula sobre o peso das carnes nas refeições do restaurante. (Testar Normalidade) α=5%.</p>
+<p>R:</p>
+<p>H0: A distribuição dos pesos das carnes segue uma distribuição normal. H1: A distribuição dos pesos das carnes não segue uma distribuição normal.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados observados</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">198</span>, <span class="dv">254</span>, <span class="dv">262</span>, <span class="dv">272</span>, <span class="dv">275</span>, <span class="dv">278</span>, <span class="dv">285</span>, <span class="dv">287</span>, <span class="dv">287</span>, <span class="dv">292</span>)  <span class="co"># pesos observados</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Teste de Lilliefors</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>teste <span class="ot">&lt;-</span> nortest<span class="sc">::</span><span class="fu">lillie.test</span>(amostra)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(teste)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lilliefors (Kolmogorov-Smirnov) normality test
+
+data:  amostra
+D = 0.24322, p-value = 0.09606</code></pre>
+</div>
+</div>
+<p>Portanto, concluímos que, com base no teste de Lilliefors, não há evidências para rejeitar a afirmação de que a distribuição dos pesos das carnes segue uma distribuição normal, ou seja, podemos dizer que os pesos .</p>
+</section>
 
 </main>
 <!-- /main column -->
@@ -3130,12 +3428,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copiada");
+    button.setAttribute("title", "Copied!");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copiada");
+      button.setAttribute("data-bs-title", "Copied!");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
