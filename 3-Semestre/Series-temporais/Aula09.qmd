@@ -1,8 +1,8 @@
 ---
-title: "Aula 08"
+title: "Aula 09"
 lang: pt-BR
 author: "Mikael Marin Coletto"
-date: "2024-10-01"
+date: "2024-11-20"
 format:
   html:
     toc: true
@@ -42,14 +42,7 @@ rewrite_data <- F
 ## Lendo dados e primeira inspeção visual
 
 ```{r}
-## Exemplo claude
-# Create example data (you can replace this with your own data)
-set.seed(123)
-t <- 100
-y1 <- arima.sim(n = t, model = list(ar = 0.5))
-y2 <- arima.sim(n = t, model = list(ar = 0.4))
-data <- cbind(y1, y2)
-data <- ts(data, frequency = 4)  # Convert to time series object
+dados <- data.table::fread(file = paste0(data_path, "dados/SLC 2014 Cristiano.csv"))
 
 
 # Step 1: Test for stationarity

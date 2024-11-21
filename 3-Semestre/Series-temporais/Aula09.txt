@@ -1,0 +1,45 @@
+Z_t = sigma_1*Z_{t-1} + e_t
+e_t ~ RB (Ruído branco)
+
+Ruído Branco
+E(e_t) = 0 <- média 0
+E(e_t*e_t) = sigma^2 <- variância constante (Homocedástica)
+Não autocorrelacionada
+
+Quando sigma^2 (variância) não é constante, tenho um modelo de volatilidade ARCH.
+
+Autoregressivo Condicional a Heterocedasticidade.
+
+Condicionada, pois necessita de uma variável que não seja autocorrelacionada.
+
+ARIMA - ARCH (alfa, beta) - Autogressivo condicionado à heterocedasticidade
+ARIMA Estima média - ARCH estima Variância
+ARIMA (p_1, d_1, q) - ARCH (alfa_1 Beta)
+
+Cluster de volatilidade
+
+Uma grande variância em períodos de clusters.
+
+alfa + Beta qto maior melhor, pois mede a persistência.
+
+A volatilidade não é previsível, mercado financeiro por exemplo, acontece uma notícia (por ex: uma bomba explode) e a bolsa começa em um momento de volatilidade.
+
+Erro ao quadrado -> Se é constante, é homocedástico. Senão é constante, se aumenta, então é heterocedástico.
+
+
+Primeiro estima o ARIMA e avalia os resíduos, precisa ser ruído branco.
+
+Nos artigos -> Fatores estilizados -> Volatilidade da variância
+
+Beta_0 e Beta_I <- Precisa ser sempre positiva (porque é variância, foi elevado ao quadrado)
+
+GARCH (P, Q) -> P - Autoregressão + Q - Médias móveis
+
+Alfa_I <- mede a extensão de um choque;
+Alfa_I + Beta_I <- medida de persistência de um choque na volatilidade.
+
+Para escolha do modelo, ARCH, GARCH, EARCH, TGARCH -> Observar o AIC e BIC.
+
+** Excesso de curtose indica maior volatilidade
+
+Curtose -> Variação da volatilidade, pensando em um gráfico de uma normal, teríamos um achatamento do pico do gráfico, portanto teríamos maiores números entre toda a distribuição.
