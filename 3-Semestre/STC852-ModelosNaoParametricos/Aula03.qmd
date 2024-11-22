@@ -1,0 +1,173 @@
+---
+title: "Aula 03 - Testes para duas amostras relacionadas"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-11-22"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+data_from <- "local"
+descritiva <- F
+# data_from <- "pendrive"
+if(data_from == "local"){
+  data_path <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/Series-temporais/Trabalho/dados/"
+}
+if(data_from == "pendrive"){
+  data_path <- "/media/userlm/Ventoy/Projetos/R/Pos-Estat/3-semestre/Series-temporais/Trabalho/dados/"
+}
+rewrite_data <- F
+```
+# Teste para 2 amostras relacionadas
+
+## Teste de McNemar
+
+O teste busca captar se indivíduos se deslocam entre duas categorias e avaliar se esse deslocamento é significativo.
+
+* Dicotômico, duas categorias.
+
+**Hipóteses**
+
+
+H0: Os tratamentos não diferem. (antes = depois)
+H1: Os tratamentos diferem. (antes != depois)
+
+### **Procedimento:**
+
+1. Enquadrar as frequencias na tabela:
+
+![Tabela](imgs/tabela-teste-mcnemar.png)
+
+2. Determinar
+
+$f_e = \frac{(b+c)}{2}$
+
+
+Se $f_e < 5$, empregar o teste binomial, com x = menor frequencia.
+
+### Exemplo
+
+```{r}
+####Duas Amostras
+######################Testes para duas amostras relacionadas
+#### McNemar
+mercado<- matrix(c(37,13,3,47),
+                 nrow = 2,
+                 dimnames = list("Antes" = c("A", "B"),
+                                 "Depois" = c("A", "B")))
+mercado
+mcnemar.test(mercado, correct=TRUE)
+```
+
+## Teste dos sinais
+
+**Hipóteses**
+
+H0: Os tratamentos não diferem. (antes = depois)
+H1: Os tratamentos diferem. (antes != depois)
+
+Por exemplo, dois medicamentos aplicados ao mesmo indivíduo, ou um controle e outro medicamento.
+
+### **Procedimento:**
+
+- Determinar o sinal da diferença em cada par (+ ou -)
+- n = número total de diferenças com sinal
+- Se $n \leq 25$, procede-se com um teste binomial c/ $p = \frac{1}{2}$ e x = menor frequencia dos sinais (+ ou -) 
+- Se $n > 25$: 
+
+$$z = \frac{2x - n}{\sqrt{n}}$$
+
+Em ambos: p-valor $\leq  \alpha$ rejeita-se H0.
+
+### Exemplo:
+
+```{r}
+mvelho <-c(18, 15, 19, 23, 12, 16, 18, 17)
+mnovo <- c(24, 14, 22, 28, 16, 20, 20, 18)
+mvelho-mnovo
+
+## Vimos que temos x = 1, pois a menor das duas diferença é -1 (um sinal)
+
+2*pbinom(1, 8, 0.5)
+
+# ou podemos então aplicar um teste binomial
+binom.test(1,8)
+
+## Como o p-valor = 0.07, se usarmos alfa = 0.05, não rejectamos H0
+
+
+###Ou atraves de pacote
+#### Instalar pacote BSDA
+#install.packages("BSDA") #depois de instalar pode remover essa linha
+library(BSDA)
+SIGN.test(mvelho, mnovo, alternative = "two.sided",
+          conf.level = 0.95)
+
+## O Resultado é o mesmo
+
+```
+
+
+
+## Teste de Wilcoxon
+
+**Hipóteses**
+
+H0: Os tratamentos não diferem. (antes = depois)
+H1: Os tratamentos diferem. (antes != depois)
+
+
+Utilizado para verificar a diferença entre duas situações, porém, diferente do teste dos sinais, ele leva em conta a magnitude das diferenças entre os pares. Ele envolve a atribuição de postos.
+
+H0: Os tratamentos não diferem. (antes = depois)
+H1: Os tratamentos diferem. (antes != depois)
+
+- Amostras pareadas. Por exemplo, dois medicamentos aplicados ao mesmo indivíduo, ou um controle e outro medicamento.
+- Determinar a diferença entre os valores ($d_i$) entre os pares. Se acontecer $d_i = 0$, excluir o par da análise ;
+- Atribuição de postos aos $d_i's$. Para tal, consideraremos $|di|$. Se houverem postos iguais, atribuir pré-postos, se houverem valores iguais, o posto final será a média dos pré-postos, olhar exemplo.
+- Postos: de 1 à N.
+- Determinar **T**, sendo **T**: a menor das somas entre os postos com sinal + e -;
+- N = número de sinais (se a diferença for 0, excluir da contagem)
+
+**Regra de decisão**
+- Se $n \leq 25$, $T_{calc} \leq T_{tab}$ -> Rejeita H0.
+- p-valor $< \alpha$ -> Rejeita H0.
+
+### Exemplo:
+
+```{r}
+#####Teste de Wilcoxon
+#####IMPORTANTE: NÃO ESQUECER DE COLOCAR PAIRED = TRUE
+#### ISSO INFORMA QUE AS AMOSTRAS S?O PAREADAS (DEPENDENTES)
+wilcox.test(mvelho,mnovo,paired=TRUE, alternative = "two.sided")
+### Veja que a estat?stica do teste ? V = 1,5
+### p-valor = 0,02471, ou seja rejeitamos H0.
+## Cuidar também se o teste é bilateral (two.sided) ou unilateral (less ou greater) para interpretar o p-valor
+
+#### Unilateral
+#### Baseia-se no primeiro elemento na função
+#### no caso abaixo testamos se mvelho<mnovo
+wilcox.test(mvelho,mnovo,paired=TRUE, alternative = "less")
+###p-valor = 0,01235, ou seja rejeitamos H0
+
+## Testando se o velho (mvelho) é menor que o novo (mnovo), primeiro menor do que o segundo, usar o less
+
+```
