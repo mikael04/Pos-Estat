@@ -1,0 +1,205 @@
+---
+title: "Atividade 2"
+author: "Mikael Marin Coletto"
+date: "2024-11-28"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+
+```
+
+# Questão 1
+
+Considere o quadro de notas abaixo referente a estudo para comparar a eficiência de dois métodos de aprendizagem. Utilize o teste de Wilcoxon para testar se existe diferença entre os dois métodos.
+
+![Tabela 1](imgs/tabela_1.png)
+
+
+
+R: Como possuímos uma amostra grande (mais de 30) usaremos uma aproximação pela normal.
+Também usaremos como hipótese nula que a proporção de aceitação é de 50% e como hipótese alternativa que a proporção de aceitação é diferente de 50%.
+
+
+```{r, teste-wolcoxon}
+# Create a data frame with the provided data
+data <- data.frame(
+  aluno = 1:26,
+  nota1 = c(5.1, 4.2, 3.3, 6.0, 7.1, 3.2, 2.8, 1.4, 0.8, 5.6,
+            3.8, 4.7, 6.2, 5.4, 1.2, 2.2, 1.9, 5.4, 5.5, 5.2,
+            3.8, 4.2, 1.8, 2.6, 4.3, 1.4),
+  nota2 = c(5.8, 4.7, 6.1, 7.4, 6.5, 3.2, 4.5, 3.5, 4.0, 5.5,
+            3.9, 4.5, 5.0, 5.4, 6.0, 5.0, 2.2, 1.8, 5.2, 6.0,
+            4.5, 4.7, 5.1, 2.9, 2.6, 6.5)
+)
+
+
+
+```
+
+```{r, teste-qui-quadrado}
+# Dados observados
+observado <- c(80, 100)  # aceitação, rejeição
+n <- 180
+
+# Teste qui-quadrado
+esperado <- c(n/2, n/2)  # frequência esperada sob H0
+esperado_prop <- esperado/n  # ajuste para a soma ser igual a observada
+teste <- chisq.test(observado, p = esperado_prop)
+
+# Resultados
+print(teste)
+
+# Alternativa usando prop.test
+prop.test(80, 180, p=0.5)
+
+if(teste$p.value < 0.05){
+  print("Rejeitamos H0, ou seja, há evidências para aceitar de que a proporção de aceitação é diferente de 50%") ## Proporção diferente de 50%
+}else{
+  print("Não rejeitamos H0, ou seja, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%") ## Proporção igual à 50%
+}
+
+```
+
+Portanto, concluímos que, com base nos testes qui-quadrado e binomial aproximado pela normal, não há evidências para aceitar de que a proporção de aceitação é diferente de 50%. A indicação da pesquisa foi comprovada.
+
+# Questão 2
+
+Deseja-se testar a hipótese de que os resultados das faces de um dado tem uniformidade de ocorrência. Para tanto, joga-se o mesmo o numero de vezes mostrado abaixo, anotando-se os resultados:
+
+
+![Tabela 1](imgs/tabela_1.png)
+
+Execute um teste qui-quadrado. Utilize α=5%.
+
+H0: p1 = p2 = p3 = p4 = p5 = p6 (As faces do dado tem uniformidade de ocorrência)
+H1: Pelo menos uma das probabilidades é diferente (As faces do dado não tem uniformidade de ocorrência)
+
+```{r, teste-qui-quadrado-2}
+# Dados observados
+observado <- c(180, 207, 191, 203, 210, 209)  # frequências observadas
+n <- sum(observado)
+qtd_freq <- length(observado)
+esperado <- rep(n/qtd_freq, qtd_freq)  # frequência esperada sob H0
+esperado_prop <- esperado/n  # proporção esperada sob H0
+
+# Teste qui-quadrado
+teste <- chisq.test(observado, p = esperado_prop)
+
+# Resultados
+print(teste)
+
+if(teste$p.value < 0.05){
+  print("Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência")
+}else{
+  print("Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência")
+}
+```
+
+Portanto, concluímos que, com base no teste qui-quadrado, não há evidências para rejeitar a afirmação de que os resultados das faces de um dado tem uniformidade de ocorrência. Ou seja, podemos dizer que as probabilidades de ocorrência de cada face do dado são iguais.
+
+# Questão 3
+
+24 crianças foram avaliadas com relação a um índice de agressividade e em seguida converteram-se os dados em sinais positivos (+) e negativos (-), dependendo se o índice estava acima ou abaixo da mediana do grupo. Deseja-se verificar a aleatoriedade dos escores de agressividade com relação à ordem em que foram obtidos.
+
+![Tabela 2](imgs/tabela_2.png)
+
+
+
+Verificar a aleatoriedade dos escores.
+
+H0: Os escores são aleatórios
+H1: Os escores não são aleatórios
+
+```{r, teste-qui-quadrado-3}
+
+# Dados observados
+dados <- data.frame(
+  posicao = 1:24,
+  sinal = c("a","b","a","a","a","a","b","a","a","a","b","b","b","b","a","b","b","a","a","a","b","b","b","b")
+)
+
+teste <- DescTools::RunsTest(dados$sinal)
+
+if(teste$p.value < 0.05){
+  print("Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que os escores são aleatórios")
+}else{
+  print("Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que os escores são aleatórios")
+}
+
+```
+
+Portanto, concluímos que, com base no teste de aleatoriedade dos escores, não há evidências para rejeitar a afirmação de que os escores são aleatórios. Ou seja, podemos dizer que os escores de agressividades são aleatórios.
+
+
+# Questão 4
+
+Um fabricante de autopeças garante que o diâmetro de eixos produzidos por sua fábrica segue uma distribuição normal com média 100 mm e desvio padrão 2 mm. Teste a afirmação considerando a amostra de 6 peças obtidas e o teste de Kolmogorov Smirnov ao nível de 5% de significância:
+
+R:
+Testar Distribuição normal, média 100mm e desvio padrão 2mm.
+Usando o teste de kolmogorov e nível de significância de 5%.
+
+H0: A distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm.
+H1: A distribuição dos diâmetros não segue uma distribuição normal com média 100 mm e desvio padrão 2 mm.
+
+```{r, teste-kolmogorov}
+# Dados observados
+amostra <- c(93.45, 96.74, 97.93, 100.73, 103.60, 105.20)  # diâmetros observados
+
+# Teste de Kolmogorov-Smirnov
+teste <- ks.test(amostra, "pnorm", mean=100, sd=2)
+
+# Resultados
+print(teste)
+
+if(teste$p.value < 0.05){
+  print("Rejeitamos H0, ou seja, não há evidências para aceitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm")
+}else{
+  print("Não rejeitamos H0, ou seja, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm")
+}
+
+```
+
+Portanto, concluímos que, com base no teste de Kolmogorov-Smirnov, não há evidências para rejeitar a afirmação de que a distribuição dos diâmetros segue uma distribuição normal com média 100 mm e desvio padrão 2 mm, ou seja, podemos dizer que as peças seguem os parâmetros indicados pelo fabricante.
+
+# Questão 5
+
+Refaça pelo teste de Lilliefors, o exemplo feito em sala de aula sobre o peso das carnes nas refeições do restaurante. (Testar Normalidade) α=5%.
+
+R:
+
+H0: A distribuição dos pesos das carnes segue uma distribuição normal.
+H1: A distribuição dos pesos das carnes não segue uma distribuição normal.
+
+```{r, teste-lilliefors}
+# Dados observados
+amostra <- c(198, 254, 262, 272, 275, 278, 285, 287, 287, 292)  # pesos observados
+
+# Teste de Lilliefors
+teste <- nortest::lillie.test(amostra)
+
+# Resultados
+print(teste)
+
+```
+
+Portanto, concluímos que, com base no teste de Lilliefors, não há evidências para rejeitar a afirmação de que a distribuição dos pesos das carnes segue uma distribuição normal, ou seja, podemos dizer que os pesos .

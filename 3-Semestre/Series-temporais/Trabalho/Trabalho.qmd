@@ -469,6 +469,44 @@ forecast::Acf(residuals, type = "partial", main = "ACF of Residuals")
 #   geom_line(aes(x = time(residuals_standardized), y = residuals_standardized)) +
 #   labs(title = "Standardized Residuals vs. Time", x = "Time", y = "Standardized Residuals") +
 #   theme_minimal()
+
+dados_residuos_queimadas <- as.data.frame(residuals)
+
+
+# Normalização Min-Max
+dados_normalizados <- dados_residuos_queimadas %>%
+  mutate(contagem_normalizada = (x - min(x)) / (max(x) - min(x)))
+
+dados <- dados_residuos_queimadas |> 
+  mutate(contagem_log = log(x + 1))  # Adiciona 1 para evitar log(0)
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_log)
+
+dados <- dados_residuos_queimadas %>%
+  mutate(contagem_sqrt = sqrt(x))
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_sqrt)
+
+# Aplicar Box-Cox (supondo que 'contagem' > 0)
+boxcox_result <- boxcox(lm(x ~ 1, data = dados_residuos_queimadas), lambda = seq(-2, 2, by = 0.1))
+
+# Melhor valor de lambda
+best_lambda <- boxcox_result$x[which.max(boxcox_result$y)]
+
+# Transformação dos dados com o melhor lambda
+dados <- dados_2010_2020_hans_anomes |> 
+  mutate(contagem_boxcox = ifelse(
+    abs(best_lambda) < 1e-10,  # Verifica se lambda está próximo de zero
+    log(n),                    # Usa logaritmo se lambda ≈ 0
+    (n^best_lambda - 1) / best_lambda
+  ))
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_boxcox)
+
+
 ```
 
 ```{r}
