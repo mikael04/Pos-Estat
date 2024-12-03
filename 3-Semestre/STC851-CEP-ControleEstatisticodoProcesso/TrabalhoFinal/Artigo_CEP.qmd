@@ -28,11 +28,20 @@ options(scipen = 99999)
 wd <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/STC851-CEP-ControleEstatisticodoProcesso/TrabalhoFinal/"
 ```
 
-# Introdução
+# Aplicação do gráfico de Controle CUSUM no Monitoramento de Epidemias de Hanseníase no Brasil, usando dados do SINAN
 
-# Metodologia
+## Introdução
 
-# Resultados
+A vigilância epidemiológica desempenha papel fundamental na detecção precoce de surtos e epidemias em todo o mundo. Técnicas estatísticas podem ser utilizadas no monitoramento contínuo para detectar possíveis variações de comportamento, auxiliando na rápida resposta ao incidente, possibilitando intervenções mais rápidas e efetivas. 
+Dentre as abordagens disponíveis, gráficos de controle estatístico são uma ferramenta poderosa e muito utilizada para detectar variações comuns das variações anormais, como surtos e epidemias.
+
+A utilização de gráficos de controle tradicionais é bastante utilizada na industria, e tem sido cada vez mais adotados na área epidemiológica, especialmente em contextos de detecção de doençás infecciosas. E dentre este segmento, um método que tem granhado destaque é o gráfico CUSUM, por ser mais sensível a pequenas mudanças na média do processo, que permitem uma detecção rápida no aumento ou diminuição do número de casos além da variação comum.
+
+A hanseníase é uma dessas doenças que requer monitoramento constante, devido à sua alta taxa de transmissão e ao fato de que a doença pode ser facilmente tratada se detectada precocemente e neste trabalho, aplicaremos o gráfico de controle CUSUM para monitorar a evolução da hanseníase no Brasil, usando dados do Sistema de Informação de Agravos de Notificação (SINAN).
+
+## Metodologia
+
+## Resultados
 
 ```{r}
 
@@ -229,7 +238,7 @@ residuos |>
 
 ```
 
-# Conclusão
+## Conclusão
 
 
 ```{r}
