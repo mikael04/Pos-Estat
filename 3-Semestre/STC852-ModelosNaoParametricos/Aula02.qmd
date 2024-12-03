@@ -217,7 +217,7 @@ ter1<-c("K","K","C","C","K","C","K","K","C","K","C","C","K","K","K",
 length(ter1)
 RunsTest(ter1,correct=F)
 
-## Aqui não rejeitamos h0, ou seja, a nossa  amostra é aleatória
+## Aqui não rejeitamos h0, ou seja, a nossa amostra é aleatória
 
 
 ```

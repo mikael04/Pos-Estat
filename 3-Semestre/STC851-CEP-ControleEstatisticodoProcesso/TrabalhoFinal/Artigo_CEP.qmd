@@ -1,0 +1,272 @@
+---
+title: "Artigo final"
+author: "Mikael Marin Coletto"
+date: "2024-11-14"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+
+wd <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/STC851-CEP-ControleEstatisticodoProcesso/TrabalhoFinal/"
+```
+
+# Introdução
+
+# Metodologia
+
+# Resultados
+
+```{r}
+
+dados_2010_2020 <- data.table::fread(paste0(wd, "dados/sih_rd_2010_2020.csv")) |> 
+  dplyr::rename(CID = DIAG_PRINC, ANO_MES = `__PDI_ANO_MES_CMPT`) |> 
+  dplyr::mutate(
+    # Convert to date by adding "01" for day
+    ano_mes = lubridate::ymd(paste0(ANO_MES, "01")),
+    # Extract year and month
+    ano = lubridate::year(ano_mes),
+    mes = lubridate::month(ano_mes))
+
+
+dados_2010_2020_por_cid <- dados_2010_2020 |> 
+  dplyr::group_by(CID) |> 
+  dplyr::summarise(n = n()) |>
+  dplyr::arrange(desc(n)) |> 
+  dplyr::ungroup()
+
+dados_apartir_2020 <- data.table::fread(paste0(wd, "dados/sih_rd_2020_emdiante.csv")) |> 
+  dplyr::rename(CID = DIAG_PRINC, ANO_MES = `__PDI_ANO_MES_CMPT`)
+
+dados_apartir_2020_por_cid <- dados_apartir_2020 |>
+  dplyr::group_by(CID) |> 
+  dplyr::summarise(n = n()) |>
+  dplyr::arrange(desc(n)) |> 
+  dplyr::ungroup()
+
+```
+
+```{r, dados-doenca-1}
+## Observando distribuição dos dados de Hanseníase
+cid_hanseniase <- c("A30", "A300", "A301", "A302", "A303", "A308", "A309")
+dados_2010_2020_hans_anomes <- dados_2010_2020 |> 
+  dplyr::filter(CID %in% cid_hanseniase) |> 
+  dplyr::group_by(ano_mes) |> 
+  dplyr::summarise(n = n())
+
+dados_2010_2020_hans_anomes |> 
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes, y = n)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "Distribuição de casos de Hanseníase de 2010 a 2020 no RS", x = "Ano", y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+Box.test(dados_2010_2020_hans_anomes$n, lag = 15, type = "Ljung-Box")
+
+par(mfrow = c(1, 2))
+acf(dados_2010_2020_hans_anomes$n, main = "ACF - Hanseníase")
+pacf(dados_2010_2020_hans_anomes$n, main = "PACF - Hanseníase")
+```
+
+```{r, dados-doenca-2}
+## Observando distribuição dos dados de Dengue
+cid_dengue <- c("A90", "A91")
+
+dados_2010_2020_dengue_anomes <- dados_2010_2020 |> 
+  dplyr::filter(CID %in% cid_dengue) |> 
+  dplyr::group_by(ano_mes) |> 
+  dplyr::summarise(n = n())
+
+dados_2010_2020_dengue_anomes |>
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes, y = n)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "Distribuição de casos de Dengue de 2010 a 2020 no RS", x = "Ano", y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+Box.test(dados_2010_2020_dengue_anomes$n, lag = 15, type = "Ljung-Box")
+
+par(mfrow = c(1, 2))
+acf(dados_2010_2020_dengue_anomes$n, main = "ACF - Dengue")
+pacf(dados_2010_2020_dengue_anomes$n, main = "PACF - Dengue")
+
+```
+
+## Testando normalidade dos dados
+
+```{r}
+
+dados_2010_2020_dengue_anomes |> 
+  ggplot2::ggplot(ggplot2::aes(x = n)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(title = "Histograma de casos de dengue de 2010 a 2020 no RS", x = "Número de casos", y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+shapiro.test(dados_2010_2020_dengue_anomes$n)
+```
+
+```{r}
+dados_2010_2020_hans_anomes |> 
+  ggplot2::ggplot(ggplot2::aes(x = n)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(title = "Histograma de casos de hanseníase de 2010 a 2020 no RS", x = "Número de casos", y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+shapiro.test(dados_2010_2020_hans_anomes$n)
+
+```
+
+```{r}
+
+dados_2010_2020_hans_anomes_clean <- dados_2010_2020_hans_anomes |> 
+  dplyr::filter(n < 40)
+
+# Seus dados (exemplo)
+dados <- dados_2010_2020_hans_anomes$n
+
+# Média dos dados (parâmetro lambda)
+lambda <- mean(dados)
+
+# Histograma com a curva de Poisson
+hist(dados, breaks = 10, probability = TRUE, col = "lightblue",
+     main = "Histograma com Curva de Poisson", xlab = "Casos")
+curve(dpois(x, lambda) * length(dados), add = TRUE, col = "red", lwd = 2)
+```
+
+
+```{r}
+# Frequências observadas
+freq_obs <- table(dados)
+
+# Frequências esperadas
+freq_exp <- dpois(as.numeric(names(freq_obs)), lambda) * length(dados)
+
+# Gráfico
+barplot(rbind(freq_obs, freq_exp), beside = TRUE, col = c("blue", "red"),
+        legend.text = c("Observada", "Esperada"), 
+        main = "Frequências Observadas vs. Esperadas")
+
+# Frequências esperadas arredondadas
+freq_exp_rounded <- round(freq_exp)
+
+# Teste qui-quadrado
+chisq.test(x = as.numeric(freq_obs), p = freq_exp_rounded / sum(freq_exp_rounded))
+
+```
+
+```{r}
+library(qcc)
+
+# Preparar os dados para o gráfico
+casos <- dados_2010_2020_hans_anomes$n
+
+# Criar o gráfico de controle
+qcc(casos, type = "xbar.one",
+    title = "Gráfico de Controle para Casos de Hanseníase",
+    xlab = "Meses (em ordem cronológica)",
+    ylab = "Número de Casos")
+
+# Criar gráfico CUSUM
+cusum(casos,
+      decision.interval = 5,  # Ajuste para definir a sensibilidade
+      se.shift = 1,           # Define um desvio padrão como a tolerância de mudança
+      title = "Gráfico CUSUM para Casos de Hanseníase",
+      xlab = "Meses (em ordem cronológica)",
+      ylab = "Número de Casos")
+
+library(forecast)
+
+# Converter os dados para uma série temporal
+dados_ts <- ts(casos, start = c(2010, 1), frequency = 12)
+
+# Plotar a decomposição
+plot(decompose(dados_ts))
+
+# Criar modelo de previsão
+modelo <- auto.arima(dados_ts)
+prev <- forecast(modelo, h = 12)
+plot(prev)
+
+pacf(dados_ts)
+acf(dados_ts)
+
+library(forecast)
+Box.test(dados_ts, lag = 10, type = "Ljung-Box")
+
+tseries::adf.test(dados_ts)
+
+shapiro.test(dados_ts)
+
+auto.arima(dados_ts)
+
+model <- auto.arima(dados_ts)
+
+residuos <- as.data.frame(model$residuals) 
+
+
+residuos |> 
+  ggplot2::ggplot(ggplot2::aes(x = x)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(title = "Histograma dos resíduos do modelo", x = "Resíduos", y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+
+
+```
+
+# Conclusão
+
+
+```{r}
+# Normalização Min-Max
+dados_normalizados <- dados_2010_2020_hans_anomes %>%
+  mutate(contagem_normalizada = (n - min(n)) / (max(n) - min(n)))
+
+dados <- dados_2010_2020_hans_anomes |> 
+  mutate(contagem_log = log(n + 1))  # Adiciona 1 para evitar log(0)
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_log)
+
+dados <- dados_2010_2020_hans_anomes %>%
+  mutate(contagem_sqrt = sqrt(n))
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_sqrt)
+
+library(MASS)
+
+# Aplicar Box-Cox (supondo que 'contagem' > 0)
+boxcox_result <- boxcox(lm(n ~ 1, data = dados_2010_2020_hans_anomes), lambda = seq(-2, 2, by = 0.1))
+
+# Melhor valor de lambda
+best_lambda <- boxcox_result$x[which.max(boxcox_result$y)]
+
+# Transformação dos dados com o melhor lambda
+dados <- dados_2010_2020_hans_anomes |> 
+  mutate(contagem_boxcox = ifelse(
+    abs(best_lambda) < 1e-10,  # Verifica se lambda está próximo de zero
+    log(n),                    # Usa logaritmo se lambda ≈ 0
+    (n^best_lambda - 1) / best_lambda
+  ))
+
+# Verificar a normalidade após a transformação
+shapiro.test(dados$contagem_boxcox)
+
+```
+

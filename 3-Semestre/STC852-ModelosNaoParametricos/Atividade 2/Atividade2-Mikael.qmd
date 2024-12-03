@@ -1,0 +1,147 @@
+---
+title: "Atividade 2"
+author: "Mikael Marin Coletto"
+date: "2024-11-28"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+
+```
+
+# Questão 1
+
+Considere o quadro de notas abaixo referente a estudo para comparar a eficiência de dois métodos de aprendizagem. Utilize o teste de Wilcoxon para testar se existe diferença entre os dois métodos.
+
+![Tabela 1](imgs/tabela_1.png)
+
+
+**R:** O teste de Wilcoxon analisa duas amostras e verifica se os tratamentos diferente entre si, para duas amostras pareadas.
+
+H0: Os tratamentos não diferem. (nota 1 = nota 2)
+H1: Os tratamentos diferem. (nota 1 $\neq$ nota 2)
+
+```{r, teste-wolcoxon}
+## Dados
+data <- data.frame(
+  aluno = 1:26,
+  nota1 = c(5.1, 4.2, 3.3, 6.0, 7.1, 3.2, 2.8, 1.4, 0.8, 5.6,
+            3.8, 4.7, 6.2, 5.4, 1.2, 2.2, 1.9, 5.4, 5.5, 5.2,
+            3.8, 4.2, 1.8, 2.6, 4.3, 1.4),
+  nota2 = c(5.8, 4.7, 6.1, 7.4, 6.5, 3.2, 4.5, 3.5, 4.0, 5.5,
+            3.9, 4.5, 5.0, 5.4, 6.0, 5.0, 2.2, 1.8, 5.2, 6.0,
+            4.5, 4.7, 5.1, 2.9, 2.6, 6.5)
+)
+
+
+## Teste de Wilcox
+teste <- wilcox.test(data$nota1, data$nota2, paired = TRUE, alternative = "two.sided")
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que os métodos de aprendizagem não são equivalentes.
+
+# Questão 2
+
+Um estudo foi realizado para avaliar o efeito de um programa de dieta. Os mesmos participantes foram avaliados antes e depois de participarem do programa. Os resultados são resumidos na seguinte tabela:
+
+![Tabela 2](imgs/tabela_2.png)
+
+**R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os participantes que participaram do programa de dieta.
+
+H0: Os tratamentos não diferem. (antes do programa = depois do programa)
+H1: Os tratamentos diferem. (antes do programa $\neq$ depois do programa)
+
+```{r, teste-mcnemar}
+## Dados
+tabela <- matrix(c(60, 10, 5, 5), nrow = 2, byrow = TRUE,
+                 dimnames = list(
+                   "Depois" = c("Perdeu peso", "Não perdeu peso"),
+                   "Antes" = c("Perdeu peso", "Não perdeu peso")
+                 ))
+
+# Convertendo para tabela
+tabela <- as.table(tabela)
+
+
+## Teste de McNemar
+teste <- mcnemar.test(tabela)
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é maior que 0.05, não rejeitamos a hipótese nula. Ou seja, não há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o programa de dieta não teve um efeito significativo na perda de peso dos participantes.
+
+
+# Questão 3
+
+Um médico quer avaliar se a pressão arterial diastólica se altera após o uso de determinado medicamento. Ele afere a pressão de 10 pacientes antes e depois de ingerirem a medicação. Determine se existem diferenças.
+
+![Tabela 3](imgs/tabela_3.png)
+
+**R:** Para estes dados, usaremos o teste de Wilcoxon para avaliar se houve uma diferença nas pressões dos pacientes após a aplicação do tratamento, neste caso a aplicação do medicamento. 
+
+H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
+
+```{r, teste-wilcoxon-2}
+## Dados
+dados_pressao <- data.frame(
+  paciente = 1:10,
+  pressao_antes = c(85, 90, 78, 92, 76, 89, 84, 77, 81, 95),
+  pressao_depois = c(82, 88, 79, 87, 74, 88, 82, 76, 80, 93)
+)
+
+## Teste de Wilcox
+teste <- wilcox.test(dados_pressao$pressao_antes, dados_pressao$pressao_depois, paired = TRUE, alternative = "two.sided")
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento teve um efeito significativo na pressão arterial diastólica dos pacientes.
+
+# Questão 4
+
+O folheto de propaganda do medicamento F apresenta os resultados a seguir, obtidos 24 horas após a medicação de 79 jogadores profissionais de futebol, que apresentavam problemas musculoesqueléticos diversos (principalmente entorse e dcontusão, mas também distensão muscular, tendinite, lombalgia e sinfisite púbica). Existe suporte estatístico para a afirmação de que esse medicamento contribui para a alteração do estado da dor 24 horas após sua administração?
+
+![Tabela 4](imgs/tabela_4.png)    
+
+
+**R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os jogadores de futebol que fizeram o tratamento medicamentoso.
+
+H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
+
+```{r, teste-mcnemar-2}
+## Dados
+tabela <- matrix(c(60, 10, 5, 5), nrow = 2, byrow = TRUE,
+                 dimnames = list(
+                   "Avaliação antes do tratamento" = c("Muita dor", "Pouca dor"),
+                   "Avaliação após 24h do tratamento" = c("Muita dor", "Pouca dor")
+                 ))
+
+## Convertendo para tabela
+tabela <- as.table(tabela)
+
+## Teste de McNemar
+teste <- mcnemar.test(tabela)
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é maior que 0.05, não rejeitamos a hipótese nula. Ou seja, não há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento não teve um efeito significativo na alteração do estado da dor dos jogadores de futebol.
