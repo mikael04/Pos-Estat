@@ -37,6 +37,7 @@ Considere o quadro de notas abaixo referente a estudo para comparar a eficiênci
 **R:** O teste de Wilcoxon analisa duas amostras e verifica se os tratamentos diferente entre si, para duas amostras pareadas.
 
 H0: Os tratamentos não diferem. (nota 1 = nota 2)
+
 H1: Os tratamentos diferem. (nota 1 $\neq$ nota 2)
 
 ```{r, teste-wolcoxon}
@@ -68,6 +69,7 @@ Um estudo foi realizado para avaliar o efeito de um programa de dieta. Os mesmos
 **R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os participantes que participaram do programa de dieta.
 
 H0: Os tratamentos não diferem. (antes do programa = depois do programa)
+
 H1: Os tratamentos diferem. (antes do programa $\neq$ depois do programa)
 
 ```{r, teste-mcnemar}
@@ -99,6 +101,7 @@ Um médico quer avaliar se a pressão arterial diastólica se altera após o uso
 **R:** Para estes dados, usaremos o teste de Wilcoxon para avaliar se houve uma diferença nas pressões dos pacientes após a aplicação do tratamento, neste caso a aplicação do medicamento. 
 
 H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+
 H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
 
 ```{r, teste-wilcoxon-2}
@@ -126,6 +129,7 @@ O folheto de propaganda do medicamento F apresenta os resultados a seguir, obtid
 **R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os jogadores de futebol que fizeram o tratamento medicamentoso.
 
 H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+
 H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
 
 ```{r, teste-mcnemar-2}
