@@ -1,0 +1,144 @@
+---
+title: "Atividade 3"
+author: "Mikael Marin Coletto"
+date: "2024-12-13"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+
+```
+
+# Questão 1
+
+1) Dois tipos de solução química, A e B, foram ensaiadas para a determinação do Ph. As
+análises de 10 amostras de cada solução estão apresentadas na tabela que segue.
+Verifique se há diferença entre elas ($\alpha$=5%).
+
+A 7,49 7,35 7,54 7,48 7,48 7,37 7,51 7,50 7,52 7,56
+B 7,28 7,35 7,52 7,50 7,38 7,48 7,31 7,22 7,41 7,45
+
+**R:** O teste de Mann-Whitney analisa duas amostras e verifica se os tratamentos diferente entre si.
+
+H0: As duas soluções não diferem. (Grupo A = Grupo B)
+H1: As duas soluções diferem. (Grupo A $\neq$ Grupo B)
+
+```{r, teste-wolcoxon}
+## Dados
+# Dados do grupo A e B
+A <- c(7.49, 7.35, 7.54, 7.48, 7.48, 7.37, 7.51, 7.50, 7.52, 7.56)
+B <- c(7.28, 7.35, 7.52, 7.50, 7.38, 7.48, 7.31, 7.22, 7.41, 7.45)
+
+teste <- wilcox.test(A, B, alternative = "two.sided", paired = FALSE)
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que as duas soluções químicas não são equivalentes.
+
+# Questão 2
+
+Numa classe de 24 alunos, comparou-se o rendimento de estudantes provenientes de
+escolas particulares e escolas públicas. Existe diferença entre os alunos, à um nível de significância de 10%?
+
+![Tabela 2](imgs/tabela_2.png)
+
+**R:** 
+
+H0: Os rendimentos das escolas não diferem. (escola pública = escola particular)
+
+H1: Os rendimentos das escolas diferem. (antes do programa $\neq$ depois do programa)
+
+```{r, teste-mcnemar}
+## Dados
+
+dados  <-
+  matrix(c(5, 7, 10, 2),
+         nrow = 2,
+         dimnames = list(Notas = c("Acima da média", "Abaixo da média"),
+                         Escolas = c("Pública", "Particular")))
+
+## Teste exato de fisher
+teste <- fisher.test(dados)
+teste
+```
+
+O teste nos resultou um p-valor de `r teste$p.value` e como ele é menor que 0.10 (nível de significância), rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os rendimentos não diferem. Portanto, podemos dizer que com base no teste exato de Fisher, usando um p-valor de 10%, as escolas obtiveram rendimentos diferentes.
+
+
+# Questão 3
+
+O tempo de uso de um aparelho de um laboratório, em meses, antes de ocorrer o
+primeiro defeito, foi anotado para 8 aparelhos da marca A e 10 aparelhos da marca B.
+Os resultados foram:
+
+![Tabela 3](imgs/tabela_3.png)
+Use o teste U de Mann-Whitney para analisar os dados, verificando se há diferença
+entre o tempo de uso dos aparelhos fabricados por A e por B. (Considere )
+
+**R:** Para estes dados, usaremos o teste de Wilcoxon para avaliar se houve uma diferença nas pressões dos pacientes após a aplicação do tratamento, neste caso a aplicação do medicamento. 
+
+H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+
+H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
+
+```{r, teste-wilcoxon-2}
+## Dados
+A <- c(321, 251, 40, 31, 35, 29, 37, 38)
+B <- c(41, 39, 36, 47, 45, 34, 48, 44, 43, 33)
+
+
+## Teste de Wilcox
+teste <- wilcox.test(A, B, paired = FALSE, alternative = "two.sided")
+teste
+```
+
+Então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento teve um efeito significativo na pressão arterial diastólica dos pacientes.
+
+# Questão 4
+
+O folheto de propaganda do medicamento F apresenta os resultados a seguir, obtidos 24 horas após a medicação de 79 jogadores profissionais de futebol, que apresentavam problemas musculoesqueléticos diversos (principalmente entorse e dcontusão, mas também distensão muscular, tendinite, lombalgia e sinfisite púbica). Existe suporte estatístico para a afirmação de que esse medicamento contribui para a alteração do estado da dor 24 horas após sua administração?
+
+![Tabela 4](imgs/tabela_4.png)    
+
+
+**R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os jogadores de futebol que fizeram o tratamento medicamentoso.
+
+H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+
+H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
+
+```{r, teste-mcnemar-2}
+## Dados
+tabela <- matrix(c(60, 10, 5, 5), nrow = 2, byrow = TRUE,
+                 dimnames = list(
+                   "Avaliação antes do tratamento" = c("Muita dor", "Pouca dor"),
+                   "Avaliação após 24h do tratamento" = c("Muita dor", "Pouca dor")
+                 ))
+
+## Convertendo para tabela
+tabela <- as.table(tabela)
+
+## Teste de McNemar
+teste <- mcnemar.test(tabela)
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é maior que 0.05, não rejeitamos a hipótese nula. Ou seja, não há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento não teve um efeito significativo na alteração do estado da dor dos jogadores de futebol.
