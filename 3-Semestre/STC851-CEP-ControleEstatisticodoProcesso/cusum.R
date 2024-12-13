@@ -4,7 +4,7 @@
 
 ############## Exercício 1 ################
 
-install.packages("qcc")
+# install.packages("qcc")
 library(qcc)
 
 # Create the dataframe
@@ -25,22 +25,23 @@ summary(data)
 
 
 # Function to calculate CUSUM Sh and Sl values
-calculate_cusum <- function(data, target, k) {
-  n <- length(data)
+calculate_cusum <- function(data_, target, k) {
+  xi <- data_$xi
+  n <- length(xi)
   Sh <- numeric(n)
   Sl <- numeric(n)
 
-  
+
   for (i in 1:n) {
     if (i == 1) {
-      Sh[i] <- max(0, data$xi[i] - target - k)
-      Sl[i] <- max(0, target - k - data$xi[i])
+      Sh[i] <- max(0, xi[i] - target - k)
+      Sl[i] <- max(0, target - k - xi[i])
     } else {
-      Sh[i] <- max(0, Sh[i-1] + data$xi[i] - target - k)
-      Sl[i] <- max(0, target - k - data$xi[i] + Sl[i-1])
+      Sh[i] <- max(0, Sh[i-1] + xi[i] - target - k)
+      Sl[i] <- max(0, target - k - xi[i] + Sl[i-1])
     }
   }
-  
+
   return(list(Sh = Sh, Sl = Sl))
 }
 
@@ -51,7 +52,7 @@ summary(data)
 target <- 10
 k <- 0.5
 
-result <- calculate_cusum(data$xi, target, k)
+result <- calculate_cusum(data, target, k)
 
 
 # Print first few values of Sh and Sl for debugging
@@ -66,14 +67,14 @@ print(result$Sh)
 print(result$Sl)
 
 # Plot CUSUM chart
-plot(result$Sh, type = "l", col = "red", ylim = range(c(result$Sh, result$Sl)), 
+plot(result$Sh, type = "l", col = "red", ylim = range(c(result$Sh, result$Sl)),
      xlab = "Sample", ylab = "CUSUM", main = "CUSUM Chart")
 lines(result$Sl, col = "blue")
 legend("topleft", legend = c("Sh", "Sl"), col = c("red", "blue"), lty = 1)
 
 
 # Plot CUSUM chart with improved visibility
-plot(result$Sh, type = "l", col = "red", 
+plot(result$Sh, type = "l", col = "red",
      ylim = range(c(result$Sh, result$Sl, 0)), # Ensure 0 is included in the range
      xlab = "Sample", ylab = "CUSUM", main = "CUSUM Chart")
 lines(result$Sl, col = "blue")

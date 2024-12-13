@@ -1,0 +1,5 @@
+- AIC, BIC me dão o modelo com melhor resultado, mas nem sempre o que dá melhor previsão.
+- Uso de treino e teste para séries temporais deve ser usado com muito cuidado, porque precisa ser pensado o curto, médio e longo prazo de cada série.
+- Avaliar critério de avaliação do modelo (SMAPE, AIC, BIC) para a área de conhecimento.
+- Desigualdade de THeil, fala se a previsão é melhor do que a média.
+- Combinação de previsão, ideia similar a árvore de decisão.
