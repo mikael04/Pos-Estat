@@ -9,11 +9,30 @@ data <- data.frame(
   Total = c(23, 169, 192)
 )
 
+# Create a contingency table
+table_data <- matrix(
+  c(
+    17, 218,  # Frequencies for "Sim" (Lesão na cabeça)
+    130, 428  # Frequencies for "Não" (Lesão na cabeça)
+  ),
+  nrow = 2, byrow = TRUE,
+  dimnames = list(
+    Lesao_na_Cabeca = c("Sim", "Nao"),
+    Uso_de_Capacete = c("Sim", "Nao")
+  )
+)
+
+# Convert the matrix to a table object
+table_data <- as.table(table_data)
+
+# Print the table
+print(table_data)
+
 # Display the data
 print(data)
 
 dados<-read.table("3-Semestre/STC852-ModelosNaoParametricos/teste.txt",h=T)
-dados
+# dados
 attach(dados)
 Fuma
 Infa
@@ -21,7 +40,7 @@ Infa
 tabcont<-table(Fuma,Infa)
 tabcont
 
-teste<-chisq.test(tabcont,correct = F)
+teste<-chisq.test(table_data,correct = F)
 teste
 
 ## Como p-valor < 0.05, rejeitamos a hipótese nula de que as variáveis são independentes, ou seja, existe sim uma associação
@@ -44,7 +63,7 @@ Raca <-
          dimnames = list(Raca = c("A", "B"),
                          Acasalamento = c("Fecundo", "Nao Fecundo")))
 Raca
-fisher.test(Raca, alternative = "less") #### Outras opcoes sao alternative="greater",
+fisher.test(Raca, alternative = "two.sided") #### Outras opcoes sao alternative="greater",
 ## Testando se "A" é menor do que a raça B (na ordem que foi escrito)
 #### alternative="two.sided"
 

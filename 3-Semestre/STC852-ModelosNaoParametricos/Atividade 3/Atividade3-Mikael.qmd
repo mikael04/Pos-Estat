@@ -1,21 +1,11 @@
 ---
 title: "Atividade 3"
+lang: "pt-BR"
 author: "Mikael Marin Coletto"
-date: "2024-12-13"
+date: "2024-12-12"
 format:
-  html:
-    toc: true
-    code-fold: true
-    theme: cerulean
-    transition: slide
-    background-transition: fade
-    embed-resources: true
-    # anchor-sections: true 
-    smooth-scroll: true
-    center: true
   pdf:
     toc: true
-    number-sections: true
     colorlinks: true
 ---
 
@@ -29,12 +19,14 @@ options(scipen = 99999)
 
 # Questão 1
 
-1) Dois tipos de solução química, A e B, foram ensaiadas para a determinação do Ph. As
+Dois tipos de solução química, A e B, foram ensaiadas para a determinação do Ph. As
 análises de 10 amostras de cada solução estão apresentadas na tabela que segue.
 Verifique se há diferença entre elas ($\alpha$=5%).
 
 A 7,49 7,35 7,54 7,48 7,48 7,37 7,51 7,50 7,52 7,56
+
 B 7,28 7,35 7,52 7,50 7,38 7,48 7,31 7,22 7,41 7,45
+
 
 **R:** O teste de Mann-Whitney analisa duas amostras e verifica se os tratamentos diferente entre si.
 
@@ -51,16 +43,15 @@ teste <- wilcox.test(A, B, alternative = "two.sided", paired = FALSE)
 teste
 ```
 
-Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que as duas soluções químicas não são equivalentes.
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05 (nível de significância de 5%), rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que as duas soluções químicas não são equivalentes.
 
 # Questão 2
 
-Numa classe de 24 alunos, comparou-se o rendimento de estudantes provenientes de
-escolas particulares e escolas públicas. Existe diferença entre os alunos, à um nível de significância de 10%?
+Numa classe de 24 alunos, comparou-se o rendimento de estudantes provenientes de escolas particulares e escolas públicas. Existe diferença entre os alunos, à um nível de significância de 10%?
 
-![Tabela 2](imgs/tabela_2.png)
+![Tabela 2](imgs/q2-tabela.png)
 
-**R:** 
+**R:** Para estes dados, usaremos o teste exato de Fisher para verificar se há diferença entre os rendimentos dos alunos de escolas públicas e particulares.
 
 H0: Os rendimentos das escolas não diferem. (escola pública = escola particular)
 
@@ -85,60 +76,98 @@ O teste nos resultou um p-valor de `r teste$p.value` e como ele é menor que 0.1
 
 # Questão 3
 
-O tempo de uso de um aparelho de um laboratório, em meses, antes de ocorrer o
-primeiro defeito, foi anotado para 8 aparelhos da marca A e 10 aparelhos da marca B.
+O tempo de uso de um aparelho de um laboratório, em meses, antes de ocorrer o primeiro defeito, foi anotado para 8 aparelhos da marca A e 10 aparelhos da marca B.
 Os resultados foram:
 
-![Tabela 3](imgs/tabela_3.png)
-Use o teste U de Mann-Whitney para analisar os dados, verificando se há diferença
-entre o tempo de uso dos aparelhos fabricados por A e por B. (Considere )
+![Tabela 3](imgs/q3-tabela.png)
 
-**R:** Para estes dados, usaremos o teste de Wilcoxon para avaliar se houve uma diferença nas pressões dos pacientes após a aplicação do tratamento, neste caso a aplicação do medicamento. 
+**R:** Para estes dados, usaremos o teste de Mann-Whitney para verificar se há diferença entre os tempos de uso dos aparelhos das marcas A e B.
 
 H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
 
 H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
 
-```{r, teste-wilcoxon-2}
+```{r, teste-mann-whitney-2}
 ## Dados
 A <- c(321, 251, 40, 31, 35, 29, 37, 38)
 B <- c(41, 39, 36, 47, 45, 34, 48, 44, 43, 33)
 
 
-## Teste de Wilcox
+## Teste de Mann Whitney
 teste <- wilcox.test(A, B, paired = FALSE, alternative = "two.sided")
 teste
 ```
 
-Então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento teve um efeito significativo na pressão arterial diastólica dos pacientes.
+Então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula (à um nível de significância de 5%). Ou seja, há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento teve um efeito significativo na pressão arterial diastólica dos pacientes.
 
 # Questão 4
 
-O folheto de propaganda do medicamento F apresenta os resultados a seguir, obtidos 24 horas após a medicação de 79 jogadores profissionais de futebol, que apresentavam problemas musculoesqueléticos diversos (principalmente entorse e dcontusão, mas também distensão muscular, tendinite, lombalgia e sinfisite púbica). Existe suporte estatístico para a afirmação de que esse medicamento contribui para a alteração do estado da dor 24 horas após sua administração?
+O diretor de uma escola elementar classifica os pais em três categorias de renda, segundo a área residencial, e em três níveis de participação nos programas da escola. De acordo com a tabela abaixo, testar a hipótese de que não existe relação entre renda e participação nos programas da escola, utilizando um nível de significância de 5%. Interprete o significado do resultado do teste.
 
-![Tabela 4](imgs/tabela_4.png)    
+![Tabela 4](imgs/q4-tabela.png)    
 
 
-**R:** Para estes dados, usaremos o teste de McNemar para avaliar se houve um deslocamento (ou seja, houve uma diferença) entre os jogadores de futebol que fizeram o tratamento medicamentoso.
+**R:** Para estes dados, aplicaremos o teste de qui-quadrado para verificar se existe diferença entre os níveis de renda e a participação nos programas da escola.
 
-H0: Os tratamentos não diferem. (antes do medicamento = depois do medicamento)
+H0: Os níveis de renda não interfere na participação do programa (baixo = médio = alto).
 
-H1: Os tratamentos diferem. (antes do medicamento $\neq$ depois do medicamento)
+H1: Os níveis de renda interfere na participação do programa (pelo menos uma renda difere das demais).
 
 ```{r, teste-mcnemar-2}
 ## Dados
-tabela <- matrix(c(60, 10, 5, 5), nrow = 2, byrow = TRUE,
-                 dimnames = list(
-                   "Avaliação antes do tratamento" = c("Muita dor", "Pouca dor"),
-                   "Avaliação após 24h do tratamento" = c("Muita dor", "Pouca dor")
-                 ))
+table_data <- matrix(
+  c(
+    28, 48, 16,  # Frequências para "Nunca"
+    22, 65, 14,  # Frequências para "Ocasional"
+    17, 74, 3    # Frequências para "Regular"
+  ),
+  nrow = 3, byrow = TRUE,
+  dimnames = list(
+    Participacao = c("Nunca", "Ocasional", "Regular"),
+    Nivel_de_Renda = c("Baixo", "Medio", "Alto")
+  )
+)
 
-## Convertendo para tabela
-tabela <- as.table(tabela)
+# Convert the matrix to a table object
+table_data <- as.table(table_data)
 
-## Teste de McNemar
-teste <- mcnemar.test(tabela)
+teste <- chisq.test(table_data, correct = F)
 teste
 ```
 
-Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é maior que 0.05, não rejeitamos a hipótese nula. Ou seja, não há evidências para rejeitar a hipótese de que os tratamentos não diferem. Portanto, podemos dizer que o medicamento não teve um efeito significativo na alteração do estado da dor dos jogadores de futebol.
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é menor que 0.05, rejeitamos a hipótese nula. Ou seja, podemos dizer que existe diferença para pelo menos uma das rendas em relação às demais no quesito participação nos programas.
+
+# Questão 5
+
+A tabela abaixo faz parte de um estudo que investiga a efetividade dos capacetes de segurança de bicicleta na prevenção de lesões na cabeça. Os dados consistem de uma amostra aleatória de 793 indivíduos envolvidos em acidentes ciclísticos durante um período especificado de um ano. 
+
+![Tabela 5](imgs/q5-tabela.png)
+
+**R:** Para estes dados usaremos o teste exato de Fisher para verificar se há diferença entre o uso de capacete e a efetividade da segurança das lesões na cabeça.
+
+H0: O uso de capacete não faz diferença significativa na efetividade da segurança das lesões na cabeça (Com capacete = Sem capacete).
+
+H1: O uso de capacete faz diferença significativa na efetividade da segurança das lesões na cabeça (Com capacete $\neq$ Sem capacete).
+
+```{r, teste-fisher-2}
+## Dados
+table_data <- matrix(
+  c(
+    17, 218,  # Frequências para "Sim" (Lesão na cabeça)
+    130, 428  # Frequências para "Não" (Lesão na cabeça)
+  ),
+  nrow = 2, byrow = TRUE,
+  dimnames = list(
+    Lesao_na_Cabeca = c("Sim", "Nao"),
+    Uso_de_Capacete = c("Sim", "Nao")
+  )
+)
+
+table_data
+
+## Rodando teste de exato de Fisher
+teste <- fisher.test(table_data)
+teste
+```
+
+Usando o nível de significância de 5%, Tivemos então um p-valor de `r teste$p.value` e como ele é muito menor que 0.05, rejeitamos a hipótese nula. Ou seja, podemos dizer que, usando o teste exato de Fisher com nível de significância de 5%, o uso de capacete fez diferença significativa na efetividade da segurança das lesões na cabeça para esta amostra.
