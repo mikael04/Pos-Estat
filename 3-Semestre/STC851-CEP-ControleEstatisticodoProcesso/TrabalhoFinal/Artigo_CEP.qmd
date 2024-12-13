@@ -25,7 +25,9 @@ A vigilância epidemiológica desempenha um papel fundamental na detecção prec
 
 Originalmente empregados na indústria para o controle de processos, os gráficos de controle tradicionais têm sido cada vez mais adotados na área epidemiológica, especialmente na detecção de doenças infecciosas. Dentre essas ferramentas, o gráfico CUSUM (Cumulative Sum) tem ganhado destaque devido à sua maior sensibilidade a pequenas mudanças na média do processo, permitindo a detecção rápida de aumentos ou diminuições no número de casos que excedem a variação comum. Essa característica torna o CUSUM particularmente eficaz na identificação precoce de tendências emergentes que podem indicar a ocorrência de surtos.
 
-A hanseníase é uma doença que requer monitoramento constante, devido à sua capacidade de transmissão e ao fato de que pode ser facilmente tratada se detectada precocemente. No contexto brasileiro, onde a doença ainda apresenta uma considerável incidência, é essencial implementar estratégias eficazes de vigilância. Neste trabalho, aplicaremos o gráfico de controle CUSUM para monitorar a evolução da hanseníase no Brasil, utilizando dados provenientes do Sistema de Informação de Agravos de Notificação (SINAN). Esta abordagem visa identificar, de forma preventiva, quaisquer variações significativas na incidência da doença, facilitando intervenções mais direcionadas e eficientes. Além disso, espera-se que os resultados obtidos contribuam para o aprimoramento das práticas de vigilância epidemiológica no país, oferecendo uma metodologia robusta para a detecção precoce e o controle efetivo da hanseníase.
+A hanseníase é uma doença que requer monitoramento constante, devido à sua capacidade de transmissão e ao fato de que pode ser facilmente tratada se detectada precocemente. No contexto brasileiro, onde a doença ainda apresenta uma considerável prevalência, é essencial implementar estratégias eficazes de vigilância. Neste trabalho, aplicaremos o gráfico de controle CUSUM para monitorar a evolução da hanseníase no Brasil, utilizando dados provenientes do Sistema de Informação de Agravos de Notificação (SINAN). Esta abordagem visa identificar, de forma preventiva, quaisquer variações significativas na prevalência da doença, facilitando intervenções mais direcionadas e eficientes. Além disso, espera-se que os resultados obtidos contribuam para o aprimoramento das práticas de vigilância epidemiológica no país, oferecendo uma metodologia robusta para a detecção precoce e o controle efetivo da hanseníase.
+
+O objetivo deste trabalho é fornecer uma ferramenta com bases sólidas para auxiliar o monitoramento dos dados de hanseníase no Brasil, utilizando o gráfico de controle CUSUM como uma abordagem estatística eficaz para a indicação de surtos e tendências emergentes.
 
 # Referêncial teórico
 
@@ -37,43 +39,43 @@ A qualidade e integridade dos dados do SINAN são essenciais para o monitorament
 
 Uma das formas para a detecção precoce de mudanças no padrão de comportamento de uma doença é o uso de ferramentas estatísticas adequadas, uma das que já tem sido utilizada em dados epidemiológico são os gráficos de controle (@sonesson_bock_disc_vig_saud_pub_estat). Tais ferramentas já tem sido amplamente utilizadas em áreas como controle de qualidade e estatística industrial, e agora estão sendo adaptadas para a vigilância em saúde, possibilitando a identificação precode de surtos e epidemias a partir de séries temporais de dados.
 
-Dentro deste campo, o uso do gráfico de controle CUSUM (*cumulative sum control chart* ou gráfico de controle de somas acumuladas) tem ganhado destaque na vigilância em saúde (@fricker_statistical_methods_biosurvellance) por sua capacidade de detectar pequenas mudanças na incidência de uma doença ao longo do tempo entre as medições observadas e um parâmetro de referência, normalmente uma média histórica), permitindo assim identificar rapidamente tendências na ocorrência de casos antes que se caracterize um surto. Esse tipo de análise é bastante pertinente em doenças de transmissão lenta, como a hanseníase, onde essas modificações podem ser indicar falhas na vigilância, no tratamento ou em intervenções preventivas.
+Dentro deste campo, o uso do gráfico de controle CUSUM (*cumulative sum control chart* ou gráfico de controle de somas acumuladas) tem ganhado destaque na vigilância em saúde (@fricker_statistical_methods_biosurvellance) por sua capacidade de detectar pequenas mudanças na prevalência de uma doença ao longo do tempo entre as medições observadas e um parâmetro de referência, normalmente uma média histórica), permitindo assim identificar rapidamente tendências na ocorrência de casos antes que se caracterize um surto. Esse tipo de análise é bastante pertinente em doenças de transmissão lenta, como a hanseníase, onde essas modificações podem ser indicar falhas na vigilância, no tratamento ou em intervenções preventivas.
 
 # Metodologia
 
-Para a realização deste artigo, utilizaremos dados de notificação de casos de hanseníase provenientes do Sistema de Informação de Agravos de Notificação (SINAN) do Brasil. Os dados utilizados serão do período de 2001 a 2023 e foram coletados através do tabnet disponibilizado pelo Governo Federal e contêm informações sobre a incidência dos casos de hanseníase, permitindo a análise da evolução da doença ao longo do tempo. A escolha deste período visa abranger um intervalo significativo de tempo para a detecção de possíveis variações na incidência da hanseníase.
+Para a realização deste artigo, foram utilizados dados de notificação de casos de hanseníase provenientes do Sistema de Informação de Agravos de Notificação (SINAN) do Brasil. Os dados serão do período de 2001 a 2023 e foram coletados através do tabnet disponibilizado pelo Governo Federal e contêm informações sobre a prevalência dos casos de hanseníase, permitindo a análise da evolução da doença ao longo do tempo. A escolha deste período visa abranger um intervalo significativo de tempo para a detecção de possíveis variações na prevalência da hanseníase.
 
 Após a coleta, os dados foram agregados por unidade de tempo, selecionamos mês para melhor visualização do longo período de tempo escolhido. Em seguida, foi feito um trabalho de limpeza e verificação da consistência dos dados, buscando por possíveis falhas no preenchimento, erros nos agrupamentos, ou demais casos de observações que precisaríamos remover da base de dados.
 
-Na análise descritiva observamos a média, mediana, desvio padrão e valores mínimos e máximos da contagem de casos, para compreender o quadro geral da doença ao longo do período analisado. Em seguida, foi feita uma análise gráfica da série temporal, com o objetivo de identificar possíveis padrões, tendências ou sazonalidades nos dados. Para isso, utilizamos gráficos de linha e histogramas para visualizar a distribuição dos casos.
+Na análise descritiva foram observadas a média, a mediana, o desvio padrão e os valores mínimos e máximos da contagem de casos, para compreender o quadro geral da doença ao longo do período analisado. Em seguida, foi feita uma análise gráfica da série temporal, com o objetivo de identificar possíveis padrões, tendências ou sazonalidades nos dados. Para isso, foram utilizados gráficos de linha e histogramas para visualizar a distribuição dos casos.
 
-Após a análise inicial, será verificada se a série temporal é estacionária, para isso, será feito o teste de Dickey-Fuller aumentado (ADF) e o teste de Ljung-Box para verificar a presença de autocorrelação nos dados. Caso a série não seja estacionária, serão feitas as transformações nos dados, e utilizaremos um modelo ARIMA para a modelagem, e neste caso, utilizaremos os resíduos da série para a construção do gráfico de controle. O intuito é que, após estacionarmos a série, se obtivermos valores fora dos limites nos resíduos, é um indicativo de que a própria série está saindo de controle.
+Após a análise inicial, foi verificada se a série temporal é estacionária, para isso, será feito o teste de Dickey-Fuller aumentado (ADF) e o teste de Ljung-Box para verificar a presença de autocorrelação nos dados. Como a série não foi estacionária, foram feitas as transformações nos dados, e utilizamos um modelo ARIMA para a modelagem. E então, foi utilizado os resíduos do modelo para a construção do gráfico de controle. O intuito é que, após estacionarmos a série, se ao obtermos valores fora dos limites nos resíduos, seria um indicativo de que a própria série está saindo de controle.
 
-E assimn serão feitos os primeiros cálculos para a construção do gráfico de controle de somas acumuladas (CUSUM).
+E assim foram feitos os primeiros cálculos para a construção do gráfico de controle de somas acumuladas (CUSUM).
 
-O primeiro passo é a definição do nível de referência $\mu$, obtido através do cálculo da média histórica do número de casos nos períodos considerados livres de surto. Em seguida definimos o parâmetro de deslocamento $k$, geralmente definido como uma fração do desvio-padrão histórico da série, esse parâmetro vai determinar a sensibilidade do gráfico à pequenas variações na média, quanto menor, mais sensível, mas podendo aumentar as chances de termos falsos positivos.
+O primeiro passo foi a definição do nível de referência $\mu$, obtido através do cálculo da média histórica do número de casos nos períodos considerados livres de surto. Em seguida definimos o parâmetro de deslocamento $k$, geralmente caracterizado como uma fração do desvio-padrão histórico da série, esse parâmetro vai determinar a sensibilidade do gráfico à pequenas variações na média, quanto menor, mais sensível, mas podendo aumentar as chances de termos falsos positivos.
 
-E então, calcularemos os incrementos cumulativos, para cada ponto de contagem observado no mês, vamos definir um incremento em relação à média histórica como $X_t - (\mu + k)$ . Para o valor superior ($CUSUM^+$) teremos:
+E então, foram calculados os incrementos cumulativos, para cada ponto de contagem observado no mês, vamos definir um incremento em relação à média histórica como $X_t - (\mu + k)$ . Para o valor superior ($CUSUM^+$) teremos:
 
 $$S_H(i) = max(0, S_H(i-1) + X_t - (\mu + k)$$
 
 E para o valor inferior ($CUSUM^-$) teremos: $$S_L(i) = max(0, S_L(t-1)^- + ((\mu - k)- X_t)$$
 
-Estabeleceremos o limite de controle ($H$), utilizando o nível de confiança e o tamanho da amostra como parâmetros com base no desvio-padrão histórico.
+Foi estabelecido o limite de controle ($H$), utilizando o nível de confiança e o tamanho da amostra como parâmetros com base no desvio-padrão histórico.
 
-Será feita uma comparação com o método de Shewhart para observar a diferença na sensibilidade das variações, e possíveis casos onde o gráfico de CUSUM fornece alarmes mais precoces ou mais precisos.
+E para comparação, usamos o método de Shewhart para observar a diferença na sensibilidade das variações, e possíveis casos onde o gráfico de CUSUM fornece alarmes mais precoces ou mais precisos.
 
-Além dessa comparação, faremos também análise de diferentes usos de $k$ e $H$ , para testar a melhor opção de escolha entre sensibilidade, ou seja, detectar surtos precoces, e especificidade, evitar falsos positivos.
+Além dessa comparação, foi feito também análise de diferentes parâmetros $k$ e $H$, para testar a melhor opção de escolha entre sensibilidade, ou seja, detectar surtos precoces, e especificidade, evitar falsos positivos.
 
-Os softwares que serão utilizados serão a linguagem R, criada com o intuito de ser uma linguagem estatística, o ambiente de desenvolvimento do relatório e das análises será o RStudio, utilizando os pacotes *quarto* para construção do relatório, *dplyr* para manipulação dos dados, *ggplot2* para elaboração dos gráficos, o pacote *forecast* para modelagem da série temporal e o pacote *qcc* para construção do gráfico de controle do tipo CUSUM (@package_qcc).
+Os softwares utilizados foram a linguagem R (versão 4.3.3), criada com o intuito de ser uma linguagem estatística, o ambiente de desenvolvimento do relatório e das análises será o RStudio (versão RStudio 2024.09.1+394), utilizando os pacotes *quarto* (@package_quarto) para construção do relatório, *dplyr* para manipulação dos dados (@package_dplyr), *ggplot2* para elaboração dos gráficos (@package_ggplot2), o pacote *forecast* para modelagem da série temporal (@package_forecast_1 e @package_forecast_2) e o pacote *qcc* para construção do gráfico de controle do tipo CUSUM (@package_qcc).
 
 # Resultados
 
 ## Avaliando banco de dados
 
-A primeira etapa será uma análise exploratória dos dados de hanseníase obtidos através do sinan, para isso, vamos carregar os dados e observar a completude dos dados no quesito data de diagnóstico e o ID do agravo (CID).
+A primeira etapa desenvolvida foi uma análise exploratória dos dados de hanseníase obtidos através do sinan, para isso, carregamos os dados e observamos a completude dos dados no quesito data de diagnóstico e o ID do agravo (CID).
 
-```{r, lendo-dados-analise-inciial}
+```{r, lendo-dados-analise-inciial, echo=FALSE}
 sinan_hans_2001_2023 <- data.table::fread(
   paste0(wd, "dados/sinan_hansbr_2001_2023.csv")) |> 
   dplyr::rename(CID = ID_AGRAVO, DATA = DT_DIAG) |> 
@@ -93,7 +95,7 @@ n_inv_cid_data <- sinan_hans_2001_2023 |>
 
 ```
 
-Pelo código acima, observamos que o único CID disponível nesta base de dados é o de Hanseníase `r cid_distinct`. Além disso, não temos nenhum caso sem CID ou sem data de diagnóstico preenchida (a contagem retornou `r n_inv_cid_data`). Porém, temos casos de diagnóstico em datas muito mais antigas do que a análise propôs, portanto os casos anteriores à 2001 serão removidos da base de dados logo adiante, o que pode ser um erro de preenchimento ou um caso de diagnóstico tardio.
+Pelo código desenvolvido, foi observado que o único CID disponível nesta base de dados é o de Hanseníase `r cid_distinct`. Além disso, não temos nenhum caso sem CID ou sem data de diagnóstico preenchida (a contagem retornou `r n_inv_cid_data`). Porém, temos casos de diagnóstico em datas muito mais antigas do que a análise propôs, portanto os casos anteriores à 2001 serão removidos da base de dados logo adiante, o que pode ser um erro de preenchimento ou um caso de diagnóstico tardio.
 
 ## Análise exploratória
 
@@ -105,7 +107,6 @@ sinan_hans_2001_2023_anomes <- sinan_hans_2001_2023 |>
 
 ## Removendo anos anteriores (dados incompletos)
 sinan_hans_2001_2022_anomes <- sinan_hans_2001_2023_anomes |> 
-  dplyr::filter(ano_mes >= "2001-01", ano_mes <= "2022-12") |>
   dplyr::mutate(ano_mes_graf = lubridate::ymd(paste0(ano_mes, "-01")))
 
 ## Criando gráfico da distribuição de casos
@@ -200,11 +201,11 @@ ggplot2::ggplot(sinan_hans_2001_2022_anomes) +
 
 ```
 
-Os dados possuem uma dispersão considerável, mas mais de 50% deles estão dentro dos quartis 2 e 3, o que indica que a maior parte dos dados está concentrada em uma faixa relativamente estreita. A média e a mediana estão próximas, o que sugere que a distribuição dos dados é simétrica. O boxplot ajuda a visualizar essa distribuição.
+Os dados possuem uma dispersão em torno da média, mais de 50% deles estão dentro dos quartis 2 e 3, o que indica que a maior parte dos dados está concentrada em uma faixa relativamente estreita. A média e a mediana estão próximas, o que sugere que a distribuição dos dados é simétrica. O boxplot ajuda a visualizar essa distribuição.
 
 ## Avaliando estacionariedade
 
-Para verificar a estacionariedade da série temporal, utilizaremos o teste de Dickey-Fuller aumentado (ADF) e o teste de Ljung-Box para verificar a presença de autocorrelação nos dados.
+Para verificar a estacionariedade da série temporal, foi utilizado o teste de Dickey-Fuller aumentado (ADF) e o teste de Ljung-Box para verificar a presença de autocorrelação nos dados.
 
 ```{r, testes-estacionariedade, warning=FALSE, message=FALSE, echo=FALSE}
 ## Teste de autocorrelação de Ljung-box
@@ -226,7 +227,7 @@ Por inspeção visual dos gráficos de autocorrelação e autocorrelação parci
 
 ## Modelando a série
 
-Para a modelagem, utilizaremos o pacote `forecast` para ajustar um modelo ARIMA aos dados e verificar a estacionariedade dos resíduos, usando sua função *auto.arima* para definir o modelo. Essa função testa diversos parâmetros de autocorrelação, de médias móveis e de diferenciação para encontrar o melhor modelo para a série temporal, definido pelos menores valores de AIC e BIC.
+Para a modelagem, foi utilizado o pacote `forecast` para ajustar um modelo ARIMA aos dados e verificar a estacionariedade dos resíduos, usando sua função *auto.arima* para definir o modelo. Essa função testa diversos parâmetros de autocorrelação, de médias móveis e de diferenciação para encontrar o melhor modelo para a série temporal, definido pelos menores valores de AIC e BIC.
 
 ```{r, diferenciação, warning=FALSE, message=FALSE, echo=FALSE}
 library(forecast)
@@ -275,11 +276,11 @@ pacf(residuals(modelo), main = "PACF - Resíduos")
 
 ```
 
-Agora que modelamos a série e verificamos a estacionariedade dos resíduos, podemos prosseguir com a construção do gráfico de controle CUSUM.
+Agora que foi modelada a série e já foi testada a estacionariedade dos resíduos, podemos prosseguir com a construção do gráfico de controle CUSUM.
 
 ## Gráfico CUSUM
 
-Após a estabilização da série, iremos começar a construção do gráfico de controle CUSUM. Para isso vamos utilizar os resíduos da série temporal modelada, calcular a média histórica dos casos de hanseníase e o desvio padrão, que serão utilizados para definir os parâmetro de deslocamento e de decisão do gráfico.
+Após a estabilização da série, foi iniciada a construção do gráfico de controle CUSUM. Para isso utilizamos os resíduos da série temporal modelada, calculamos a média histórica dos casos de hanseníase e o desvio padrão, que serão utilizados para definir os parâmetro de deslocamento e de decisão do gráfico.
 
 ```{r, calculo-parametros-cusum, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 # # Calculando a média histórica e o desvio padrão
@@ -354,25 +355,25 @@ invisible(cusum(residuos$x,
       ylab = "Desvio Padrão",
       labels = residuos$ano_mes))
 
-# Criar gráfico CUSUM para os resíduos com H = 4, k = 1
-invisible(cusum(residuos$x,
-      decision.interval = 4, # Limite de controle (H)
-      se.shift = 1,        # Parâmetro de deslocamentoe (k)
-      digits = 4,
-      title = "Gráfico CUSUM para os resíduos (H = 4, k = 1)",
-      xlab = "Meses (em ordem cronológica)",
-      ylab = "Desvio Padrão",
-      labels = residuos$ano_mes))
+# # Criar gráfico CUSUM para os resíduos com H = 4, k = 1
+# invisible(cusum(residuos$x,
+#       decision.interval = 4, # Limite de controle (H)
+#       se.shift = 1,        # Parâmetro de deslocamentoe (k)
+#       digits = 4,
+#       title = "Gráfico CUSUM para os resíduos (H = 4, k = 1)",
+#       xlab = "Meses (em ordem cronológica)",
+#       ylab = "Desvio Padrão",
+#       labels = residuos$ano_mes))
 
-# Criar gráfico CUSUM para os resíduos com H = 5, k = 1/2
-invisible(cusum(residuos$x,
-      decision.interval = 5, # Limite de controle (H)
-      se.shift = 1/2,        # Parâmetro de deslocamentoe (k)
-      digits = 4,
-      title = "Gráfico CUSUM para os resíduos (H = 5, k = 1/2)",
-      xlab = "Meses (em ordem cronológica)",
-      ylab = "Desvio Padrão",
-      labels = residuos$ano_mes))
+# # Criar gráfico CUSUM para os resíduos com H = 5, k = 1/2
+# invisible(cusum(residuos$x,
+#       decision.interval = 5, # Limite de controle (H)
+#       se.shift = 1/2,        # Parâmetro de deslocamentoe (k)
+#       digits = 4,
+#       title = "Gráfico CUSUM para os resíduos (H = 5, k = 1/2)",
+#       xlab = "Meses (em ordem cronológica)",
+#       ylab = "Desvio Padrão",
+#       labels = residuos$ano_mes))
 
 # Criar gráfico CUSUM para os resíduos com H = 5, k = 1
 invisible(cusum(residuos$x,
@@ -386,11 +387,11 @@ invisible(cusum(residuos$x,
 
 ```
 
-Avaliando ambos os gráficos, podemos observar que o gráfico com $H = 4$ e $k = 1/2$ é mais sensível a pequenas variações, enquanto o gráfico com $H = 5$ e $k = 1$ é mais conservador, exigindo uma mudança maior para acionar um alarme. O primeiro gráfico nos dá diversos pontos fora de controle, entre 2002 e 2005 indicando surtos, alguns pontos em 2006 à 2008 indicando valores abaixo do esperado, pontos em 2009 novamente indicando surtos e o período de pandemia quase como um todo a partir de 2020 até 2021 indicando o número de casos abaixo do esperado, além disso usando o contexto geral da doença, a distribuição da série original e sabendo que passamos por um período de pandemia em 2020, o segundo gráfico praticamente nos dá a série sob controle durante todo o período senão levarmos em conta o período de pandemia. A escolha entre esses parâmetros dependerá do objetivo da análise, se o foco for detectar surtos precocemente, o gráfico mais sensível é mais adequado, mas se o objetivo for evitar falsos positivos, o gráfico mais conservador é a melhor opção.
+Avaliando ambos os gráficos, observamos que o gráfico com $H = 4$ e $k = 1/2$ é mais sensível a pequenas variações, enquanto o gráfico com $H = 5$ e $k = 1$ é mais conservador, exigindo uma mudança maior para acionar um alarme. O primeiro gráfico nos dá diversos pontos fora de controle, entre 2002 e 2005 indicando surtos, alguns pontos em 2006 à 2008 indicam valores abaixo do esperado, pontos em 2009 novamente indicam surtos e o período de pandemia quase como um todo a partir de 2020 até 2021 mostram o número de casos abaixo do esperado, além disso usando o contexto geral da doença, a distribuição da série original e sabendo que passamos por um período de pandemia de COVID-19 em 2020, o segundo gráfico praticamente nos dá a série sob controle durante todo o período excluindo o período da pandemia. A escolha entre esses parâmetros dependerá do objetivo da análise, se o foco for detectar surtos precocemente, o gráfico mais sensível é mais adequado, mas se o objetivo for evitar falsos positivos, o gráfico mais conservador é a melhor opção. Outros dois gráficos intermediários também foram testados, com parâmetros $H= 4$ e $k = 1$ e $H = 5$ e $k = 1/2$, mas não foram apresentados aqui.
 
 ## Comparando com o gráfico de Shewhart
 
-Para comparar a sensibilidade do gráfico CUSUM com o gráfico de Shewhart, construiremos um gráfico de controle tradicional para os resíduos da série temporal modelada.
+Para comparar a sensibilidade do gráfico CUSUM com o gráfico de Shewhart, foi construído um gráfico de controle tradicional para os resíduos da série temporal modelada.
 
 ```{r, shewhart, warning=FALSE, message=FALSE, echo=FALSE}
 # Gráfico de controle de Shewhart
@@ -484,9 +485,7 @@ ggplot(dados_cusum, aes(x = ano_mes, y = Valor_CUSUM, color = Tipo_CUSUM)) +
 
 # Conclusão
 
-A hanseníase é uma doença milenar que ainda representa um desafio para a saúde pública em muitos países, principalmente no Brasil. A vigilância epidemiológica tem papel fundamental na resposta à doenças, permitindo a detecção precoce de surtos e epidemias, bem como o acompanhamento da evolução das doenças ao longo do tempo. O uso dos dados administrativos do SINAN são um avanço importante para a vigilância no Brasil, mas ainda há desafios a serem superados, como a subnotificação de casos e a qualidade dos dados.
-
-Nesse contexto, o uso de gráficos de controle mostra-se uma ótima ferramenta para a vigilância em saúde, pososbilitando a detecção precoce de surtos e epidemias a partir de séries temporais de dados, a flexibilidade na definição de parâmetros torna esses gráficos adequados à diferentes tipos de comportamentos de transmissão de doenças, tornando-os mais sensíveis e específicos conforme as características do agravo em análise. Dentre as abordagens disponíveis, o gráfico de controle CUSUM, em particular, tem se destacado por sua capacidade de detectar pequenas variações na incidência de uma doença ao longo do tempo, permitindo identificar tendências emergentes antes que se caracterize um surto. Além disso, é uma ferramenta de fácil construção e aplicação contínua, tornando-o uma excelente opção para a vigilância em saúde.
+Nesse contexto, o uso de gráficos de controle mostra-se uma ótima ferramenta para a vigilância em saúde, pososbilitando a detecção precoce de surtos e epidemias a partir de séries temporais de dados, a flexibilidade na definição de parâmetros torna esses gráficos adequados à diferentes tipos de comportamentos de transmissão de doenças, tornando-os mais sensíveis e específicos conforme as características do agravo em análise. Dentre as abordagens disponíveis, o gráfico de controle CUSUM, em particular, tem se destacado por sua capacidade de detectar pequenas variações na prevalência de uma doença ao longo do tempo, permitindo identificar tendências emergentes antes que se caracterize um surto. Além disso, é uma ferramenta de fácil construção e aplicação contínua, tornando-o uma excelente opção para a vigilância em saúde.
 
 Apesar de a literatura nacional ainda ser inscipiente nesse campo, a experiência demonstrada incetiva o uso de ferramentas estatísticas mais robustas e de fácil implementação para auxiliar diferentes cenários epidemiológicos, como a hanseníase, e em diferentes contextos de saúde pública no Brasil. Dessa forma este estudo contribui para o avanço da vigilância epidemiológica no país, fortalecendo a capacidade do sistema de saúde em responder de forma eficiente frente à ameaças emergentes e apoiando os gestores de saúde na tomada de decisões baseadas em evidências.
 
