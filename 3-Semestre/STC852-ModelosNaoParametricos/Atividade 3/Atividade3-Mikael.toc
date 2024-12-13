@@ -1,7 +1,0 @@
-\babel@toc {brazilian}{}\relax 
-\contentsline {section}{\nonumberline Questão 1}{1}{section*.3}%
-\contentsline {section}{\nonumberline Questão 2}{2}{section*.5}%
-\contentsline {section}{\nonumberline Questão 3}{3}{section*.8}%
-\contentsline {section}{\nonumberline Questão 4}{4}{section*.11}%
-\contentsline {section}{\nonumberline Questão 5}{5}{section*.14}%
-\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

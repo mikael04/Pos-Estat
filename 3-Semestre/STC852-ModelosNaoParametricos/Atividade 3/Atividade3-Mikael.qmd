@@ -3,10 +3,7 @@ title: "Atividade 3"
 lang: "pt-BR"
 author: "Mikael Marin Coletto"
 date: "2024-12-12"
-format:
-  pdf:
-    toc: true
-    colorlinks: true
+format: pdf
 ---
 
 ```{r setup, include=FALSE}
