@@ -1,0 +1,342 @@
+---
+title: "Avaliando a diferença entre os anos de hanseníase no Brasil"
+lang: pt-BR
+author: "Mikael Marin Coletto"
+date: "2024-12-12"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cerulean
+    transition: slide
+    background-transition: fade
+    embed-resources: true
+    # anchor-sections: true 
+    smooth-scroll: true
+    center: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+options(scipen = 99999)
+
+wd <- "/mnt/Netac-Dados/Projetos/R/Pos-Estat/3-Semestre/STC851-CEP-ControleEstatisticodoProcesso/TrabalhoFinal/"
+```
+
+# Introdução
+
+A hanseníase é uma doença infecciosa causada pelo bacilo Mycobacterium leprae. Embora tenha sido controlada em muitas partes do mundo, ainda persiste em algumas regiões, especialmente em países em desenvolvimento como o Brasil, Índia e Indonésia. A Organização Mundial da Saúde (OMS) estabeleceu metas para eliminar a hanseníase como problema de saúde pública, definindo uma taxa de incidência anual inferior a 1 caso por 10.000 habitantes. No contexto brasileiro, onde a doença ainda apresenta uma considerável prevalência, os governos federais tem tentado implementar estratégias para aumentar a vigilância e consequentemente facilitar o tratamento, já que é uma doença de tratamento relativamente simples se diagnosticada em estágios iniciais.
+
+Neste relatório, utilizaremos testes estatísticos não paramétricos para avaliar as diferenças nas prevalências de hanseníase no Brasil ao longo dos anos, comparando diferentes estados. Além disso, analisaremos a diferença no número de casos entre dois estados específicos para determinar a eficácia das políticas públicas de prevenção da doença.
+
+# Métodos
+
+Para esta análise, coletamos dados oficiais de casos de notificação de hanseníase nos estados brasileiros ao longo de vários anos. Os dados foram obtidos do Ministério da Saúde do Brasil, usando o tabnet e baixando a base do Sistema de informação de Agravos de Notificação (SINAN) e abrangem um período de 23 anos (2001-2023).
+
+Inicialmente faremos uma análise descritiva da base de dados.
+
+Primeiramente, realizamos um teste não paramétrico para duas amostras independentes para comparar a diferença na incidência de hanseníase entre estados ao longo dos anos. Especificamente, utilizamos o teste de Mann-Whitney U, que é adequado para comparar medias de duas amostras independentes quando as suposições dos testes paramétricos não são satisfeitas.
+
+Além disso, selecionamos dois estados com diferentes abordagens em políticas públicas de tratamento da hanseníase e compararamos o número de casos nestes estados ao longo do mesmo período de tempo. Novamente, aplicamos o teste de Mann-Whitney U para determinar se há uma diferença significativa nos números de casos entre esses dois estados.
+
+# Resultados
+
+## Avaliando banco de dados
+
+A primeira etapa desenvolvida foi uma análise exploratória dos dados de hanseníase obtidos através do sinan, para isso, carregamos os dados e observamos a completude dos dados no quesito data de diagnóstico e o ID do agravo (CID).
+
+```{r, lendo-dados-analise-inciial, echo=TRUE}
+sinan_hans <- data.table::fread(
+  paste0(wd, "dados/sinan_hansbr_2001_2023.csv")) |> 
+  dplyr::rename(CID = ID_AGRAVO, DATA = DT_DIAG) |> 
+  dplyr::mutate(
+    UF = substr(ID_MUNICIP, 1, 2),
+    data_format = lubridate::ymd(DATA),
+    # Extraindo mes e ano da data
+    ano = substr(DATA, 1, 4),
+    mes = substr(DATA, 5, 6),
+    ano_mes = paste0(ano, "-", mes))
+
+## Verificando CID, se temos apenas o de Hanseníase
+cid_distinct <- dplyr::distinct(sinan_hans, CID) |> dplyr::pull()
+
+# Observando preenchimento de CID e datas
+n_inv_cid_data <- sinan_hans |> 
+  dplyr::filter(is.na(CID) | is.na(DATA)) |> 
+  dplyr::count() |> 
+  dplyr::pull()
+
+```
+
+Pelo código desenvolvido, foi observado que o único CID disponível nesta base de dados é o de Hanseníase `r cid_distinct`. Além disso, não temos nenhum caso sem CID ou sem data de diagnóstico preenchida (a contagem retornou `r n_inv_cid_data`). Porém, temos casos de diagnóstico em datas muito mais antigas do que a análise propôs, portanto os casos anteriores à 2001 serão removidos da base de dados logo adiante, o que pode ser um erro de preenchimento ou um caso de diagnóstico tardio.
+
+## Análise exploratória
+
+### Analisando o número de casos por ano/mês no Brasil
+
+```{r, dados-hans-visualizacao, echo=TRUE}
+## Fazendo contagens por ano/mês
+sinan_hans_2001_2023_anomes <- sinan_hans |> 
+  dplyr::group_by(ano_mes) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(ano_mes, .keep_all = T)
+
+sinan_hans_2001_2023_anomes <- sinan_hans_2001_2023_anomes |> 
+  dplyr::mutate(ano_mes_graf = lubridate::ymd(paste0(ano_mes, "-01")))
+
+## Criando gráfico da distribuição de casos
+sinan_hans_2001_2023_anomes |> 
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes_graf, y = n)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(
+    title = "Distribuição de casos de Hanseníase no Brasil", 
+    subtitle = "Dados do SISVAN",
+    x = "Ano",
+    y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+
+## Removendo anos anteriores e posteriores a período determinado (dados incompletos)
+sinan_hans_2001_2023_anomes_brasil <- sinan_hans_2001_2023_anomes |> 
+  dplyr::filter(ano >= "2001", ano < "2023") 
+
+sinan_hans_2001_2023_anomes_brasil |> 
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes_graf, y = n)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(
+    title = "Distribuição de casos de Hanseníase no Brasil (2001-2022)", 
+    subtitle = "Dados do SISVAN",
+    x = "Ano",
+    y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+```
+
+### Analisando normalidade dos dados
+
+```{r, normalidade-dados, echo=TRUE}
+## Histograma dos dados
+sinan_hans_2001_2023_anomes_brasil |> 
+  ggplot2::ggplot(ggplot2::aes(x = n)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(
+    title = "Histograma de casos de hanseníase de 2001 a 2022 no Brasil", 
+    x = "Número de casos", 
+    y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+## Teste de Shapiro-Wilk
+shapiro.test(sinan_hans_2001_2023_anomes_brasil$n)
+ks.test(sinan_hans_2001_2023_anomes_brasil$n, "pnorm", mean(sinan_hans_2001_2023_anomes_brasil$n), sd(sinan_hans_2001_2023_anomes_brasil$n))
+```
+
+Os dados de hanseníase para o Brasil de 2001 a 2022 parecem seguir uma distribuição normal, como indicado pelo teste de Shapiro-Wilk (p-valor $>$ 0.05), o teste de Kolmogorov-Smirnov (p-valor $>$ 0.05) e observando o histograma.
+
+### Analisando dados por UF
+
+Agora iremos observar os dados de algumas UFs, para isso, iremos agrupar os dados por UF e ano/mês e observar a distribuição de casos de hanseníase para Bahia e Rio Grande do Sul.
+
+```{r, echo=TRUE}
+## Lendo dados de UF
+uf_nome_cod <- data.table::fread(
+  paste0(wd, "dados/cod_ibge_mun_capitais.csv")) |> 
+  dplyr::mutate(cod_ibge = substr(cod_ibge, 1, 2)) |> 
+  dplyr::select(cod_ibge, nome_uf)
+
+## Agrupando por UF e removendo anos antes de 2001 e pós 2023
+sinan_hans_uf_2001_2022 <- sinan_hans |> 
+  dplyr::filter(ano >= "2001", ano < "2023") |> 
+  dplyr::group_by(UF, ano_mes) |> 
+  dplyr::summarise(n = n()) |> 
+  dplyr::ungroup()
+  
+
+## Unindo com dados do SINAN
+sinan_hans_uf_2001_2022 <- dplyr::inner_join(sinan_hans_uf_2001_2022, uf_nome_cod,
+                                             by=dplyr::join_by(UF == cod_ibge))
+
+
+## Criando histograma dos dados da Bahia
+sinan_hans_uf_2001_2022_ba <- sinan_hans_uf_2001_2022 |> 
+  dplyr::filter(nome_uf == "Bahia") 
+
+sinan_hans_uf_2001_2022_ba |> 
+  ggplot2::ggplot(ggplot2::aes(x = n)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(
+    title = "Histograma de casos de hanseníase de 2001 a 2022 no RS", 
+    x = "Número de casos", 
+    y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+## Rodando o teste de normalidade para a Bahia
+shapiro.test(sinan_hans_uf_2001_2022_ba |> dplyr::pull(n))
+ks.test(sinan_hans_uf_2001_2022_ba$n, "pnorm", mean(sinan_hans_uf_2001_2022_ba$n), sd(sinan_hans_uf_2001_2022_ba$n))
+nortest::ad.test(sinan_hans_uf_2001_2022_ba$n)
+
+## Criando histograma dos dados para o Rio Grande do Sul
+sinan_hans_uf_2001_2022_rs <- sinan_hans_uf_2001_2022 |> 
+  dplyr::filter(nome_uf == "Rio Grande do Sul") 
+
+sinan_hans_uf_2001_2022_rs |> 
+  ggplot2::ggplot(ggplot2::aes(x = n)) +
+  ggplot2::geom_histogram(bins = 30) +
+  ggplot2::labs(
+    title = "Histograma de casos de hanseníase de 2001 a 2022 no RS", 
+    x = "Número de casos", 
+    y = "Frequência") + 
+  ggplot2::theme_minimal()
+
+## Rodando o teste de normalidade para o RS
+shapiro.test(sinan_hans_uf_2001_2022_rs |> dplyr::pull(n))
+ks.test(sinan_hans_uf_2001_2022_rs$n, "pnorm", mean(sinan_hans_uf_2001_2022_rs$n), sd(sinan_hans_uf_2001_2022_rs$n))
+nortest::ad.test(sinan_hans_uf_2001_2022_rs$n)
+
+# ks.test(ba_hans_2001_2022, "pnorm", mean(ba_hans_2001_2022), sd(ba_hans_2001_2022))
+# nortest::ad.test(ba_hans_2001_2022)
+```
+
+Já aqui temos resultados conflitantes, segundo os testes de Shapiro-Wilk e Anderson-Darling ambas as distribuições não seguem uma distribuição normal, ambos rejeitando a hipótese nula de uma distribuição normal, o histograma da distribuição de contagem de casos também não demonstra um comportamento normal. Mas o teste de Kolmogorov-Smirnov não rejeita a hipótese nula de uma distribuição normal, ou seja, indica que os dados seguem sim uma distribuição normal.
+
+
+## Comparando a prevalência de hanseníase entre estados
+
+Agora vamos comparar a prevalência de hanseníase entre os estados brasileiros ao longo dos anos. Para isso, utilizaremos o teste de Mann-Whitney U para comparar as médias de duas amostras independentes. Vamos separar os dados por UF (Bahia e Rio Grande do Sul) e iremos comparar os valores de prevalência de hanseníase entre esses dois estados.
+
+```{r, comparando-incidencia-estados, echo=TRUE}
+## Organizando os dados
+sinan_hans_2001_2022_anomes_ba_rs <- sinan_hans |> 
+  dplyr::group_by(ano_mes, UF) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(ano_mes, .keep_all = T) |> 
+  dplyr::filter(UF %in% c("29", "43")) |> 
+  dplyr::filter(ano >= "2001", ano <= "2022") |> 
+  dplyr::mutate(ano_mes_graf = lubridate::ymd(paste0(ano_mes, "-01"))) |> 
+  dplyr::select(UF, ano_mes, ano_mes_graf, n) |> 
+  dplyr::inner_join(uf_nome_cod, by=dplyr::join_by(UF == cod_ibge)) |> 
+  dplyr::ungroup()
+
+## Selecionando os anos para comparação
+
+## Separando por coluna para comparação
+sinan_hans_2001_2022_anomes_ba_rs_matrix <- sinan_hans_2001_2022_anomes_ba_rs |> 
+  dplyr::select(nome_uf, ano_mes, n) |> 
+  tidyr::pivot_wider(names_from = nome_uf, values_from = n) |> 
+  dplyr::select(-ano_mes)
+
+## Rodando o teste U de Mann-Whitney para amostras independentes
+wilcox.test(sinan_hans_2001_2022_anomes_ba_rs_matrix$Bahia,
+            sinan_hans_2001_2022_anomes_ba_rs_matrix$`Rio Grande do Sul`,
+            alternative = "two.sided", paired = FALSE)
+
+```
+
+O resultado do teste U de Mann-Whitney foi significativo (p-valor < 0.05), indicando que há uma diferença significativa na prevalência de hanseníase entre os estados da Bahia e do Rio Grande do Sul ao longo dos anos.
+
+## Comparando o número de casos de hanseníase em diferentes estados da mesma região
+
+Agora vamos comparar o número de casos de hanseníase em uma região específica no período selecionado, usaremos os estados do Sul, portanto Paraná, Rio Grande do Sul e Santa Catarina, para observarmos se a diferença de casos também está presente, ou se os indicadores socioeconômicos influenciam a prevalência encontrada. Utilizaremos como um delineamento em blocos, onde os blocos serão as UFs, e os grupos (ou "tratamentos") serão os anos/meses observados. 
+
+```{r, comparando-incidencia-estados-sul, echo=TRUE}
+## Organizando os dados
+sinan_hans_2001_2022_anomes_sul <- sinan_hans |> 
+  dplyr::group_by(ano_mes, UF) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(ano_mes, .keep_all = T) |> 
+  dplyr::filter(UF %in% c("41", "43", "42")) |> 
+  dplyr::filter(ano >= "2001", ano <= "2022") |> 
+  dplyr::mutate(ano_mes_graf = lubridate::ymd(paste0(ano_mes, "-01"))) |> 
+  dplyr::select(UF, ano_mes, ano_mes_graf, n) |> 
+  dplyr::inner_join(uf_nome_cod, by=dplyr::join_by(UF == cod_ibge)) |> 
+  dplyr::ungroup()
+
+## Apresentando gráfico do número de casos por ano/mês nos estados do Sul
+sinan_hans_2001_2022_anomes_sul |> 
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes_graf, y = n, color = nome_uf)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(
+    title = "Distribuição de casos de Hanseníase no Sul do Brasil", 
+    subtitle = "Dados do SISVAN",
+    x = "Ano",
+    y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+
+## Rodando o teste de Friedman
+friedman.test(y = sinan_hans_2001_2022_anomes_sul$n,
+              groups = sinan_hans_2001_2022_anomes_sul$ano_mes,
+              blocks = sinan_hans_2001_2022_anomes_sul$nome_uf)
+
+pgirmess::friedmanmc(y = sinan_hans_2001_2022_anomes_sul$n,
+                     groups = sinan_hans_2001_2022_anomes_sul$nome_uf,
+                     blocks = sinan_hans_2001_2022_anomes_sul$ano_mes)
+```
+Apesar de possuírem indicadores socioeconômicos mais próximos, os estados do Sul apresentam diferenças significativas no número de casos de hanseníase no período observado, como indicado pelo teste de Friedman (p-valor < 0.05). O segundo teste inclusive nos mostra um resultado diferente do esperado pelo gráfico das distribuições, pelo gráfico parecemos ter valores muito próximos para o Rio Grande do Sul e Santa Catarina, porém, os resultados indicam que mesmo esses dois estados possuindo valores similares, existe uma diferença significativa entre o número de casos ao longo dos anos.
+
+## Comparando o número de casos entre os primeiros anos de notificação e os últimos
+
+Uma outra coisa que podemos observar no primeiro gráfico da distribuição dos dados no país é que a quantidade de casos de hanseníase vem diminuindo ao longo dos anos, porém gostaríamos de verificar se essa diminuição é significativa. Para termos uma amostra maior, utilizaremos como grupos os anos de 2001 para representar os anos iniciais e 2022 para representar os anos finais, e como blocos diferentes estados do país.
+
+```{r, comparando-incidencia-estados-inicio-fim, echo=TRUE}
+## Organizando os dados
+sinan_hans_2001_2022_anomes_inicio_fim <- sinan_hans |> 
+  dplyr::group_by(ano_mes, UF) |> 
+  dplyr::mutate(n = n()) |> 
+  dplyr::distinct(ano_mes, .keep_all = T) |> 
+  dplyr::filter(ano %in% c("2001", "2022")) |> 
+  dplyr::mutate(inicio_fim = ifelse(ano == "2001", "Inicio", "Fim")) |>
+  dplyr::mutate(ano_mes_graf = lubridate::ymd(paste0(ano_mes, "-01"))) |> 
+  dplyr::select(UF, ano_mes, ano_mes_graf, n, inicio_fim) |> 
+  dplyr::inner_join(uf_nome_cod, by=dplyr::join_by(UF == cod_ibge)) |> 
+  dplyr::ungroup()
+
+## Apresentando gráfico do número de casos por ano/mês nos anos iniciais e anos finais
+sinan_hans_2001_2022_anomes_inicio_fim |> 
+  ggplot2::ggplot(ggplot2::aes(x = ano_mes_graf, y = n, color = nome_uf)) +
+  ggplot2::geom_point() +
+  # ggplot2::facet_wrap(~inicio_fim) +
+  ggplot2::labs(
+    title = "Distribuição de casos de Hanseníase no Brasil", 
+    subtitle = "Dados do SISVAN",
+    x = "Ano",
+    y = "Número de casos") + 
+  ggplot2::theme_minimal()
+
+## Rodando os testes de Friedman
+friedman.test(y = sinan_hans_2001_2022_anomes_inicio_fim$n,
+              groups = sinan_hans_2001_2022_anomes_inicio_fim$nome_uf,
+              blocks = sinan_hans_2001_2022_anomes_inicio_fim$ano_mes)
+
+teste_friedman <- pgirmess::friedmanmc(y = sinan_hans_2001_2022_anomes_inicio_fim$n,
+                                       blocks = sinan_hans_2001_2022_anomes_inicio_fim$nome_uf,
+                                       groups = sinan_hans_2001_2022_anomes_inicio_fim$ano_mes)
+
+## Organizando  diferenças no formato de tabela
+df_diff <- as.data.frame(teste_friedman$dif.com) |> 
+  tibble::rownames_to_column(var = "comparacao") |> 
+  tidyr::separate(
+    col = "comparacao",
+    into = c("inicio", "fim"),
+    sep = 8,
+    remove = TRUE
+  ) |> 
+  dplyr::mutate(inicio = gsub("-$", "", inicio)) |> 
+  dplyr::arrange(inicio, fim)
+
+## Organizando tabela de impressão
+df_diff |> 
+  gt::gt() |>
+  gt::fmt_number(columns = everything(), decimals = 2) |> 
+  gt::cols_label(inicio = "Ano Inicial", fim = "Ano Final",
+                 stat.signif = "Significativo", p.value = "P-valor") |>
+  gt::opt_interactive()
+
+```
+
+Por fim, nesta comparação usando novamente o teste de Friedman, vemos que os anos iniciais utilizados como "agrupamentos" dentro das UFs como blocos, podemos observar que entre o ano de 2001 quase todos os comparativos nos retornaram um valor não significativo, indicando que não houve diferença significativa entre os anos iniciais, porém, ao compararmos com os anos finais, a maioria dos comparativos nos retornaram um valor significativo, indicando que neste caso existe uma diferença significativa, já comparando os anos finais com outros anos finais o resultado é similar ao dos anos iniciais entre si, a maior parte retorna como não significativo. Em resumo, vemos que parece sim ter havido uma diminuição significativa no número de casos de hanseníase se compararmos 2001 em diferentes estados com 2022 em diferentes estados.
+
+# Conclusão
+
+A hanseníase é uma doença infecciosa que ainda persiste em muitas partes do mundo, especialmente em países em desenvolvimento como o Brasil. Neste relatório, utilizamos testes estatísticos não paramétricos para avaliar as diferenças na prevalência de hanseníase nos estados do Brasil ao longo dos anos. Fizemos inicialmente uma comparação entre dois estados de regiões distintas, um do nordeste onde sabidamente existe maior prevalência da doença e outro de uma região menos afetada do sul e podemos observar através do teste U de Mann-Whitney que haviam diferenças entre os números de casos entre os estados. Além disso, comparamos o número de casos de hanseníase em uma região específica para observarmos se essa diferença de casos também está presente, ou se os indicadores socioeconômicos influenciam a prevalência encontrada. E mesmo com indicadores socioeconômicos mais próximos, os estados do Sul apresentam diferenças significativas no número de casos de hanseníase no período observado. Por fim, observamos que houve uma diminuição significativa no número de casos de hanseníase nos anos iniciais do sistema de informação de notificações (2001) em comparação com o último ano válido (2022), indicando que as políticas públicas de prevenção e tratamento da doença podem estar sendo eficazes.
