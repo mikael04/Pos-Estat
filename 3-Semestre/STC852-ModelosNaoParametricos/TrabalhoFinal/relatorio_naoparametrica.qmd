@@ -100,7 +100,7 @@ sinan_hans_2001_2023_anomes |>
 
 ## Removendo anos anteriores e posteriores a período determinado (dados incompletos)
 sinan_hans_2001_2023_anomes_brasil <- sinan_hans_2001_2023_anomes |> 
-  dplyr::filter(ano >= "2001", ano < "2023") 
+  dplyr::filter(ano >= "2001", ano <= "2019") 
 
 sinan_hans_2001_2023_anomes_brasil |> 
   ggplot2::ggplot(ggplot2::aes(x = ano_mes_graf, y = n)) +
@@ -138,7 +138,7 @@ Os dados de hanseníase para o Brasil de 2001 a 2022 parecem seguir uma distribu
 
 Agora iremos observar os dados de algumas UFs, para isso, iremos agrupar os dados por UF e ano/mês e observar a distribuição de casos de hanseníase para Bahia e Rio Grande do Sul.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, warning=FALSE}
 ## Lendo dados de UF
 uf_nome_cod <- data.table::fread(
   paste0(wd, "dados/cod_ibge_mun_capitais.csv")) |> 
